@@ -1,0 +1,255 @@
+.details-container {
+    padding: 55px 7%;
+    background: #faf8f5;
+    min-height: 600px;
+    color: #351d27;
+}
+
+.product-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 65px;
+    max-width: 1200px;
+    margin: auto;
+    align-items: center;
+}
+
+/* Product Image */
+.image-section {
+    background: #f0eae3;
+    border-radius: 16px;
+    overflow: hidden;
+    min-height: 480px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.product-image {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    display: block;
+}
+
+.image-placeholder {
+    font-family: Georgia, serif;
+    color: #98764e;
+    letter-spacing: 5px;
+    font-size: 20px;
+}
+
+/* Product Information */
+.info-section {
+    padding: 20px 0;
+}
+
+.eyebrow {
+    color: #a17b4a;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.info-section h1 {
+    font-family: Georgia, serif;
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: 500;
+    color: #351d27;
+    margin-bottom: 12px;
+}
+
+.category {
+    color: #8b7770;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.price {
+    color: #987044;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.description {
+    color: #786963;
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 28px;
+}
+
+/* Specifications */
+.specifications {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    border-top: 1px solid #e9dfd5;
+    border-bottom: 1px solid #e9dfd5;
+    padding: 22px 0;
+    margin-bottom: 25px;
+}
+
+.spec-item {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.spec-item span {
+    color: #99877d;
+    font-size: 12px;
+}
+
+.spec-item strong {
+    color: #49302f;
+    font-size: 14px;
+}
+
+/* Fragrance Notes */
+.fragrance-notes {
+    margin-bottom: 25px;
+}
+
+.fragrance-notes h3 {
+    font-family: Georgia, serif;
+    font-size: 19px;
+    margin-bottom: 9px;
+}
+
+.fragrance-notes p {
+    color: #786963;
+    line-height: 1.7;
+    font-size: 14px;
+}
+
+/* Quantity */
+.quantity-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    color: #49302f;
+}
+
+.quantity-control {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ded2c5;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.quantity-control button {
+    background: #f0eae3;
+    border: none;
+    width: 38px;
+    height: 36px;
+    font-size: 19px;
+    color: #351d27;
+    cursor: pointer;
+}
+
+.quantity-control button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.quantity-control span {
+    min-width: 42px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Total */
+.total-price {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #e9dfd5;
+    padding-top: 20px;
+    margin-bottom: 22px;
+}
+
+.total-price span {
+    color: #786963;
+}
+
+.total-price strong {
+    color: #987044;
+    font-size: 23px;
+}
+
+/* Add to Cart */
+.add-cart-button {
+    width: 100%;
+    min-height: 50px;
+    border: none;
+    border-radius: 6px;
+    background: #351d27;
+    color: #ffffff;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.add-cart-button:hover {
+    background: #76513f;
+}
+
+.add-cart-button:disabled {
+    background: #a69a94;
+    cursor: not-allowed;
+}
+
+/* Messages */
+.message {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.error-message {
+    color: #ba3333;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .product-layout {
+        gap: 30px;
+    }
+
+    .image-section,
+    .product-image {
+        min-height: 380px;
+        height: 380px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .details-container {
+        padding: 25px 16px;
+    }
+
+    .product-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .image-section,
+    .product-image {
+        min-height: 300px;
+        height: 300px;
+    }
+
+    .info-section h1 {
+        font-size: 32px;
+    }
+
+    .specifications {
+        gap: 18px;
+    }
+}

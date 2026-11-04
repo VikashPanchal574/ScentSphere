@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Size__c</fullName>
+    <label>Size</label>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>10 ml</fullName>
+                <default>false</default>
+                <label>10 ml</label>
+            </value>
+            <value>
+                <fullName>30 ml</fullName>
+                <default>false</default>
+                <label>30 ml</label>
+            </value>
+            <value>
+                <fullName>50 ml</fullName>
+                <default>false</default>
+                <label>50 ml</label>
+            </value>
+            <value>
+                <fullName>100 ml</fullName>
+                <default>false</default>
+                <label>100 ml</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,435 @@
+:host {
+    display: block;
+    font-family: Arial, sans-serif;
+}
+
+/* Main Hero */
+
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(
+        115deg,
+        #291323 0%,
+        #3B202B 55%,
+        #53352F 100%
+    );
+    color: #FAF8F4;
+    min-height: 620px;
+    padding: 65px 5% 45px;
+}
+
+.hero-container {
+    max-width: 1450px;
+    min-height: 500px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 55px;
+}
+
+/* Left Content */
+
+.hero-content {
+    max-width: 650px;
+    z-index: 2;
+}
+
+.eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: #E5B96D;
+    font-size: 11px;
+    letter-spacing: 3px;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+.eyebrow-line {
+    width: 38px;
+    height: 1px;
+    background: #D9A24E;
+}
+
+.hero-content h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(44px, 5vw, 70px);
+    line-height: 1.12;
+    font-weight: 400;
+    color: #FAF8F4;
+    margin: 0 0 25px;
+}
+
+.hero-content h1 span {
+    display: block;
+    color: #E5B96D;
+    font-style: italic;
+}
+
+.hero-description {
+    max-width: 490px;
+    color: #D8C9C5;
+    font-size: 15px;
+    line-height: 1.9;
+    margin-bottom: 35px;
+}
+
+/* Buttons */
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 55px;
+}
+
+.primary-button,
+.secondary-button {
+    min-height: 52px;
+    padding: 0 27px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.primary-button {
+    background: #D9A24E;
+    color: #291323;
+    border: 1px solid #D9A24E;
+}
+
+.primary-button span {
+    margin-left: 15px;
+    font-size: 18px;
+}
+
+.primary-button:hover {
+    background: #F0C77E;
+    border-color: #F0C77E;
+}
+
+.secondary-button {
+    background: transparent;
+    border: 1px solid #B99B8D;
+    color: #FAF8F4;
+}
+
+.secondary-button:hover {
+    background: #FAF8F4;
+    color: #291323;
+}
+
+/* Trust Features */
+
+.trust-features {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.trust-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.trust-icon {
+    color: #E5B96D;
+    font-size: 24px;
+}
+
+.trust-item div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.trust-item strong {
+    font-size: 11px;
+    font-weight: 600;
+    color: #F7EDE5;
+}
+
+.trust-item small {
+    color: #C7B3AC;
+    font-size: 10px;
+}
+
+/* Right Image */
+
+.hero-image-container {
+    position: relative;
+    width: 100%;
+    max-width: 590px;
+    height: 480px;
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-image {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.image-decoration {
+    position: absolute;
+    border: 1px solid rgba(217, 162, 78, 0.5);
+    pointer-events: none;
+}
+
+.decoration-one {
+    width: 90%;
+    height: 92%;
+    top: -15px;
+    right: -15px;
+}
+
+.decoration-two {
+    width: 95%;
+    height: 96%;
+    bottom: -15px;
+    left: -15px;
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.image-caption {
+    position: absolute;
+    z-index: 2;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    padding: 18px;
+    background: rgba(41, 19, 35, 0.82);
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.image-caption span {
+    color: #E5B96D;
+    font-family: Georgia, serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+}
+
+.image-caption small {
+    color: #F7EDE5;
+    font-size: 11px;
+}
+
+/* Slider Indicators */
+
+.hero-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 35px;
+}
+
+.indicator {
+    width: 22px;
+    height: 3px;
+    background: #80646B;
+}
+
+.indicator.active {
+    width: 42px;
+    background: #D9A24E;
+}
+
+/* Tablet */
+
+@media screen and (max-width: 1000px) {
+    .hero-container {
+        grid-template-columns: 1fr 0.9fr;
+        gap: 30px;
+    }
+
+    .hero-image-container {
+        height: 400px;
+    }
+
+    .trust-features {
+        gap: 15px;
+    }
+}
+
+
+/* =====================================
+   SCENTSPHERE - MOBILE HERO REDESIGN
+   ===================================== */
+
+@media screen and (max-width: 700px) {
+
+    .hero-section {
+        min-height: auto;
+        padding: 42px 20px 25px;
+    }
+
+    .hero-container {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 30px;
+        min-height: auto;
+    }
+
+    /* Hero Text */
+    .hero-content {
+        width: 100%;
+        max-width: 100%;
+        text-align: left;
+    }
+
+    .eyebrow {
+        font-size: 9px;
+        letter-spacing: 2px;
+        margin-bottom: 18px;
+    }
+
+    .eyebrow-line {
+        width: 25px;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(37px, 10vw, 48px);
+        line-height: 1.12;
+        margin-bottom: 18px;
+    }
+
+    .hero-content h1 span {
+        font-size: 0.95em;
+    }
+
+    .hero-description {
+        max-width: 100%;
+        font-size: 13px;
+        line-height: 1.8;
+        margin-bottom: 24px;
+    }
+
+    /* Buttons */
+    .hero-buttons {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 11px;
+        margin-bottom: 28px;
+    }
+
+    .primary-button,
+    .secondary-button {
+        width: 100%;
+        min-height: 48px;
+        font-size: 12px;
+    }
+
+    /* Trust Features */
+    .trust-features {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px 10px;
+    }
+
+    .trust-item {
+        gap: 8px;
+    }
+
+    .trust-icon {
+        font-size: 20px;
+    }
+
+    .trust-item strong {
+        font-size: 10px;
+    }
+
+    .trust-item small {
+        font-size: 9px;
+    }
+
+    /* Perfume Image */
+    .hero-image-container {
+        width: 100%;
+        max-width: 100%;
+        height: 340px;
+        justify-self: stretch;
+        margin: 0;
+    }
+
+    .hero-image {
+        border-radius: 4px;
+    }
+
+    .decoration-one {
+        right: -7px;
+        top: -8px;
+    }
+
+    .decoration-two {
+        left: -7px;
+        bottom: -8px;
+    }
+
+    .image-caption {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        padding: 13px;
+    }
+
+    .image-caption span {
+        font-size: 11px;
+    }
+
+    .image-caption small {
+        font-size: 10px;
+    }
+
+    .hero-indicators {
+        margin-top: 25px;
+    }
+}
+
+/* Small Phones */
+@media screen and (max-width: 380px) {
+
+    .hero-section {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .hero-content h1 {
+        font-size: 36px;
+    }
+
+    .hero-image-container {
+        height: 290px;
+    }
+
+    .trust-features {
+        grid-template-columns: 1fr;
+    }
+}
+
+.eyebrow-line {
+    width: 38px;
+    height: 1px;
+    background: #D9A24E;
+    flex-shrink: 0;
+}
+
+.eyebrow-text {
+    line-height: 1.6;
+}

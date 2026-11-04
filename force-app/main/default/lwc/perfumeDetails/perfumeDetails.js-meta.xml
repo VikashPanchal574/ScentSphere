@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Perfume Details</masterLabel>
+    <description>Displays detailed information about a selected fragrance.</description>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightning__AppPage</target>
+        <target>lightning__HomePage</target>
+    </targets>
+</LightningComponentBundle>

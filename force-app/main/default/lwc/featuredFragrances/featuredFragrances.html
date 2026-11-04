@@ -1,0 +1,122 @@
+<template>
+    <section class="featured-section">
+
+        <div class="section-heading">
+            <span class="eyebrow">CURATED FOR YOU</span>
+
+            <h2>Featured <span>Fragrances</span></h2>
+
+            <p>
+                Discover exceptional fragrances that leave
+                a lasting impression.
+            </p>
+        </div>
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="loading-container">
+                <lightning-spinner
+                    alternative-text="Loading fragrances"
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Error -->
+        <template if:true={errorMessage}>
+            <div class="message-container">
+                <p>{errorMessage}</p>
+                <button class="retry-button" onclick={handleRetry}>
+                    Try Again
+                </button>
+            </div>
+        </template>
+
+        <!-- Empty State -->
+        <template if:true={showEmpty}>
+            <div class="message-container">
+                <h3>Something beautiful is coming.</h3>
+                <p>Our featured fragrances will appear here soon.</p>
+            </div>
+        </template>
+
+        <!-- Product Grid -->
+        <template if:true={hasProducts}>
+            <div class="product-grid">
+
+                <template for:each={products} for:item="product">
+                    <article class="product-card" key={product.Id}>
+
+                        <div class="product-image-wrapper">
+
+                            <template if:true={product.imageUrl}>
+                                <img
+                                    src={product.imageUrl}
+                                    alt={product.productName}
+                                    class="product-image"
+                                    data-id={product.Id}
+                                    loading="lazy"
+                                    onerror={handleImageError}/>
+                            </template>
+
+                            <template if:false={product.imageUrl}>
+                                <div class="image-placeholder">
+                                    <span>✦</span>
+                                    <small>SCENTSPHERE</small>
+                                </div>
+                            </template>
+
+                            <span class="featured-label">
+                                FEATURED
+                            </span>
+
+                        </div>
+
+                        <div class="product-info">
+
+                            <p class="product-brand">
+                                {product.brand}
+                            </p>
+
+                            <h3>{product.productName}</h3>
+
+                            <p class="product-category">
+                                {product.category}
+
+                                <template if:true={product.size}>
+                                    <span> · </span>
+                                    {product.size}
+                                </template>
+                            </p>
+
+                            <div class="product-bottom">
+
+                                <span class="product-price">
+                                    {product.formattedPrice}
+                                </span>
+
+                                <button
+                                    class="view-button"
+                                    data-id={product.Id}
+                                    onclick={handleViewDetails}>
+                                    View Details →
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </article>
+                </template>
+
+            </div>
+        </template>
+
+        <div class="section-footer">
+            <button class="view-all-button" onclick={handleViewAll}>
+                Explore All Fragrances
+                <span>→</span>
+            </button>
+        </div>
+
+    </section>
+</template>

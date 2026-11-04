@@ -1,0 +1,139 @@
+<template>
+    <section class="details-container">
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="message">
+                <lightning-spinner
+                    alternative-text="Loading perfume details"
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Error -->
+        <template if:true={errorMessage}>
+            <div class="message error-message">
+                {errorMessage}
+            </div>
+        </template>
+
+        <!-- Product Details -->
+        <template if:true={perfume}>
+            <div class="product-layout">
+
+                <!-- Product Image -->
+                <div class="image-section">
+                    <template if:true={perfume.imageUrl}>
+                        <img
+                            src={perfume.imageUrl}
+                            alt={perfume.Product_Name__c}
+                            class="product-image"/>
+                    </template>
+
+                    <template if:false={perfume.imageUrl}>
+                        <div class="image-placeholder">
+                            SCENTSPHERE
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Product Information -->
+                <div class="info-section">
+
+                    <p class="eyebrow">
+                        {perfume.Brand__c}
+                    </p>
+
+                    <h1>{perfume.Product_Name__c}</h1>
+
+                    <p class="category">
+                        {perfume.Category__c} Fragrance
+                    </p>
+
+                    <div class="price">
+                        {perfume.formattedPrice}
+                    </div>
+
+                    <p class="description">
+                        {perfume.Description__c}
+                    </p>
+
+                    <!-- Product Specifications -->
+                    <div class="specifications">
+
+                        <div class="spec-item">
+                            <span>Size</span>
+                            <strong>{perfume.Size__c}</strong>
+                        </div>
+
+                        <div class="spec-item">
+                            <span>Gender</span>
+                            <strong>{perfume.Gender__c}</strong>
+                        </div>
+
+                        <div class="spec-item">
+                            <span>Category</span>
+                            <strong>{perfume.Category__c}</strong>
+                        </div>
+
+                        <div class="spec-item">
+                            <span>Available Stock</span>
+                            <strong>{perfume.Stock_Quantity__c}</strong>
+                        </div>
+
+                    </div>
+
+                    <!-- Fragrance Notes -->
+                    <template if:true={perfume.Fragrance_Notes__c}>
+                        <div class="fragrance-notes">
+                            <h3>Fragrance Notes</h3>
+                            <p>{perfume.Fragrance_Notes__c}</p>
+                        </div>
+                    </template>
+
+                    <!-- Quantity -->
+                    <div class="quantity-section">
+                        <span>Quantity</span>
+
+                        <div class="quantity-control">
+                            <button
+                                onclick={handleDecrease}
+                                disabled={isOutOfStock}>
+                                −
+                            </button>
+
+                            <span>{quantity}</span>
+
+                            <button
+                                onclick={handleIncrease}
+                                disabled={isIncreaseDisabled}>
+                                +
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Total Price -->
+                    <div class="total-price">
+                        <span>Total Price</span>
+                        <strong>{totalPrice}</strong>
+                    </div>
+
+                    <!-- Add to Cart -->
+                    <button
+                        class="add-cart-button"
+                        disabled={isOutOfStock}>
+                        <template if:true={isOutOfStock}>
+                            Out of Stock
+                        </template>
+                        <template if:false={isOutOfStock}>
+                            Add to Cart
+                        </template>
+                    </button>
+
+                </div>
+            </div>
+        </template>
+
+    </section>
+</template>

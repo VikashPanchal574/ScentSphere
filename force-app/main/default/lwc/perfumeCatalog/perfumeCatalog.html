@@ -1,0 +1,142 @@
+<template>
+    <section class="catalog-container">
+
+        <!-- Header -->
+        <div class="catalog-header">
+            <p class="eyebrow">THE SCENTSPHERE COLLECTION</p>
+            <h1>Discover Your Signature Scent</h1>
+            <p class="subtitle">
+                Explore fragrances crafted to leave a lasting impression.
+            </p>
+        </div>
+
+        <!-- Search -->
+        <div class="search-section">
+            <lightning-input
+                type="search"
+                label="Search fragrances"
+                placeholder="Search by perfume name or brand..."
+                onchange={handleSearch}>
+            </lightning-input>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+
+            <lightning-combobox
+                label="Category"
+                value={selectedCategory}
+                options={categoryOptions}
+                onchange={handleCategoryChange}>
+            </lightning-combobox>
+
+            <lightning-combobox
+                label="Brand"
+                value={selectedBrand}
+                options={brandOptions}
+                onchange={handleBrandChange}>
+            </lightning-combobox>
+
+            <lightning-combobox
+                label="Gender"
+                value={selectedGender}
+                options={genderOptions}
+                onchange={handleGenderChange}>
+            </lightning-combobox>
+
+            <lightning-combobox
+                label="Sort By"
+                value={selectedSort}
+                options={sortOptions}
+                onchange={handleSortChange}>
+            </lightning-combobox>
+
+        </div>
+
+        <!-- Product Count -->
+        <div class="results-header">
+            <h2>Our Fragrances</h2>
+            <span>{productCount} Products</span>
+        </div>
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="message">
+                <lightning-spinner
+                    alternative-text="Loading fragrances"
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+        <!-- Error -->
+        <template if:true={errorMessage}>
+            <div class="message error-message">
+                {errorMessage}
+            </div>
+        </template>
+
+        <!-- Products -->
+        <template if:true={hasProducts}>
+            <div class="product-grid">
+
+                <template for:each={products} for:item="product">
+
+                    <article class="product-card" key={product.Id}>
+
+                        <div class="product-image">
+                            <template if:true={product.imageUrl}>
+                                <img
+                                    src={product.imageUrl}
+                                    alt={product.Product_Name__c}>
+                            </template>
+
+                            <template if:false={product.imageUrl}>
+                                <div class="image-placeholder">
+                                    <span>SCENTSPHERE</span>
+                                </div>
+                            </template>
+                        </div>
+
+                        <div class="product-info">
+
+                            <p class="product-brand">
+                                {product.Brand__c}
+                            </p>
+
+                            <h3>{product.Product_Name__c}</h3>
+
+                            <p class="product-description">
+                                {product.Description__c}
+                            </p>
+
+                            <div class="product-meta">
+                                <span>{product.Category__c}</span>
+                                <span>{product.Size__c}</span>
+                            </div>
+
+                            <div class="product-footer">
+                                <span class="product-price">
+                                    {product.formattedPrice}
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                </template>
+
+            </div>
+        </template>
+
+        <!-- Empty State -->
+        <template if:true={showEmpty}>
+            <div class="message empty-message">
+                <h3>No fragrances found</h3>
+                <p>Try changing your search or filters.</p>
+            </div>
+        </template>
+
+    </section>
+</template>

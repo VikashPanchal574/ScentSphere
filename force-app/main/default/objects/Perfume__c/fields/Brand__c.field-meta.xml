@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Brand__c</fullName>
+    <label>Brand</label>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ScentSphere Originals</fullName>
+                <default>false</default>
+                <label>ScentSphere Originals</label>
+            </value>
+            <value>
+                <fullName>Dior</fullName>
+                <default>false</default>
+                <label>Dior</label>
+            </value>
+            <value>
+                <fullName>Chanel</fullName>
+                <default>false</default>
+                <label>Chanel</label>
+            </value>
+            <value>
+                <fullName>Yves Saint Laurent</fullName>
+                <default>false</default>
+                <label>Yves Saint Laurent</label>
+            </value>
+            <value>
+                <fullName>Versace</fullName>
+                <default>false</default>
+                <label>Versace</label>
+            </value>
+            <value>
+                <fullName>Gucci</fullName>
+                <default>false</default>
+                <label>Gucci</label>
+            </value>
+            <value>
+                <fullName>Armani</fullName>
+                <default>false</default>
+                <label>Armani</label>
+            </value>
+            <value>
+                <fullName>Tom Ford</fullName>
+                <default>false</default>
+                <label>Tom Ford</label>
+            </value>
+            <value>
+                <fullName>Other</fullName>
+                <default>false</default>
+                <label>Other</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

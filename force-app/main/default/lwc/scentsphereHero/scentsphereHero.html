@@ -1,0 +1,91 @@
+<template>
+    <section class="hero-section">
+
+        <div class="hero-container">
+
+            <!-- Left Content -->
+            <div class="hero-content">
+
+                <div class="eyebrow">
+                    <span class="eyebrow-line"></span>
+                    <span class="eyebrow-text">THE WORLD OF FINE FRAGRANCES</span>
+                </div>
+
+                <h1>
+                    Discover Your
+                    <span>Signature Scent</span>
+                </h1>
+
+                <p class="hero-description">
+                    Experience the art of fine perfumery.
+                    Explore captivating fragrances crafted to
+                    express your personality and leave a lasting impression.
+                </p>
+
+                <div class="hero-buttons">
+                    <button class="primary-button" onclick={handleShopNow}>
+                        Shop Now
+                        <span>→</span>
+                    </button>
+
+                    <button class="secondary-button" onclick={handleExplore}>
+                        Explore Collections
+                    </button>
+                </div>
+
+                <!-- Trust Features -->
+                <div class="trust-features">
+
+                    <div class="trust-item">
+                        <span class="trust-icon">✦</span>
+                        <div>
+                            <strong>100% Authentic</strong>
+                            <small>Genuine Fragrances</small>
+                        </div>
+                    </div>
+
+                    <div class="trust-item">
+                        <span class="trust-icon">◇</span>
+                        <div>
+                            <strong>Secure Payments</strong>
+                            <small>Safe Checkout</small>
+                        </div>
+                    </div>
+
+                    <div class="trust-item">
+                        <span class="trust-icon">↺</span>
+                        <div>
+                            <strong>Easy Returns</strong>
+                            <small>Customer First</small>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Image -->
+            <div class="hero-image-container">
+
+                <div class="image-decoration decoration-one"></div>
+                <div class="image-decoration decoration-two"></div>
+
+                <img src={heroImage} alt="Luxury perfume bottle with elegant floral arrangement" class="hero-image" />
+
+                <div class="image-caption">
+                    <span>THE SCENT OF ELEGANCE</span>
+                    <small>Discover something extraordinary</small>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Bottom Slider Indicator -->
+        <div class="hero-indicators">
+            <span class="indicator active"></span>
+            <span class="indicator"></span>
+            <span class="indicator"></span>
+        </div>
+
+    </section>
+</template>
