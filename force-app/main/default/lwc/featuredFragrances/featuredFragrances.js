@@ -1,9 +1,11 @@
+
 import { LightningElement, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 
 import getFeaturedPerfumes
     from '@salesforce/apex/FeaturedFragrancesController.getFeaturedPerfumes';
 
-export default class FeaturedFragrances extends LightningElement {
+export default class FeaturedFragrances extends NavigationMixin(LightningElement) {
 
     products = [];
     isLoading = true;
@@ -11,11 +13,9 @@ export default class FeaturedFragrances extends LightningElement {
 
     // Format perfume data received from Apex
     formatProducts(data) {
-
         return data.map(perfume => ({
             ...perfume,
 
-            // Salesforce Files image URL or external URL fallback
             imageUrl: perfume.imageUrl || '',
 
             formattedPrice: new Intl.NumberFormat('en-IN', {
@@ -26,17 +26,15 @@ export default class FeaturedFragrances extends LightningElement {
         }));
     }
 
+    // Fetch featured perfumes
     @wire(getFeaturedPerfumes)
     wiredPerfumes({ data, error }) {
-
         if (data) {
-
             this.products = this.formatProducts(data);
             this.errorMessage = '';
             this.isLoading = false;
 
         } else if (error) {
-
             this.products = [];
             this.errorMessage =
                 'Unable to load fragrances. Please try again.';
@@ -56,23 +54,36 @@ export default class FeaturedFragrances extends LightningElement {
             this.products.length === 0;
     }
 
+    // Navigate to Product Details page
     handleViewDetails(event) {
+    event.stopPropagation();
 
-        const perfumeId = event.currentTarget.dataset.id;
+    const perfumeId = event.currentTarget.dataset.id;
 
-        this.dispatchEvent(
-            new CustomEvent('viewdetails', {
-                detail: { perfumeId },
-                bubbles: true,
-                composed: true
-            })
-        );
-
-        console.log('Selected Perfume:', perfumeId);
+    if (!perfumeId) {
+        return;
     }
 
-    handleViewAll() {
+    this[NavigationMixin.Navigate]({
+        type: 'comm__namedPage',
+        attributes: {
+            name: 'Product_Details__c'
+        },
+        state: {
+            c__recordId: perfumeId
+        }
+    });
+}
 
+handleCardKeydown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        this.handleViewDetails(event);
+    }
+}
+
+    // Navigate to Shop through parent event
+    handleViewAll() {
         this.dispatchEvent(
             new CustomEvent('viewall', {
                 bubbles: true,
@@ -81,23 +92,24 @@ export default class FeaturedFragrances extends LightningElement {
         );
     }
 
+    // Handle broken product images
     handleImageError(event) {
+        const perfumeId = event.currentTarget.dataset.id;
 
-    const perfumeId = event.currentTarget.dataset.id;
+        this.products = this.products.map(product => {
+            if (product.Id === perfumeId) {
+                return {
+                    ...product,
+                    imageUrl: ''
+                };
+            }
 
-    this.products = this.products.map(product => {
-        if (product.Id === perfumeId) {
-            return {
-                ...product,
-                imageUrl: ''
-            };
-        }
+            return product;
+        });
+    }
 
-        return product;
-    });
-}
+    // Retry loading featured perfumes
     handleRetry() {
-
         this.isLoading = true;
         this.errorMessage = '';
 

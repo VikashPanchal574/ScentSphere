@@ -1,10 +1,12 @@
 import { LightningElement, api, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
+import { NavigationMixin } from 'lightning/navigation';
+import addToCart from '@salesforce/apex/CartController.addToCart';
 
 import getPerfumeDetails
     from '@salesforce/apex/PerfumeDetailsController.getPerfumeDetails';
 
-export default class PerfumeDetails extends LightningElement {
+export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
     @api recordId;
 
@@ -12,6 +14,34 @@ export default class PerfumeDetails extends LightningElement {
     isLoading = true;
     errorMessage = '';
     quantity = 1;
+
+    isAddingToCart = false;
+    cartMessage = '';
+    cartError = '';
+
+    async handleAddToCart() {
+    if (!this.perfume || this.isOutOfStock) {
+        return;
+    }
+
+    this.isAddingToCart = true;
+    this.cartMessage = '';
+    this.cartError = '';
+
+    try {
+        await addToCart({
+            perfumeId: this.perfume.Id,
+            quantity: this.quantity
+        });
+
+        this.cartMessage = 'Perfume added to your cart successfully!';
+    } catch (error) {
+        this.cartError =
+            error.body?.message || 'Unable to add perfume to cart.';
+    } finally {
+        this.isAddingToCart = false;
+    }
+}
 
     // Read selected perfume ID from the page URL
     @wire(CurrentPageReference)
@@ -24,6 +54,15 @@ export default class PerfumeDetails extends LightningElement {
             }
         }
     }
+
+    handleBackToShop() {
+    this[NavigationMixin.Navigate]({
+        type: 'comm__namedPage',
+        attributes: {
+            name: 'Shop__c'
+        }
+    });
+}
 
     // Fetch perfume details from Apex
     @wire(getPerfumeDetails, { perfumeId: '$recordId' })

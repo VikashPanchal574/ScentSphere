@@ -1,9 +1,11 @@
+
 import { LightningElement, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 
 import getActivePerfumes
     from '@salesforce/apex/PerfumeCatalogController.getActivePerfumes';
 
-export default class PerfumeCatalog extends LightningElement {
+export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
 
     allProducts = [];
     products = [];
@@ -43,6 +45,62 @@ export default class PerfumeCatalog extends LightningElement {
 
         this.isLoading = false;
     }
+
+    // Navigate to selected perfume details
+    handleViewDetails(event) {
+        const perfumeId = event.currentTarget.dataset.id;
+
+        if (!perfumeId) {
+            return;
+        }
+
+        this[NavigationMixin.Navigate]({
+            type: 'comm__namedPage',
+            attributes: {
+                name: 'Product_Details__c'
+            },
+            state: {
+                c__recordId: perfumeId
+            }
+        });
+    }
+
+    handleCardClick(event) {
+    // Avoid duplicate navigation when View Details is clicked
+    if (event.target.closest('button')) {
+        return;
+    }
+
+    this.navigateToPerfume(event.currentTarget.dataset.id);
+}
+
+handleCardKeydown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        this.navigateToPerfume(event.currentTarget.dataset.id);
+    }
+}
+
+handleViewDetails(event) {
+    event.stopPropagation();
+    this.navigateToPerfume(event.currentTarget.dataset.id);
+}
+
+navigateToPerfume(perfumeId) {
+    if (!perfumeId) {
+        return;
+    }
+
+    this[NavigationMixin.Navigate]({
+        type: 'comm__namedPage',
+        attributes: {
+            name: 'Product_Details__c'
+        },
+        state: {
+            c__recordId: perfumeId
+        }
+    });
+}
 
     get categoryOptions() {
         return this.getPicklistOptions('Category__c');

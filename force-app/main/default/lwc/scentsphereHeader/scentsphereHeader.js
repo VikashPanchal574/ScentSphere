@@ -27,6 +27,19 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         return this.isMenuOpen ? 'true' : 'false';
     }
 
+    /* Hide Header on Authentication Pages */
+    get showHeader() {
+        const path = window.location.pathname.toLowerCase();
+
+        const authPages = [
+            '/selfregister',
+            '/login',
+            '/forgotpassword'
+        ];
+
+        return !authPages.some(page => path.endsWith(page));
+    }
+
     /* Common Navigation Method */
     navigateToPage(pageName) {
         this[NavigationMixin.Navigate]({
@@ -84,10 +97,17 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     handleCart() {
-        console.log('Shopping cart clicked');
-    }
+    this.navigateToPage('Shopping_Cart__c');
+}
 
     handleLogin() {
-        console.log('Sign In clicked');
-    }
+    this[NavigationMixin.Navigate]({
+        type: 'comm__loginPage',
+        attributes: {
+            actionName: 'login'
+        }
+    });
+
+    this.closeMenu();
+}
 }

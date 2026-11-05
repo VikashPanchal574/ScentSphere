@@ -1,12 +1,17 @@
 <template>
     <section class="details-container">
 
+        <!-- Back to Shop -->
+        <div class="back-navigation">
+            <button class="back-button" onclick={handleBackToShop}>
+                <span>←</span> Back to Shop
+            </button>
+        </div>
+
         <!-- Loading -->
         <template if:true={isLoading}>
             <div class="message">
-                <lightning-spinner
-                    alternative-text="Loading perfume details"
-                    size="medium">
+                <lightning-spinner alternative-text="Loading perfume details" size="medium">
                 </lightning-spinner>
             </div>
         </template>
@@ -25,10 +30,7 @@
                 <!-- Product Image -->
                 <div class="image-section">
                     <template if:true={perfume.imageUrl}>
-                        <img
-                            src={perfume.imageUrl}
-                            alt={perfume.Product_Name__c}
-                            class="product-image"/>
+                        <img src={perfume.imageUrl} alt={perfume.Product_Name__c} class="product-image" />
                     </template>
 
                     <template if:false={perfume.imageUrl}>
@@ -97,17 +99,13 @@
                         <span>Quantity</span>
 
                         <div class="quantity-control">
-                            <button
-                                onclick={handleDecrease}
-                                disabled={isOutOfStock}>
+                            <button onclick={handleDecrease} disabled={isOutOfStock}>
                                 −
                             </button>
 
                             <span>{quantity}</span>
 
-                            <button
-                                onclick={handleIncrease}
-                                disabled={isIncreaseDisabled}>
+                            <button onclick={handleIncrease} disabled={isIncreaseDisabled}>
                                 +
                             </button>
                         </div>
@@ -120,17 +118,21 @@
                     </div>
 
                     <!-- Add to Cart -->
-                    <button
-                        class="add-cart-button"
-                        disabled={isOutOfStock}>
-                        <template if:true={isOutOfStock}>
-                            Out of Stock
+                    <button class="add-to-cart-button" onclick={handleAddToCart} disabled={isOutOfStock}>
+                        <template if:true={isAddingToCart}>
+                            Adding...
                         </template>
-                        <template if:false={isOutOfStock}>
+                        <template if:false={isAddingToCart}>
                             Add to Cart
                         </template>
                     </button>
+                    <template if:true={cartMessage}>
+                        <p class="success-message">{cartMessage}</p>
+                    </template>
 
+                    <template if:true={cartError}>
+                        <p class="error-message">{cartError}</p>
+                    </template>
                 </div>
             </div>
         </template>

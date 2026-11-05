@@ -1,0 +1,70 @@
+<template>
+    <div class="checkout-container">
+
+        <div class="checkout-header">
+            <p class="eyebrow">SCENTSPHERE</p>
+            <h1>Complete Your Order</h1>
+            <p>One final step before your fragrance arrives.</p>
+        </div>
+
+        <div class="checkout-layout">
+
+            <!-- Shipping Address -->
+            <section class="shipping-section">
+                <h2>Shipping Address</h2>
+                <p class="section-description">
+                    Where should we deliver your fragrance?
+                </p>
+
+                <lightning-textarea
+                    label="Full Shipping Address"
+                    placeholder="House/Flat No., Street, Area, City, State, PIN Code"
+                    value={shippingAddress}
+                    onchange={handleAddressChange}
+                    required
+                    max-length="1000">
+                </lightning-textarea>
+
+                <p class="delivery-note">
+                    Please enter your complete delivery address.
+                </p>
+            </section>
+
+            <!-- Order Summary -->
+            <section class="summary-section">
+                <h2>Order Summary</h2>
+
+                <div class="summary-row">
+                    <span>Items</span>
+                    <span>{totalItems}</span>
+                </div>
+
+                <div class="summary-row total-row">
+                    <span>Total Amount</span>
+                    <span>{formattedTotal}</span>
+                </div>
+
+                <button
+                    class="place-order-button"
+                    onclick={handlePlaceOrder}
+                    disabled={isPlacingOrder}>
+                    <template if:true={isPlacingOrder}>
+                        Placing Order...
+                    </template>
+                    <template if:false={isPlacingOrder}>
+                        Place Order
+                    </template>
+                </button>
+
+                <template if:true={errorMessage}>
+                    <p class="error-message">{errorMessage}</p>
+                </template>
+
+                <p class="secure-note">
+                    Your order will be created with payment pending.
+                </p>
+            </section>
+
+        </div>
+    </div>
+</template>

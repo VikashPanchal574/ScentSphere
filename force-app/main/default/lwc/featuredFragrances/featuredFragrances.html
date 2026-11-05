@@ -15,9 +15,7 @@
         <!-- Loading -->
         <template if:true={isLoading}>
             <div class="loading-container">
-                <lightning-spinner
-                    alternative-text="Loading fragrances"
-                    size="medium">
+                <lightning-spinner alternative-text="Loading fragrances" size="medium">
                 </lightning-spinner>
             </div>
         </template>
@@ -45,18 +43,13 @@
             <div class="product-grid">
 
                 <template for:each={products} for:item="product">
-                    <article class="product-card" key={product.Id}>
-
+                    <article class="product-card" key={product.Id} data-id={product.Id} onclick={handleViewDetails}
+                        onkeydown={handleCardKeydown} tabindex="0" role="link" aria-label="View perfume details">
                         <div class="product-image-wrapper">
 
                             <template if:true={product.imageUrl}>
-                                <img
-                                    src={product.imageUrl}
-                                    alt={product.productName}
-                                    class="product-image"
-                                    data-id={product.Id}
-                                    loading="lazy"
-                                    onerror={handleImageError}/>
+                                <img src={product.imageUrl} alt={product.productName} class="product-image"
+                                    data-id={product.Id} loading="lazy" onerror={handleImageError} />
                             </template>
 
                             <template if:false={product.imageUrl}>
@@ -95,10 +88,7 @@
                                     {product.formattedPrice}
                                 </span>
 
-                                <button
-                                    class="view-button"
-                                    data-id={product.Id}
-                                    onclick={handleViewDetails}>
+                                <button class="view-button" data-id={product.Id} onclick={handleViewDetails}>
                                     View Details →
                                 </button>
 

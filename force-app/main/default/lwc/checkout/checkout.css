@@ -1,0 +1,150 @@
+.checkout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    color: #30252a;
+}
+
+.checkout-header {
+    text-align: center;
+    margin-bottom: 45px;
+}
+
+.eyebrow {
+    color: #b08a46;
+    letter-spacing: 5px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.checkout-header h1 {
+    font-family: Georgia, serif;
+    font-size: 38px;
+    color: #4a172e;
+    margin-bottom: 12px;
+}
+
+.checkout-header p:last-child {
+    color: #82777b;
+    font-size: 15px;
+}
+
+.checkout-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.shipping-section,
+.summary-section {
+    background: #ffffff;
+    padding: 32px;
+    border: 1px solid #eee6dc;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(48, 37, 42, 0.05);
+}
+
+.shipping-section h2,
+.summary-section h2 {
+    color: #4a172e;
+    font-family: Georgia, serif;
+    font-size: 23px;
+    margin-bottom: 10px;
+}
+
+.section-description {
+    color: #82777b;
+    font-size: 14px;
+    margin-bottom: 25px;
+}
+
+.delivery-note {
+    color: #82777b;
+    font-size: 12px;
+    margin-top: 12px;
+}
+
+.summary-section {
+    position: sticky;
+    top: 25px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 0;
+    border-bottom: 1px solid #eee6dc;
+    font-size: 15px;
+}
+
+.total-row {
+    color: #4a172e;
+    font-size: 19px;
+    font-weight: 700;
+    border-bottom: none;
+}
+
+.place-order-button {
+    width: 100%;
+    padding: 16px;
+    margin-top: 20px;
+    border: none;
+    border-radius: 6px;
+    background: #4a172e;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.place-order-button:hover {
+    background: #6b2845;
+}
+
+.place-order-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.secure-note {
+    text-align: center;
+    color: #82777b;
+    font-size: 12px;
+    margin-top: 18px;
+}
+
+.error-message {
+    color: #ba1a1a;
+    background: #fff0f0;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 13px;
+    margin-top: 15px;
+}
+
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 35px 16px;
+    }
+
+    .checkout-header h1 {
+        font-size: 29px;
+    }
+
+    .checkout-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-section {
+        position: static;
+    }
+
+    .shipping-section,
+    .summary-section {
+        padding: 22px;
+    }
+}

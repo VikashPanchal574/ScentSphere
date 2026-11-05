@@ -12,10 +12,7 @@
 
         <!-- Search -->
         <div class="search-section">
-            <lightning-input
-                type="search"
-                label="Search fragrances"
-                placeholder="Search by perfume name or brand..."
+            <lightning-input type="search" label="Search fragrances" placeholder="Search by perfume name or brand..."
                 onchange={handleSearch}>
             </lightning-input>
         </div>
@@ -23,32 +20,18 @@
         <!-- Filters -->
         <div class="filter-section">
 
-            <lightning-combobox
-                label="Category"
-                value={selectedCategory}
-                options={categoryOptions}
+            <lightning-combobox label="Category" value={selectedCategory} options={categoryOptions}
                 onchange={handleCategoryChange}>
             </lightning-combobox>
 
-            <lightning-combobox
-                label="Brand"
-                value={selectedBrand}
-                options={brandOptions}
-                onchange={handleBrandChange}>
+            <lightning-combobox label="Brand" value={selectedBrand} options={brandOptions} onchange={handleBrandChange}>
             </lightning-combobox>
 
-            <lightning-combobox
-                label="Gender"
-                value={selectedGender}
-                options={genderOptions}
+            <lightning-combobox label="Gender" value={selectedGender} options={genderOptions}
                 onchange={handleGenderChange}>
             </lightning-combobox>
 
-            <lightning-combobox
-                label="Sort By"
-                value={selectedSort}
-                options={sortOptions}
-                onchange={handleSortChange}>
+            <lightning-combobox label="Sort By" value={selectedSort} options={sortOptions} onchange={handleSortChange}>
             </lightning-combobox>
 
         </div>
@@ -62,9 +45,7 @@
         <!-- Loading -->
         <template if:true={isLoading}>
             <div class="message">
-                <lightning-spinner
-                    alternative-text="Loading fragrances"
-                    size="medium">
+                <lightning-spinner alternative-text="Loading fragrances" size="medium">
                 </lightning-spinner>
             </div>
         </template>
@@ -82,13 +63,12 @@
 
                 <template for:each={products} for:item="product">
 
-                    <article class="product-card" key={product.Id}>
-
+                    <!--Change Code for navigation to product details-->
+                    <article class="product-card" key={product.Id} data-id={product.Id} onclick={handleCardClick}
+                        onkeydown={handleCardKeydown} tabindex="0" role="link" aria-label="View perfume details">
                         <div class="product-image">
                             <template if:true={product.imageUrl}>
-                                <img
-                                    src={product.imageUrl}
-                                    alt={product.Product_Name__c}>
+                                <img src={product.imageUrl} alt={product.Product_Name__c}>
                             </template>
 
                             <template if:false={product.imageUrl}>
@@ -119,6 +99,10 @@
                                 <span class="product-price">
                                     {product.formattedPrice}
                                 </span>
+
+                                <button class="view-details-button" data-id={product.Id} onclick={handleViewDetails}>
+                                    View Details →
+                                </button>
                             </div>
 
                         </div>

@@ -212,3 +212,94 @@
         font-size: 21px;
     }
 }
+/* Product Footer */
+.product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+/* View Details Button */
+.view-details-button {
+    background: #ffffff;
+    color: #a66b32;
+    border: 1px solid #c58b45;
+    padding: 8px 15px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect */
+.view-details-button:hover {
+    background: #351d27;
+    color: #ffffff;
+    border-color: #351d27;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(53, 29, 39, 0.18);
+}
+
+/* Click Effect */
+.view-details-button:active {
+    transform: translateY(0);
+}
+
+/* Equal height product cards */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Product information layout */
+.product-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Reserve equal space for description */
+.product-description {
+    min-height: 42px;
+    max-height: 42px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Keep product meta at consistent position */
+.product-meta {
+    margin-top: 12px;
+}
+
+/* Push price and button to the bottom */
+.product-footer {
+    margin-top: auto;
+    padding-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.product-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(53, 29, 39, 0.12);
+}
+
+.product-card:focus-visible {
+    outline: 2px solid #c58b45;
+    outline-offset: 3px;
+}
+
+.view-details-button {
+    position: relative;
+    z-index: 1;
+}

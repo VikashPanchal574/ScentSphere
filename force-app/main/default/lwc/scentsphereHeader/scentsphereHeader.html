@@ -1,99 +1,102 @@
+
 <template>
-    <!-- Announcement Bar -->
-    <div class="announcement-bar">
-        <div class="announcement-content">
-            <span>🚚 Free Shipping on Orders Above ₹1,999</span>
-            <span class="announcement-separator">|</span>
-            <span>🎁 First Order? Use Code <strong>SCENT10</strong> for 10% Off</span>
-            <span class="announcement-separator">|</span>
-            <span>✦ Luxury Fragrances, Crafted for You</span>
-        </div>
-    </div>
-
-    <!-- Main Header -->
-    <header class="main-header">
-        <div class="header-container">
-
-            <!-- Mobile Menu Button -->
-            <button
-                class="menu-toggle"
-                onclick={toggleMenu}
-                aria-label="Toggle menu"
-                aria-expanded={menuAriaExpanded}>
-                {menuIcon}
-            </button>
-
-            <!-- Logo -->
-            <a href="#" class="brand" onclick={handleHome}>
-                <span class="brand-icon">✿</span>
-                <div class="brand-text">
-                    <span class="brand-name">SCENTSPHERE</span>
-                    <span class="brand-tagline">THE ART OF FRAGRANCE</span>
-                </div>
-            </a>
-
-            <!-- Navigation -->
-            <nav class={navClass} onclick={closeMenu}>
-                <a href="#" class="nav-link active" onclick={handleHome}>Home</a>
-                <a href="#" class="nav-link" onclick={handleShop}>Shop</a>
-                <a href="#" class="nav-link" onclick={handleCollections}>Collections</a>
-                <a href="#" class="nav-link" onclick={handleGifts}>Gifts</a>
-                <a href="#" class="nav-link" onclick={handleAbout}>About</a>
-                <a href="#" class="nav-link" onclick={handleContact}>Contact</a>
-            </nav>
-
-            <!-- Header Actions -->
-            <div class="header-actions">
-
-                <div class="search-box">
-                    <lightning-icon
-                        icon-name="utility:search"
-                        size="small"
-                        alternative-text="Search">
-                    </lightning-icon>
-
-                    <input
-                        type="search"
-                        placeholder="Search perfumes..."
-                        value={searchTerm}
-                        oninput={handleSearch}
-                        aria-label="Search perfumes"/>
-                </div>
-
-                <button class="action-button wishlist-btn"
-                    title="Wishlist"
-                    onclick={handleWishlist}>
-                    <lightning-icon
-                        icon-name="utility:heart"
-                        size="medium"
-                        alternative-text="Wishlist">
-                    </lightning-icon>
-                    <span class="count-badge">0</span>
-                </button>
-
-                <button class="action-button cart-btn"
-                    title="Shopping Cart"
-                    onclick={handleCart}>
-                    <lightning-icon
-                        icon-name="utility:cart"
-                        size="medium"
-                        alternative-text="Cart">
-                    </lightning-icon>
-                    <span class="count-badge">0</span>
-                </button>
-
-                <span class="action-divider"></span>
-
-                <button class="login-button" onclick={handleLogin}>
-                    <lightning-icon
-                        icon-name="utility:user"
-                        size="small"
-                        alternative-text="Account">
-                    </lightning-icon>
-                    <span>Sign In</span>
-                </button>
-
+    <template if:true={showHeader}>
+        <!-- Announcement Bar -->
+        <div class="announcement-bar">
+            <div class="announcement-content">
+                <span>🚚 Free Shipping on Orders Above ₹1,999</span>
+                <span class="announcement-separator">|</span>
+                <span>🎁 First Order? Use Code <strong>SCENT10</strong> for 10% Off</span>
+                <span class="announcement-separator">|</span>
+                <span>✦ Luxury Fragrances, Crafted for You</span>
             </div>
         </div>
-    </header>
+
+        <!-- Main Header -->
+        <header class="main-header">
+            <div class="header-container">
+
+                <!-- Mobile Menu Button -->
+                <button
+                    class="menu-toggle"
+                    onclick={toggleMenu}
+                    aria-label="Toggle menu"
+                    aria-expanded={menuAriaExpanded}>
+                    {menuIcon}
+                </button>
+
+                <!-- Logo -->
+                <a href="#" class="brand" onclick={handleHome}>
+                    <span class="brand-icon">✿</span>
+                    <div class="brand-text">
+                        <span class="brand-name">SCENTSPHERE</span>
+                        <span class="brand-tagline">THE ART OF FRAGRANCE</span>
+                    </div>
+                </a>
+
+                <!-- Navigation -->
+                <nav class={navClass} onclick={closeMenu}>
+                    <a href="#" class="nav-link active" onclick={handleHome}>Home</a>
+                    <a href="#" class="nav-link" onclick={handleShop}>Shop</a>
+                    <a href="#" class="nav-link" onclick={handleCollections}>Collections</a>
+                    <a href="#" class="nav-link" onclick={handleGifts}>Gifts</a>
+                    <a href="#" class="nav-link" onclick={handleAbout}>About</a>
+                    <a href="#" class="nav-link" onclick={handleContact}>Contact</a>
+                </nav>
+
+                <!-- Header Actions -->
+                <div class="header-actions">
+
+                    <div class="search-box">
+                        <lightning-icon
+                            icon-name="utility:search"
+                            size="small"
+                            alternative-text="Search">
+                        </lightning-icon>
+
+                        <input
+                            type="search"
+                            placeholder="Search perfumes..."
+                            value={searchTerm}
+                            oninput={handleSearch}
+                            aria-label="Search perfumes"/>
+                    </div>
+
+                    <button class="action-button wishlist-btn"
+                        title="Wishlist"
+                        onclick={handleWishlist}>
+                        <lightning-icon
+                            icon-name="utility:heart"
+                            size="medium"
+                            alternative-text="Wishlist">
+                        </lightning-icon>
+                        <span class="count-badge">0</span>
+                    </button>
+
+                    <button class="action-button cart-btn"
+                        title="Shopping Cart"
+                        onclick={handleCart}>
+                        <lightning-icon
+                            icon-name="utility:cart"
+                            size="medium"
+                            alternative-text="Cart">
+                        </lightning-icon>
+                        <span class="count-badge">0</span>
+                    </button>
+
+                    <span class="action-divider"></span>
+
+                    <button class="login-button" onclick={handleLogin}>
+                        <lightning-icon
+                            icon-name="utility:user"
+                            size="small"
+                            alternative-text="Account">
+                        </lightning-icon>
+                        <span>Sign In</span>
+                    </button>
+
+                </div>
+            </div>
+        </header>
+    </template>
 </template>
