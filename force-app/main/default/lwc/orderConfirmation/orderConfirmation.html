@@ -1,0 +1,115 @@
+<template>
+    <div class="confirmation-container">
+
+        <template if:true={isLoading}>
+            <div class="loading-section">
+                <lightning-spinner
+                    alternative-text="Loading order details"
+                    size="medium">
+                </lightning-spinner>
+                <p>Loading your order details...</p>
+            </div>
+        </template>
+
+        <template if:true={errorMessage}>
+            <div class="error-section">
+                <lightning-icon
+                    icon-name="utility:error"
+                    size="large"
+                    variant="error">
+                </lightning-icon>
+                <h2>Unable to Load Order</h2>
+                <p>{errorMessage}</p>
+            </div>
+        </template>
+
+        <template if:true={order}>
+            <div class="success-icon">
+                <lightning-icon
+                    icon-name="utility:success"
+                    size="large"
+                    variant="success">
+                </lightning-icon>
+            </div>
+
+            <div class="confirmation-header">
+                <p class="eyebrow">SCENTSPHERE</p>
+                <h1>Thank You for Your Order!</h1>
+                <p>Your fragrance journey is about to begin.</p>
+            </div>
+
+            <div class="order-card">
+
+                <div class="order-top">
+                    <div>
+                        <p class="label">ORDER NUMBER</p>
+                        <h2>{order.Name}</h2>
+                    </div>
+
+                    <div class="status-badge">
+                        {order.Order_Status__c}
+                    </div>
+                </div>
+
+                <div class="order-info">
+                    <div>
+                        <p class="label">ORDER DATE</p>
+                        <p>{order.Order_Date__c}</p>
+                    </div>
+
+                    <div>
+                        <p class="label">PAYMENT STATUS</p>
+                        <p>{order.Payment_Status__c}</p>
+                    </div>
+
+                    <div>
+                        <p class="label">TOTAL AMOUNT</p>
+                        <p class="amount">{order.formattedTotal}</p>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <h2 class="section-title">Order Items</h2>
+
+                <template for:each={orderItems} for:item="item">
+                    <div class="product-row" key={item.Id}>
+                        <div class="product-details">
+                            <h3>{item.productName}</h3>
+                            <p>Quantity: {item.Quantity__c}</p>
+                        </div>
+
+                        <div class="product-price">
+                            <p>{item.formattedPrice}</p>
+                            <span>{item.formattedSubtotal}</span>
+                        </div>
+                    </div>
+                </template>
+
+                <div class="divider"></div>
+
+                <div class="total-row">
+                    <span>Order Total</span>
+                    <strong>{order.formattedTotal}</strong>
+                </div>
+
+                <div class="shipping-section">
+                    <h2 class="section-title">Shipping Address</h2>
+                    <p>{order.Shipping_Address__c}</p>
+                </div>
+
+            </div>
+
+            <div class="bottom-message">
+                <p>We appreciate your trust in ScentSphere.</p>
+
+                <button
+                    class="continue-button"
+                    onclick={handleContinueShopping}>
+                    Continue Shopping
+                </button>
+            </div>
+        </template>
+
+    </div>
+</template>

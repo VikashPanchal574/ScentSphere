@@ -42,10 +42,27 @@ public with sharing class CheckoutController {
             ];
 
             if (carts.isEmpty()) {
-                throw new AuraHandledException(
-                    'No active shopping cart found.'
-                );
-            }
+
+    // Reuse the customer's latest unpaid pending order
+    List<Customer_Order__c> pendingOrders = [
+        SELECT Id
+        FROM Customer_Order__c
+        WHERE Customer__c = :contactId
+        AND Payment_Status__c = 'Pending'
+        AND Order_Status__c = 'Pending'
+        WITH USER_MODE
+        ORDER BY CreatedDate DESC
+        LIMIT 1
+    ];
+
+    if (!pendingOrders.isEmpty()) {
+        return pendingOrders[0].Id;
+    }
+
+    throw new AuraHandledException(
+        'No active shopping cart or pending order found.'
+    );
+}
 
             Shopping_Cart__c cart = carts[0];
 
