@@ -1,11 +1,168 @@
 <template>
-    <div class="payment-return-container">
-        <lightning-spinner
-            alternative-text="Verifying payment..."
-            size="medium">
-        </lightning-spinner>
+    <div class="payment-container">
 
-        <h2>Verifying Your Payment</h2>
-        <p>Please wait while we confirm your payment with Razorpay.</p>
+        <!-- Verifying (redirect from Razorpay) -->
+        <template if:true={isVerifying}>
+            <div class="state-box">
+                <lightning-spinner
+                    alternative-text="Verifying Payment"
+                    size="large">
+                </lightning-spinner>
+                <h2>Verifying Your Payment</h2>
+                <p>{statusMessage}</p>
+            </div>
+        </template>
+
+        <!-- Waiting for the customer to finish paying in the Razorpay tab -->
+        <template if:true={isWaiting}>
+            <div class="state-box">
+                <lightning-spinner
+                    alternative-text="Waiting for payment confirmation"
+                    size="large">
+                </lightning-spinner>
+                <h2>Waiting for Your Payment</h2>
+                <p>Complete your payment in the Razorpay window. This page updates automatically as soon as your payment is confirmed.</p>
+            </div>
+        </template>
+
+        <!-- Waited too long -->
+        <template if:true={isTimedOut}>
+            <div class="state-box">
+                <lightning-icon
+                    icon-name="utility:clock"
+                    alternative-text="Waiting"
+                    size="large">
+                </lightning-icon>
+                <h2>We Have Not Received Your Payment Yet</h2>
+                <p>If you have already paid, your order will be confirmed automatically. Please check back shortly or contact support.</p>
+            </div>
+        </template>
+
+        <!-- Verification failed -->
+        <template if:true={errorMessage}>
+            <div class="state-box">
+                <lightning-icon
+                    icon-name="utility:error"
+                    alternative-text="Error"
+                    variant="error"
+                    size="large">
+                </lightning-icon>
+                <h2>Payment Verification Failed</h2>
+                <p>{errorMessage}</p>
+            </div>
+        </template>
+
+        <!-- Payment successful -->
+        <template if:true={isSuccess}>
+
+            <div class="success-header">
+                <lightning-icon
+                    icon-name="utility:success"
+                    alternative-text="Success"
+                    variant="success"
+                    size="large">
+                </lightning-icon>
+                <p class="eyebrow">SCENTSPHERE</p>
+                <h1>Payment Successful!</h1>
+                <p class="success-text">{statusMessage}</p>
+            </div>
+
+            <!-- Loading order -->
+            <template if:true={isLoadingOrder}>
+                <div class="order-loading">
+                    <lightning-spinner
+                        alternative-text="Loading order details"
+                        size="small">
+                    </lightning-spinner>
+                    <p>Loading your order details...</p>
+                </div>
+            </template>
+
+            <!-- Order could not be loaded (payment is still successful) -->
+            <template if:true={orderErrorMessage}>
+                <div class="order-note">
+                    <p>{orderErrorMessage}</p>
+                </div>
+            </template>
+
+            <!-- Order details -->
+            <template if:true={order}>
+                <div class="order-card">
+
+                    <div class="order-top">
+                        <div>
+                            <p class="label">ORDER NUMBER</p>
+                            <h2 class="order-number">{order.Name}</h2>
+                        </div>
+                        <div class="status-badge">{order.Order_Status__c}</div>
+                    </div>
+
+                    <div class="order-info">
+                        <div>
+                            <p class="label">ORDER DATE</p>
+                            <p>{order.formattedDate}</p>
+                        </div>
+                        <div>
+                            <p class="label">PAYMENT STATUS</p>
+                            <p>{order.Payment_Status__c}</p>
+                        </div>
+                        <template if:true={order.razorpayPaymentId}>
+                            <div>
+                                <p class="label">PAYMENT ID</p>
+                                <p class="payment-id">{order.razorpayPaymentId}</p>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h2 class="section-title">Order Items</h2>
+
+                    <template for:each={orderItems} for:item="item">
+                        <div class="product-row" key={item.Id}>
+
+                            <div class="product-image">
+                                <template if:true={item.imageUrl}>
+                                    <img src={item.imageUrl} alt={item.productName}>
+                                </template>
+                                <template if:false={item.imageUrl}>
+                                    <div class="image-placeholder">SCENTSPHERE</div>
+                                </template>
+                            </div>
+
+                            <div class="product-details">
+                                <h3>{item.productName}</h3>
+                                <p>Quantity: {item.Quantity__c}</p>
+                                <p>Price: {item.formattedPrice}</p>
+                            </div>
+
+                            <div class="product-subtotal">
+                                {item.formattedSubtotal}
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="divider"></div>
+
+                    <div class="total-row">
+                        <span>Order Total</span>
+                        <strong>{order.formattedTotal}</strong>
+                    </div>
+
+                    <div class="shipping-section">
+                        <h2 class="section-title">Shipping Address</h2>
+                        <p class="address">{order.Shipping_Address__c}</p>
+                    </div>
+                </div>
+            </template>
+
+            <div class="bottom-message">
+                <p>We appreciate your trust in ScentSphere.</p>
+                <button class="continue-button" onclick={handleContinueShopping}>
+                    Continue Shopping
+                </button>
+            </div>
+
+        </template>
     </div>
 </template>

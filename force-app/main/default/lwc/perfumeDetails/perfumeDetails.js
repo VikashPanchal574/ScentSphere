@@ -1,6 +1,10 @@
 import { LightningElement, api, wire } from 'lwc';
-import { CurrentPageReference } from 'lightning/navigation';
-import { NavigationMixin } from 'lightning/navigation';
+
+import {
+    CurrentPageReference,
+    NavigationMixin
+} from 'lightning/navigation';
+
 import addToCart from '@salesforce/apex/CartController.addToCart';
 
 import getPerfumeDetails
@@ -19,59 +23,94 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     cartMessage = '';
     cartError = '';
 
-    async handleAddToCart() {
-    if (!this.perfume || this.isOutOfStock) {
-        return;
-    }
+    // Navigation context
+    navigationSource = 'shop';
+    returnPageName;
+    returnCategory = 'All';
 
-    this.isAddingToCart = true;
-    this.cartMessage = '';
-    this.cartError = '';
-
-    try {
-        await addToCart({
-            perfumeId: this.perfume.Id,
-            quantity: this.quantity
-        });
-
-        this.cartMessage = 'Perfume added to your cart successfully!';
-    } catch (error) {
-        this.cartError =
-            error.body?.message || 'Unable to add perfume to cart.';
-    } finally {
-        this.isAddingToCart = false;
-    }
-}
-
-    // Read selected perfume ID from the page URL
+    // Read navigation information from URL
     @wire(CurrentPageReference)
     getPageReference(pageReference) {
+
         if (pageReference) {
-            const idFromUrl = pageReference.state?.c__recordId;
+
+            const state = pageReference.state || {};
+
+            const idFromUrl = state.c__recordId;
 
             if (idFromUrl) {
                 this.recordId = idFromUrl;
             }
+
+            this.navigationSource = state.c__source || 'shop';
+
+            this.returnPageName = state.c__returnPage;
+
+            this.returnCategory = state.c__category || 'All';
         }
     }
 
-    handleBackToShop() {
-    this[NavigationMixin.Navigate]({
-        type: 'comm__namedPage',
-        attributes: {
-            name: 'Shop__c'
-        }
-    });
-}
+    // Dynamic Back Button Label
+    get backButtonLabel() {
 
-    // Fetch perfume details from Apex
+        if (this.navigationSource === 'collections') {
+            return 'Back to Collections';
+        }
+
+        if (this.navigationSource === 'wishlist') {
+            return 'Back to Wishlist';
+        }
+
+        return 'Back to Shop';
+    }
+
+    // Navigate to the original page
+    handleBackNavigation() {
+
+        let destinationName = this.returnPageName;
+
+        // Fallback destinations
+        if (!destinationName) {
+
+            if (this.navigationSource === 'collections') {
+                destinationName = 'Collections__c';
+
+            } else if (this.navigationSource === 'wishlist') {
+                destinationName = 'Wishlist__c';
+
+            } else {
+                destinationName = 'Shop__c';
+            }
+        }
+
+        const pageReference = {
+            type: 'comm__namedPage',
+            attributes: {
+                name: destinationName
+            }
+        };
+
+        // Restore previously selected collection category
+        if (this.navigationSource === 'collections') {
+
+            pageReference.state = {
+                c__category: this.returnCategory
+            };
+        }
+
+        this[NavigationMixin.Navigate](pageReference);
+    }
+
+    // Fetch perfume details
     @wire(getPerfumeDetails, { perfumeId: '$recordId' })
     wiredPerfume({ data, error }) {
 
         if (data) {
+
             this.perfume = {
                 ...data,
                 imageUrl: data.Product_Image_URL__c || '',
+
                 formattedPrice: new Intl.NumberFormat('en-IN', {
                     style: 'currency',
                     currency: 'INR',
@@ -83,17 +122,51 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             this.isLoading = false;
 
         } else if (error) {
+
             this.perfume = undefined;
-            this.errorMessage =
-                'Unable to load perfume details.';
+            this.errorMessage = 'Unable to load perfume details.';
             this.isLoading = false;
 
             console.error('Perfume Details Error:', error);
         }
     }
 
+    // Add to cart
+    async handleAddToCart() {
+
+        if (!this.perfume || this.isOutOfStock) {
+            return;
+        }
+
+        this.isAddingToCart = true;
+        this.cartMessage = '';
+        this.cartError = '';
+
+        try {
+
+            await addToCart({
+                perfumeId: this.perfume.Id,
+                quantity: this.quantity
+            });
+
+            this.cartMessage =
+                'Perfume added to your cart successfully!';
+
+        } catch (error) {
+
+            this.cartError =
+                error?.body?.message ||
+                'Unable to add perfume to cart.';
+
+        } finally {
+
+            this.isAddingToCart = false;
+        }
+    }
+
     // Quantity controls
     handleIncrease() {
+
         if (
             this.perfume &&
             this.quantity < this.perfume.Stock_Quantity__c
@@ -103,22 +176,26 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     }
 
     handleDecrease() {
+
         if (this.quantity > 1) {
             this.quantity--;
         }
     }
 
     get isOutOfStock() {
+
         return !this.perfume ||
             this.perfume.Stock_Quantity__c <= 0;
     }
 
     get isIncreaseDisabled() {
+
         return this.isOutOfStock ||
             this.quantity >= this.perfume.Stock_Quantity__c;
     }
 
     get totalPrice() {
+
         if (!this.perfume) {
             return '';
         }

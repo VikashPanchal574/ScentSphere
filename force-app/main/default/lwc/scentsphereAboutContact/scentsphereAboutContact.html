@@ -1,0 +1,286 @@
+
+<template>
+    <div class="about-contact-page">
+
+        <!-- ABOUT HERO: HEADER ABOUT TARGET -->
+        <section
+            class="about-hero"
+            data-target="about-top">
+
+            <div class="about-hero-content">
+
+                <p class="eyebrow">THE STORY OF SCENTSPHERE</p>
+
+                <h1>
+                    More than a fragrance.
+                    <span>A feeling.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Every fragrance has a story. At ScentSphere,
+                    we believe the right scent is a beautiful expression
+                    of your personality, mood and individuality.
+                </p>
+
+                <div class="hero-actions">
+
+                    <button
+                        class="primary-button"
+                        onclick={handleContactClick}
+                        type="button">
+                        Get in Touch →
+                    </button>
+
+                    <button
+                        class="secondary-button"
+                        onclick={handleAboutClick}
+                        type="button">
+                        Discover Our Story
+                    </button>
+
+                </div>
+            </div>
+
+            <div class="hero-visual">
+
+                <div class="visual-circle"></div>
+
+                <div class="hero-bottle">
+
+                    <div class="bottle-cap"></div>
+                    <div class="bottle-neck"></div>
+
+                    <div class="bottle-body">
+                        <span class="bottle-brand">SCENT</span>
+                        <span class="bottle-name">SPHERE</span>
+                        <span class="bottle-divider"></span>
+                        <span class="bottle-label">EAU DE PARFUM</span>
+                    </div>
+
+                </div>
+
+                <div class="visual-caption">
+                    THE ART OF FRAGRANCE
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- OUR STORY -->
+        <section
+            class="story-section"
+            data-target="about-section">
+
+            <div class="story-content">
+
+                <p class="eyebrow">WHO WE ARE</p>
+
+                <h2>
+                    A world where
+                    <span>fragrance meets identity.</span>
+                </h2>
+
+                <p>
+                    ScentSphere is a fragrance destination for people
+                    who love expressing themselves through scent.
+                    We bring together different fragrance personalities
+                    so you can discover something that feels uniquely yours.
+                </p>
+
+                <p>
+                    From fresh everyday fragrances to rich and memorable
+                    evening scents, our collection celebrates the beauty
+                    of finding your signature fragrance.
+                </p>
+
+            </div>
+
+            <div class="story-highlight">
+
+                <span class="highlight-symbol">✦</span>
+
+                <h3>Your scent is your signature.</h3>
+
+                <p>
+                    Discover it. Experience it. Make it yours.
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- OUR VALUES -->
+        <section class="values-section">
+
+            <div class="section-heading">
+
+                <p class="eyebrow">WHAT DEFINES US</p>
+
+                <h2>
+                    The ScentSphere
+                    <span>Experience</span>
+                </h2>
+
+                <p>
+                    A fragrance experience built around
+                    individuality and elegance.
+                </p>
+
+            </div>
+
+            <div class="values-grid">
+
+                <article class="value-card">
+                    <span class="value-icon">✦</span>
+                    <h3>Individuality</h3>
+                    <p>
+                        Fragrances that let your personality
+                        speak without saying a word.
+                    </p>
+                </article>
+
+                <article class="value-card">
+                    <span class="value-icon">◇</span>
+                    <h3>Elegance</h3>
+                    <p>
+                        Discover scents that bring elegance
+                        to everyday moments.
+                    </p>
+                </article>
+
+                <article class="value-card">
+                    <span class="value-icon">❋</span>
+                    <h3>Discovery</h3>
+                    <p>
+                        Explore different fragrance families
+                        and find your personal favourite.
+                    </p>
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section
+            class="contact-section"
+            data-target="contact-section">
+
+            <div class="contact-heading">
+
+                <p class="eyebrow">WE WOULD LOVE TO HEAR FROM YOU</p>
+
+                <h2>
+                    Let's start a
+                    <span>conversation.</span>
+                </h2>
+
+                <p>
+                    Have a question about a fragrance or an order?
+                    Send us a message and our team will be happy to help.
+                </p>
+
+            </div>
+
+            <div class="contact-layout">
+
+                <!-- Contact Information -->
+                <div class="contact-information">
+
+                    <h3>Get in Touch</h3>
+
+                    <p>
+                        Whether you need help choosing a fragrance
+                        or have a question about your shopping experience,
+                        we're here to help.
+                    </p>
+
+                    <div class="contact-feature">
+                        <span>✦</span>
+                        <div>
+                            <strong>Fragrance Assistance</strong>
+                            <p>Need help discovering your signature scent?</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-feature">
+                        <span>✦</span>
+                        <div>
+                            <strong>Order Support</strong>
+                            <p>Questions about your order or purchase?</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-feature">
+                        <span>✦</span>
+                        <div>
+                            <strong>Customer Experience</strong>
+                            <p>Share your feedback with ScentSphere.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form-container">
+
+                    <h3>Send Us a Message</h3>
+
+                    <lightning-record-edit-form
+                        object-api-name="Case"
+                        onsubmit={handleSubmit}
+                        onsuccess={handleSuccess}
+                        onerror={handleError}>
+
+                        <lightning-messages></lightning-messages>
+
+                        <lightning-input-field
+                            field-name="SuppliedName"
+                            required>
+                        </lightning-input-field>
+
+                        <lightning-input-field
+                            field-name="SuppliedEmail"
+                            required>
+                        </lightning-input-field>
+
+                        <lightning-input-field
+                            field-name="Subject"
+                            required>
+                        </lightning-input-field>
+
+                        <lightning-input-field
+                            field-name="Description"
+                            required>
+                        </lightning-input-field>
+
+                        <button
+                            class="submit-button"
+                            type="submit"
+                            disabled={isSubmitting}>
+
+                            <template if:true={isSubmitting}>
+                                Sending...
+                            </template>
+
+                            <template if:false={isSubmitting}>
+                                Send Message →
+                            </template>
+
+                        </button>
+
+                    </lightning-record-edit-form>
+
+                    <template if:true={formMessage}>
+                        <p class="form-message">{formMessage}</p>
+                    </template>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+</template>

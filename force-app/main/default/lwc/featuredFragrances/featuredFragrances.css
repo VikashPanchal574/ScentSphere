@@ -341,3 +341,13 @@
 .product-card {
     cursor: pointer;
 }
+.product-image-wrapper {
+    position: relative;
+}
+
+.wishlist-action {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+}

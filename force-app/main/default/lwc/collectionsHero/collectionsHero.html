@@ -1,0 +1,217 @@
+<template>
+    <div class="collections-page">
+
+        <!-- HERO SECTION -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <p class="eyebrow">SCENTSPHERE EXCLUSIVE COLLECTION</p>
+
+                <h1>
+                    Find the fragrance
+                    that feels like
+                    <span>you.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Explore an extraordinary collection of fragrances
+                    crafted for every personality, every mood and every occasion.
+                </p>
+
+                <button class="explore-button" onclick={handleExplore}>
+                    Explore Collections
+                    <span class="arrow">↘</span>
+                </button>
+
+                <div class="hero-features">
+                    <span>✦ Premium Fragrances</span>
+                    <span>✦ Timeless Elegance</span>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="visual-circle"></div>
+
+                <div class="perfume-bottle">
+                    <div class="bottle-cap"></div>
+                    <div class="bottle-neck"></div>
+
+                    <div class="bottle-body">
+                        <div class="bottle-brand">SCENT</div>
+                        <div class="bottle-name">SPHERE</div>
+                        <div class="bottle-line"></div>
+                        <div class="bottle-label">EAU DE PARFUM</div>
+                    </div>
+                </div>
+
+                <div class="floating-note note-top">
+                    <span>01</span>
+                    <p>Elegance<br/>in every drop</p>
+                </div>
+
+                <div class="floating-note note-bottom">
+                    <span>✦</span>
+                    <p>Your scent.<br/>Your identity.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- COLLECTION CATEGORIES -->
+        <section class="collection-section" data-target="collection-grid">
+
+            <div class="section-heading">
+                <p class="eyebrow">EXPLORE SCENTSPHERE</p>
+
+                <h2>
+                    Discover Your
+                    <span>World of Fragrance</span>
+                </h2>
+
+                <p>
+                    Every fragrance tells a story. Find the one that tells yours.
+                </p>
+            </div>
+
+            <div class="collection-grid">
+                <template for:each={collectionTypes} for:item="item">
+
+                    <button
+                        class="collection-card"
+                        key={item.id}
+                        data-category={item.value}
+                        onclick={handleCategoryClick}
+                        type="button"
+                    >
+                        <span class="card-number">{item.number}</span>
+
+                        <h3>{item.title}</h3>
+
+                        <p>{item.description}</p>
+
+                        <span class="card-decoration">✦</span>
+                    </button>
+
+                </template>
+            </div>
+        </section>
+
+        <!-- PERFUME RESULTS -->
+        <section class="products-section" data-target="perfume-results">
+
+            <div class="products-heading">
+                <div>
+                    <p class="eyebrow">CURATED FOR YOU</p>
+                    <h2>{selectedCategoryLabel}</h2>
+                    <p>Discover fragrances selected from our collection.</p>
+                </div>
+
+                <button
+                    class="view-all-button"
+                    onclick={handleShowAll}
+                    type="button"
+                >
+                    View All Fragrances
+                </button>
+            </div>
+
+            <!-- LOADING -->
+            <template if:true={isLoading}>
+                <div class="loading-container">
+                    <lightning-spinner
+                        alternative-text="Loading perfumes"
+                        size="medium"
+                    ></lightning-spinner>
+                </div>
+            </template>
+
+            <!-- ERROR -->
+            <template if:true={showError}>
+                <div class="message-container error-message">
+                    {errorMessage}
+                </div>
+            </template>
+
+            <!-- EMPTY RESULT -->
+            <template if:true={showEmptyMessage}>
+                <div class="message-container">
+                    <h3>No Fragrances Found</h3>
+                    <p>There are currently no active perfumes in this category.</p>
+                </div>
+            </template>
+
+            <!-- PERFUME CARDS -->
+            <template if:true={hasPerfumes}>
+                <div class="perfume-grid">
+
+                    <template for:each={perfumes} for:item="perfume">
+
+                        <article class="perfume-card" key={perfume.Id}>
+
+                            <div class="product-image">
+
+                                <template if:true={perfume.Product_Image_URL__c}>
+                                    <img
+                                        src={perfume.Product_Image_URL__c}
+                                        alt={perfume.Product_Name__c}
+                                    />
+                                </template>
+
+                                <template if:false={perfume.Product_Image_URL__c}>
+                                    <div class="image-placeholder">
+                                        SCENTSPHERE
+                                    </div>
+                                </template>
+
+                            </div>
+
+                            <div class="product-info">
+
+                                <p class="product-brand">
+                                    {perfume.Brand__c}
+                                </p>
+
+                                <h3>{perfume.Product_Name__c}</h3>
+
+                                <p class="product-description">
+                                    {perfume.Description__c}
+                                </p>
+
+                                <div class="product-meta">
+                                    <template if:true={perfume.Size__c}>
+                                        <span>{perfume.Size__c}</span>
+                                    </template>
+
+                                    <span>{perfume.Category__c}</span>
+                                </div>
+
+                                <div class="product-bottom">
+
+    <div class="product-price">
+        <lightning-formatted-number
+            value={perfume.Price__c}
+            format-style="currency"
+            currency-code="INR"
+            maximum-fraction-digits="2"
+        ></lightning-formatted-number>
+    </div>
+
+    <button
+        class="view-button"
+        data-id={perfume.Id}
+        onclick={handleViewDetails}
+        type="button">
+        View Details →
+    </button>
+
+</div>
+                            </div>
+                        </article>
+
+                    </template>
+
+                </div>
+            </template>
+
+        </section>
+
+    </div>
+</template>

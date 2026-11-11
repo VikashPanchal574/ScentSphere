@@ -1,0 +1,188 @@
+
+<template>
+    <section class="wishlist-container">
+
+        <!-- Page Header -->
+        <div class="wishlist-header">
+            <p class="eyebrow">YOUR PERSONAL COLLECTION</p>
+
+            <h1>My <span>Wishlist</span></h1>
+
+            <p class="wishlist-subtitle">
+                Your favourite fragrances, saved in one place.
+            </p>
+
+            <template if:false={isGuestUser}>
+                <div class="wishlist-total">
+                    {wishlistCount} Saved Fragrances
+                </div>
+            </template>
+        </div>
+
+
+        <!-- Guest Message -->
+        <template if:true={isGuestUser}>
+            <div class="wishlist-message">
+                <h2>Login Required</h2>
+                <p>Please sign in to view your saved fragrances.</p>
+            </div>
+        </template>
+
+
+        <!-- Loading -->
+        <template if:true={isLoading}>
+            <div class="wishlist-loading">
+                <lightning-spinner
+                    alternative-text="Loading wishlist"
+                    size="medium">
+                </lightning-spinner>
+            </div>
+        </template>
+
+
+        <!-- Error -->
+        <template if:true={errorMessage}>
+            <div class="wishlist-message error-message">
+                <h3>Something went wrong</h3>
+                <p>{errorMessage}</p>
+
+                <button
+                    class="retry-button"
+                    onclick={handleRetry}>
+                    Try Again
+                </button>
+            </div>
+        </template>
+
+
+        <!-- Wishlist Products -->
+        <template if:true={hasItems}>
+            <div class="wishlist-grid">
+
+                <template for:each={wishlistItems} for:item="item">
+
+                    <article
+                        class="wishlist-card"
+                        key={item.Id}>
+
+                        <!-- Product Image -->
+                        <div class="wishlist-image">
+
+                            <template if:true={item.Perfume__r.Product_Image_URL__c}>
+                                <img
+                                    src={item.Perfume__r.Product_Image_URL__c}
+                                    alt={item.Perfume__r.Product_Name__c}>
+                            </template>
+
+                            <template if:false={item.Perfume__r.Product_Image_URL__c}>
+                                <div class="image-placeholder">
+                                    <span>SCENTSPHERE</span>
+                                </div>
+                            </template>
+
+                        </div>
+
+
+                        <!-- Product Information -->
+                        <div class="wishlist-info">
+
+                            <p class="product-brand">
+                                {item.Perfume__r.Brand__c}
+                            </p>
+
+                            <h3>
+                                {item.Perfume__r.Product_Name__c}
+                            </h3>
+
+                            <p class="product-category">
+                                {item.Perfume__r.Category__c}
+                            </p>
+
+
+                            <!-- Availability -->
+                            <template if:true={item.Perfume__r.Active__c}>
+                                <span class="availability available">
+                                    Available
+                                </span>
+                            </template>
+
+                            <template if:false={item.Perfume__r.Active__c}>
+                                <span class="availability unavailable">
+                                    Currently Unavailable
+                                </span>
+                            </template>
+
+
+                            <!-- Price and View Details -->
+                            <div class="wishlist-product-footer">
+
+                                <span class="product-price">
+                                    <lightning-formatted-number
+                                        value={item.Perfume__r.Price__c}
+                                        format-style="currency"
+                                        currency-code="INR"
+                                        currency-display-as="symbol">
+                                    </lightning-formatted-number>
+                                </span>
+
+                                <button
+                                    class="view-details-button"
+                                    data-perfume-id={item.Perfume__c}
+                                    onclick={handleViewDetails}>
+                                    View Details →
+                                </button>
+
+                            </div>
+
+
+                            <!-- Remove Button -->
+                            <button
+                                class="remove-button"
+                                data-perfume-id={item.Perfume__c}
+                                onclick={handleRemove}
+                                disabled={isRemoving}>
+
+                                <lightning-icon
+                                    icon-name="utility:delete"
+                                    size="x-small"
+                                    alternative-text="Remove">
+                                </lightning-icon>
+
+                                <span>Remove from Wishlist</span>
+
+                            </button>
+
+                        </div>
+
+                    </article>
+
+                </template>
+
+            </div>
+        </template>
+
+
+        <!-- Empty Wishlist -->
+        <template if:true={showEmpty}>
+            <div class="empty-wishlist">
+
+                <div class="empty-heart">
+                    <lightning-icon
+                        icon-name="utility:heart"
+                        size="large"
+                        alternative-text="Empty Wishlist">
+                    </lightning-icon>
+                </div>
+
+                <h2>Your Wishlist is Empty</h2>
+
+                <p>
+                    You haven't saved any fragrances yet.
+                    Discover something special and add it here.
+                </p>
+
+            </div>
+        </template>
+
+    </section>
+</template>

@@ -3,11 +3,16 @@
 
         <!-- Back to Shop -->
         <div class="back-navigation">
-            <button class="back-button" onclick={handleBackToShop}>
-                <span>←</span> Back to Shop
-            </button>
-        </div>
+    <button
+        class="back-button"
+        onclick={handleBackNavigation}
+        type="button">
 
+        <span>←</span>
+        {backButtonLabel}
+
+    </button>
+</div>
         <!-- Loading -->
         <template if:true={isLoading}>
             <div class="message">

@@ -56,13 +56,14 @@ public with sharing class OrderConfirmationController {
             }
 
             // 4. Fetch order items
-            List<Order_Item__c> items = [
-                SELECT Id, Perfume__c, Perfume__r.Product_Name__c,
-                       Quantity__c, Unit_Price__c, Subtotal__c
-                FROM Order_Item__c
-                WHERE Customer_Order__c = :customerOrder.Id
-                WITH USER_MODE
-            ];
+           List<Order_Item__c> items = [
+    SELECT Id, Perfume__c, Perfume__r.Product_Name__c,
+           Perfume__r.Product_Image_URL__c,
+           Quantity__c, Unit_Price__c, Subtotal__c
+    FROM Order_Item__c
+    WHERE Customer_Order__c = :customerOrder.Id
+    WITH USER_MODE
+];
 
             // 5. Prepare response
             OrderDetailsWrapper result = new OrderDetailsWrapper();

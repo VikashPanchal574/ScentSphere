@@ -1,0 +1,260 @@
+
+:host {
+    display: block;
+    background: #faf8f5;
+    color: #30232b;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.account-page {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 55px 30px 75px;
+}
+
+.page-heading {
+    margin-bottom: 35px;
+}
+
+.eyebrow {
+    color: #b78342;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    margin-bottom: 10px;
+}
+
+.page-heading h1 {
+    font-family: Georgia, serif;
+    font-size: 36px;
+    color: #321728;
+    margin: 0 0 10px;
+}
+
+.subtitle,
+.member-since {
+    color: #82767c;
+    font-size: 14px;
+}
+
+.account-grid {
+    display: grid;
+    grid-template-columns: 350px minmax(0, 1fr);
+    gap: 25px;
+    align-items: start;
+}
+
+.profile-card,
+.orders-card {
+    background: #fffdf9;
+    border: 1px solid #eee5dc;
+    border-radius: 8px;
+    padding: 26px;
+    box-shadow: 0 5px 20px rgba(50, 23, 40, 0.04);
+}
+
+.profile-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #eee5dc;
+    margin-bottom: 24px;
+}
+
+.avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #321728;
+    color: #e5c58e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: Georgia, serif;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.profile-top h2,
+.orders-heading h2 {
+    font-family: Georgia, serif;
+    color: #321728;
+    font-size: 22px;
+    margin: 0 0 6px;
+}
+
+.member-since {
+    margin: 0;
+    font-size: 12px;
+}
+
+.section-title {
+    color: #321728;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 18px;
+}
+
+.detail-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #f1ece6;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow-wrap: anywhere;
+}
+
+.detail-item span {
+    color: #94888d;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.detail-item strong {
+    color: #382b32;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.address-item {
+    line-height: 1.5;
+}
+
+.orders-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.orders-heading h2 {
+    font-size: 26px;
+}
+
+.order-count {
+    background: #f5eee5;
+    color: #805d37;
+    padding: 8px 13px;
+    border-radius: 20px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th {
+    background: #f8f3ed;
+    color: #806b70;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    padding: 15px 12px;
+    white-space: nowrap;
+}
+
+td {
+    padding: 17px 12px;
+    border-bottom: 1px solid #eee8e1;
+    color: #554950;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.order-number,
+.amount {
+    color: #321728;
+    font-weight: 700;
+}
+
+.empty-orders {
+    text-align: center;
+    padding: 65px 15px;
+}
+
+.empty-icon {
+    margin-bottom: 15px;
+}
+
+.empty-orders h3 {
+    color: #321728;
+    font-family: Georgia, serif;
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.empty-orders p {
+    color: #91858a;
+    font-size: 13px;
+}
+
+.loading {
+    min-height: 200px;
+    position: relative;
+}
+
+.message {
+    padding: 18px;
+    border-radius: 6px;
+    background: #fff0ee;
+    color: #9c342b;
+}
+
+@media (max-width: 850px) {
+    .account-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .account-page {
+        padding: 35px 16px 50px;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-heading h1 {
+        font-size: 29px;
+    }
+
+    .profile-card,
+    .orders-card {
+        padding: 19px;
+    }
+
+    .orders-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+.logout-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 24px;
+    padding: 12px 18px;
+    background: #321728;
+    color: #fffdf9;
+    border: 1px solid #321728;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+    background: #4a263c;
+}
