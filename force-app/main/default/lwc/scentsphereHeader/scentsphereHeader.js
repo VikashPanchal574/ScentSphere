@@ -1,4 +1,3 @@
-
 import { LightningElement, wire } from 'lwc';
 
 import {
@@ -19,8 +18,14 @@ import logoResource from '@salesforce/resourceUrl/ScentSphereLogo';
 import getWishlistPerfumeIds
     from '@salesforce/apex/WishlistController.getWishlistPerfumeIds';
 
+import getCartCount
+    from '@salesforce/apex/CartController.getCartCount';
+
 import WISHLIST_UPDATE
     from '@salesforce/messageChannel/WishlistUpdate__c';
+
+import CART_UPDATE
+    from '@salesforce/messageChannel/CartUpdate__c';
 
 
 export default class ScentsphereHeader extends NavigationMixin(LightningElement) {
@@ -34,11 +39,14 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     wishlistCount = 0;
     subscription = null;
 
+    cartCount = 0;
+    cartSubscription = null;
+
     // Current Salesforce page reference
     @wire(CurrentPageReference)
     pageReference;
 
-    // Subscribe to Wishlist Updates
+    // Subscribe to Wishlist and Cart Updates
     @wire(MessageContext)
     wiredMessageContext(context) {
 
@@ -51,22 +59,69 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
                 { scope: APPLICATION_SCOPE }
             );
         }
+
+        if (context && !this.cartSubscription) {
+
+            this.cartSubscription = subscribe(
+                context,
+                CART_UPDATE,
+                () => this.loadCartCount(),
+                { scope: APPLICATION_SCOPE }
+            );
+        }
     }
 
-    // Initial wishlist count
+    // Initial counts
     connectedCallback() {
 
         if (!this.isGuest) {
             this.loadWishlistCount();
+            this.loadCartCount();
+        }
+    }
+
+    // Keep spacer height equal to the fixed header height
+    renderedCallback() {
+
+        if (this.resizeObserver) {
+            return;
+        }
+
+        const shell = this.template.querySelector('.header-fixed');
+        const spacer = this.template.querySelector('.header-spacer');
+
+        if (!shell || !spacer) {
+            return;
+        }
+
+        const syncHeight = () => {
+            spacer.style.height = shell.offsetHeight + 'px';
+        };
+
+        syncHeight();
+
+        if (window.ResizeObserver) {
+            this.resizeObserver = new ResizeObserver(syncHeight);
+            this.resizeObserver.observe(shell);
         }
     }
 
     // Unsubscribe when component is removed
     disconnectedCallback() {
 
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
+        }
+
         if (this.subscription) {
             unsubscribe(this.subscription);
             this.subscription = null;
+        }
+
+        if (this.cartSubscription) {
+            unsubscribe(this.cartSubscription);
+            this.cartSubscription = null;
         }
     }
 
@@ -90,6 +145,22 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
+    // Fetch latest cart count
+    async loadCartCount() {
+
+        if (this.isGuest) {
+            this.cartCount = 0;
+            return;
+        }
+
+        try {
+            this.cartCount = await getCartCount();
+        } catch (error) {
+            console.error('Cart count error:', error);
+            this.cartCount = 0;
+        }
+    }
+
     // Receive wishlist updates from other components
     handleWishlistUpdate(message) {
 
@@ -104,6 +175,14 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         return this.wishlistCount > 99
             ? '99+'
             : String(this.wishlistCount);
+    }
+
+    // Cart badge label
+    get cartCountLabel() {
+
+        return this.cartCount > 99
+            ? '99+'
+            : String(this.cartCount);
     }
 
     // Hide Header on Authentication Pages
@@ -138,7 +217,8 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
             'Shop__c': 'shop',
             'Collections__c': 'collections',
             'Shopping_Cart__c': 'cart',
-            'My_Wishlist__c': 'wishlist'
+            'My_Wishlist__c': 'wishlist',
+            'Gifts__c': 'gifts'
         };
 
         return pageMap[pageName] || '';
@@ -266,9 +346,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     handleGifts(event) {
 
         event.preventDefault();
-        this.closeMenu();
-
-        console.log('Gifts page coming soon');
+        this.navigateToPage('Gifts__c');
     }
 
     // About - Navigate to top section

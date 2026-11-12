@@ -17,6 +17,28 @@
       box-shadow: none !important;
       border: none !important;
 }
+
+/* =========================
+   FIXED HEADER + SPACER
+========================= */
+
+/* Spacer keeps page content below the fixed header.
+   Exact height is set by JS (renderedCallback); these are fallbacks. */
+.header-spacer {
+    width: 100%;
+    height: 153px;
+}
+
+/* The real header stays pinned to the top while the page scrolls */
+.header-fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: var(--ivory);
+}
+
 /* =========================
    ANNOUNCEMENT BAR
 ========================= */
@@ -418,6 +440,10 @@
 
 @media screen and (max-width: 900px) {
 
+    .header-spacer {
+        height: 181px;
+    }
+
     .announcement-content {
         gap: 8px;
         font-size: 10px;
@@ -576,6 +602,10 @@
 ========================= */
 
 @media screen and (max-width: 430px) {
+
+    .header-spacer {
+        height: 167px;
+    }
 
     .announcement-bar {
         padding: 7px 8px;

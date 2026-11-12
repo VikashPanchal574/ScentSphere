@@ -2,17 +2,72 @@
 public with sharing class CheckoutController {
 
     @AuraEnabled
-    public static Id placeOrder(String shippingAddress) {
+    public static Id placeOrder(String fullName,
+    String mobileNumber,
+    String houseNumber,
+    String streetArea,
+    String landmark,
+    String city,
+    String shippingState,
+    String pinCode,
+    String country) {
 
         Savepoint sp = Database.setSavepoint();
 
         try {
-            // 1. Validate shipping address
-            if (String.isBlank(shippingAddress)) {
-                throw new AuraHandledException(
-                    'Please enter your shipping address.'
-                );
-            }
+           // 1. Validate shipping address fields
+if (
+    String.isBlank(fullName) ||
+    String.isBlank(mobileNumber) ||
+    String.isBlank(houseNumber) ||
+    String.isBlank(streetArea) ||
+    String.isBlank(city) ||
+    String.isBlank(shippingState) ||
+    String.isBlank(pinCode) ||
+    String.isBlank(country)
+) {
+    throw new AuraHandledException(
+        'Please complete all required shipping fields.'
+    );
+}
+
+if (!Pattern.matches('^[6-9][0-9]{9}$', mobileNumber.trim())) {
+    throw new AuraHandledException(
+        'Please enter a valid 10-digit mobile number.'
+    );
+}
+
+if (!Pattern.matches('^[1-9][0-9]{5}$', pinCode.trim())) {
+    throw new AuraHandledException(
+        'Please enter a valid 6-digit PIN code.'
+    );
+}
+
+if (country.trim() != 'India') {
+    throw new AuraHandledException(
+        'Currently, delivery is available in India only.'
+    );
+}
+
+// Build formatted shipping address
+List<String> addressLines = new List<String>{
+    'Name: ' + fullName.trim(),
+    'Mobile: ' + mobileNumber.trim(),
+    'House/Flat: ' + houseNumber.trim(),
+    'Street/Area: ' + streetArea.trim()
+};
+
+if (!String.isBlank(landmark)) {
+    addressLines.add('Landmark: ' + landmark.trim());
+}
+
+addressLines.add('City: ' + city.trim());
+addressLines.add('State: ' + shippingState.trim());
+addressLines.add('PIN Code: ' + pinCode.trim());
+addressLines.add('Country: ' + country.trim());
+
+String formattedShippingAddress =
+    String.join(addressLines, '\n');
 
             // 2. Get logged-in customer's Contact Id
             User currentUser = [
@@ -122,7 +177,7 @@ public with sharing class CheckoutController {
             Customer_Order__c newOrder = new Customer_Order__c(
                 Customer__c = contactId,
                 Order_Date__c = Date.today(),
-                Shipping_Address__c = shippingAddress.trim(),
+                Shipping_Address__c = formattedShippingAddress,
                 Total_Amount__c = cart.Total_Amount__c,
                 Order_Status__c = 'Pending',
                 Payment_Status__c = 'Pending'

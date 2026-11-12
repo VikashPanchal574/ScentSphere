@@ -1,3 +1,4 @@
+
 <template>
     <div class="checkout-container">
 
@@ -16,17 +17,113 @@
                     Where should we deliver your fragrance?
                 </p>
 
-                <lightning-textarea
-                    label="Full Shipping Address"
-                    placeholder="House/Flat No., Street, Area, City, State, PIN Code"
-                    value={shippingAddress}
-                    onchange={handleAddressChange}
-                    required
-                    max-length="1000">
-                </lightning-textarea>
+                <div class="address-grid">
+
+                    <lightning-input
+                        type="text"
+                        label="Full Name"
+                        placeholder="Enter your full name"
+                        value={fullName}
+                        data-field="fullName"
+                        onchange={handleInputChange}
+                        maxlength="80"
+                        required>
+                    </lightning-input>
+
+                    <lightning-input
+                        type="tel"
+                        label="Mobile Number"
+                        placeholder="10-digit mobile number"
+                        value={mobileNumber}
+                        data-field="mobileNumber"
+                        onchange={handleInputChange}
+                        pattern="[6-9][0-9]{9}"
+                        message-when-pattern-mismatch="Enter a valid 10-digit Indian mobile number."
+                        maxlength="10"
+                        required>
+                    </lightning-input>
+
+                    <lightning-input
+                        class="full-width"
+                        type="text"
+                        label="House / Flat / Building"
+                        placeholder="House number, flat or building name"
+                        value={houseNumber}
+                        data-field="houseNumber"
+                        onchange={handleInputChange}
+                        maxlength="150"
+                        required>
+                    </lightning-input>
+
+                    <lightning-input
+                        class="full-width"
+                        type="text"
+                        label="Street / Area / Locality"
+                        placeholder="Enter street, area or locality"
+                        value={streetArea}
+                        data-field="streetArea"
+                        onchange={handleInputChange}
+                        maxlength="150"
+                        required>
+                    </lightning-input>
+
+                    <lightning-input
+                        class="full-width"
+                        type="text"
+                        label="Landmark"
+                        placeholder="Nearby landmark (optional)"
+                        value={landmark}
+                        data-field="landmark"
+                        onchange={handleInputChange}
+                        maxlength="100">
+                    </lightning-input>
+
+                    <lightning-input
+                        type="text"
+                        label="City"
+                        placeholder="Enter city"
+                        value={city}
+                        data-field="city"
+                        onchange={handleInputChange}
+                        maxlength="80"
+                        required>
+                    </lightning-input>
+
+                    <lightning-combobox
+                        label="State"
+                        placeholder="Select state"
+                        options={stateOptions}
+                        value={shippingState}
+                        data-field="shippingState"
+                        onchange={handleInputChange}
+                        required>
+                    </lightning-combobox>
+
+                    <lightning-input
+                        type="text"
+                        label="PIN Code"
+                        placeholder="6-digit PIN code"
+                        value={pinCode}
+                        data-field="pinCode"
+                        onchange={handleInputChange}
+                        pattern="[1-9][0-9]{5}"
+                        message-when-pattern-mismatch="Enter a valid 6-digit PIN code."
+                        maxlength="6"
+                        required>
+                    </lightning-input>
+
+                    <lightning-input
+                        type="text"
+                        label="Country"
+                        value={country}
+                        disabled>
+                    </lightning-input>
+
+                </div>
 
                 <p class="delivery-note">
-                    Please enter your complete delivery address.
+                    Please make sure your mobile number and delivery
+                    address are correct.
                 </p>
             </section>
 
@@ -48,12 +145,15 @@
                     class="place-order-button"
                     onclick={handlePlaceOrder}
                     disabled={isPlacingOrder}>
+
                     <template if:true={isPlacingOrder}>
                         Placing Order...
                     </template>
+
                     <template if:false={isPlacingOrder}>
                         Place Order
                     </template>
+
                 </button>
 
                 <template if:true={errorMessage}>

@@ -1,0 +1,368 @@
+
+<template>
+    <div class="gifts-page">
+
+        <!-- GIFT HERO -->
+        <section class="gifts-hero">
+
+            <div class="hero-content">
+
+                <p class="eyebrow">THE ART OF GIFTING</p>
+
+                <h1>
+                    Make Every Moment
+                    <span>Fragrant.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Celebrate the people who matter with fragrances
+                    that turn meaningful moments into unforgettable memories.
+                </p>
+
+                <button
+                    class="primary-button"
+                    onclick={handleExploreGifts}
+                    type="button">
+                    Explore Gift Ideas →
+                </button>
+
+                <div class="hero-features">
+                    <span>✦ Thoughtful Choices</span>
+                    <span>✦ Timeless Fragrances</span>
+                </div>
+
+            </div>
+
+            <!-- Decorative Gift Box -->
+            <div class="gift-visual">
+
+                <div class="gift-circle"></div>
+
+                <div class="gift-box">
+
+                    <div class="gift-box-lid">
+                        <div class="gift-bow"></div>
+                    </div>
+
+                    <div class="gift-box-body">
+                        <div class="gift-ribbon"></div>
+                        <span class="gift-star">✦</span>
+                        <span class="gift-brand">SCENTSPHERE</span>
+                        <span class="gift-caption">A GIFT TO REMEMBER</span>
+                    </div>
+
+                </div>
+
+                <div class="gift-note">
+                    A little luxury,<br/>
+                    a lasting memory.
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- GIFT CATEGORIES -->
+        <section class="gift-categories-section">
+
+            <div class="section-heading">
+
+                <p class="eyebrow">FIND THE PERFECT GIFT</p>
+
+                <h2>
+                    Gifts for Every
+                    <span>Special Someone</span>
+                </h2>
+
+                <p>
+                    Thoughtful fragrance inspiration for every
+                    personality and special occasion.
+                </p>
+
+            </div>
+
+            <div class="gift-category-grid">
+
+                <!-- GIFTS FOR HIM -->
+                <button
+                    class="gift-category-card"
+                    data-gift-collection="Gifts for Him"
+                    onclick={handleGiftCategoryClick}
+                    type="button"
+                    aria-label="Explore Gifts for Him">
+
+                    <span class="category-number">01</span>
+                    <span class="category-icon">✦</span>
+
+                    <h3>Gifts for Him</h3>
+
+                    <p>
+                        Discover bold and sophisticated
+                        fragrance inspirations.
+                    </p>
+
+                    <span class="category-link">
+                        Explore Collection →
+                    </span>
+
+                </button>
+
+                <!-- GIFTS FOR HER -->
+                <button
+                    class="gift-category-card"
+                    data-gift-collection="Gifts for Her"
+                    onclick={handleGiftCategoryClick}
+                    type="button"
+                    aria-label="Explore Gifts for Her">
+
+                    <span class="category-number">02</span>
+                    <span class="category-icon">❋</span>
+
+                    <h3>Gifts for Her</h3>
+
+                    <p>
+                        Explore elegant and expressive
+                        fragrance inspirations.
+                    </p>
+
+                    <span class="category-link">
+                        Explore Collection →
+                    </span>
+
+                </button>
+
+                <!-- SPECIAL MOMENTS -->
+                <button
+                    class="gift-category-card"
+                    data-gift-collection="Special Moments"
+                    onclick={handleGiftCategoryClick}
+                    type="button"
+                    aria-label="Explore Special Moments Gifts">
+
+                    <span class="category-number">03</span>
+                    <span class="category-icon">◇</span>
+
+                    <h3>Special Moments</h3>
+
+                    <p>
+                        Find fragrance inspiration for
+                        birthdays and celebrations.
+                    </p>
+
+                    <span class="category-link">
+                        Explore Collection →
+                    </span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- GIFT PRODUCT SECTION -->
+        <section
+            class="gift-products-section"
+            data-target="gift-products">
+
+            <div class="products-heading">
+
+                <div>
+
+                    <p class="eyebrow">A LITTLE INSPIRATION</p>
+
+                    <h2>
+                        <span>{selectedCollectionLabel}</span>
+                    </h2>
+
+                    <p>
+                        Discover specially selected fragrances
+                        for meaningful gifting moments.
+                    </p>
+
+                </div>
+
+                <div class="products-actions">
+
+                    <button
+                        class="view-all-button"
+                        onclick={handleShowAllGifts}
+                        type="button">
+                        View All Gifts
+                    </button>
+
+                    <button
+                        class="refresh-button"
+                        onclick={handleRefresh}
+                        type="button">
+                        ↻ Refresh
+                    </button>
+
+                </div>
+
+            </div>
+
+            <!-- LOADING -->
+            <template if:true={isLoading}>
+
+                <div class="loading-container">
+
+                    <lightning-spinner
+                        alternative-text="Loading gift ideas"
+                        size="medium">
+                    </lightning-spinner>
+
+                </div>
+
+            </template>
+
+            <!-- ERROR -->
+            <template if:true={showError}>
+
+                <div class="message-container error-message">
+
+                    <p>{errorMessage}</p>
+
+                    <button
+                        class="retry-button"
+                        onclick={handleRefresh}
+                        type="button">
+                        Try Again
+                    </button>
+
+                </div>
+
+            </template>
+
+            <!-- EMPTY STATE -->
+            <template if:true={showEmpty}>
+
+                <div class="message-container">
+
+                    <h3>Something beautiful is coming.</h3>
+
+                    <p>
+                        No perfumes are currently assigned
+                        to this gift collection.
+                    </p>
+
+                    <button
+                        class="view-all-button"
+                        onclick={handleShowAllGifts}
+                        type="button">
+                        Explore All Gifts
+                    </button>
+
+                </div>
+
+            </template>
+
+            <!-- GIFT PERFUME PRODUCTS -->
+            <template if:true={hasProducts}>
+
+                <div class="gift-products-grid">
+
+                    <template for:each={products} for:item="product">
+
+                        <article
+                            class="gift-product-card"
+                            key={product.Id}>
+
+                            <!-- Product Image -->
+                            <div class="product-image-wrapper">
+
+                                <template if:true={product.Product_Image_URL__c}>
+
+                                    <img
+                                        src={product.Product_Image_URL__c}
+                                        alt={product.Product_Name__c}
+                                        class="product-image"/>
+
+                                </template>
+
+                                <template if:false={product.Product_Image_URL__c}>
+
+                                    <div class="image-placeholder">
+                                        SCENTSPHERE
+                                    </div>
+
+                                </template>
+
+                            </div>
+
+                            <!-- Product Information -->
+                            <div class="product-info">
+
+                                <p class="product-brand">
+                                    {product.Brand__c}
+                                </p>
+
+                                <h3>{product.Product_Name__c}</h3>
+
+                                <p class="product-description">
+                                    {product.Description__c}
+                                </p>
+
+                                <div class="product-meta">
+
+                                    <template if:true={product.Size__c}>
+                                        <span>{product.Size__c}</span>
+                                    </template>
+
+                                    <span>{product.Category__c}</span>
+
+                                </div>
+
+                                <div class="product-bottom">
+
+                                    <span class="product-price">
+
+                                        <lightning-formatted-number
+                                            value={product.Price__c}
+                                            format-style="currency"
+                                            currency-code="INR"
+                                            maximum-fraction-digits="2">
+                                        </lightning-formatted-number>
+
+                                    </span>
+
+                                    <button
+                                        class="view-button"
+                                        data-id={product.Id}
+                                        onclick={handleViewDetails}
+                                        type="button">
+                                        View Details →
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    </template>
+
+                </div>
+
+            </template>
+
+        </section>
+
+        <!-- GIFT CLOSING BANNER -->
+        <section class="gift-closing-section">
+
+            <p class="eyebrow">SCENTSPHERE</p>
+
+            <h2>
+                Give a fragrance.
+                <span>Share a feeling.</span>
+            </h2>
+
+            <p>
+                Because the most beautiful gifts
+                are the ones remembered.
+            </p>
+
+        </section>
+
+    </div>
+</template>

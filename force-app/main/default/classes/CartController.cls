@@ -1,3 +1,4 @@
+
 public with sharing class CartController {
 
     // ==========================================
@@ -17,21 +18,12 @@ public with sharing class CartController {
     // HELPERS
     // ==========================================
 
-    /**
-     * AuraHandledException.getMessage() returns the generic text
-     * "Script-thrown exception" unless setMessage() is called.
-     * This helper makes the real message visible to LWC and to tests.
-     */
     private static AuraHandledException buildException(String message) {
         AuraHandledException ex = new AuraHandledException(message);
         ex.setMessage(message);
         return ex;
     }
 
-    /**
-     * Writes the real (internal) error to the debug log only.
-     * The user receives a friendly message, never the raw exception text.
-     */
     private static void logError(String source, Exception e) {
         System.debug(
             LoggingLevel.ERROR,
@@ -105,7 +97,50 @@ public with sharing class CartController {
     }
 
     // ==========================================
-    // GET CART DETAILS
+    // SHARED CART FETCH LOGIC
+    // ==========================================
+
+    private static CartResponse fetchCartDetails(Id contactId) {
+
+        CartResponse response = new CartResponse();
+
+        List<Shopping_Cart__c> carts = [
+            SELECT Id, Name, Customer__c,
+                   Cart_Status__c,
+                   Total_Amount__c,
+                   Total_Items__c
+            FROM Shopping_Cart__c
+            WHERE Customer__c = :contactId
+            AND Cart_Status__c = 'Active'
+            WITH USER_MODE
+            LIMIT 1
+        ];
+
+        if (carts.isEmpty()) {
+            return response;
+        }
+
+        response.cart = carts[0];
+
+        response.items = [
+            SELECT Id, Name,
+                   Perfume__c,
+                   Perfume__r.Product_Name__c,
+                   Perfume__r.Product_Image_URL__c,
+                   Quantity__c,
+                   Unit_Price__c,
+                   Subtotal__c
+            FROM Cart_Item__c
+            WHERE Shopping_Cart__c = :response.cart.Id
+            WITH USER_MODE
+            ORDER BY CreatedDate DESC
+        ];
+
+        return response;
+    }
+
+    // ==========================================
+    // GET CART DETAILS - CACHEABLE
     // ==========================================
 
     @AuraEnabled(cacheable=true)
@@ -115,47 +150,37 @@ public with sharing class CartController {
 
             Id contactId = getCurrentContactId();
 
-            CartResponse response = new CartResponse();
-
-            List<Shopping_Cart__c> carts = [
-                SELECT Id, Name, Customer__c,
-                       Cart_Status__c,
-                       Total_Amount__c,
-                       Total_Items__c
-                FROM Shopping_Cart__c
-                WHERE Customer__c = :contactId
-                AND Cart_Status__c = 'Active'
-                WITH USER_MODE
-                LIMIT 1
-            ];
-
-            if (carts.isEmpty()) {
-                return response;
-            }
-
-            response.cart = carts[0];
-
-            response.items = [
-                SELECT Id, Name,
-                       Perfume__c,
-                       Perfume__r.Product_Name__c,
-                       Perfume__r.Product_Image_URL__c,
-                       Quantity__c,
-                       Unit_Price__c,
-                       Subtotal__c
-                FROM Cart_Item__c
-                WHERE Shopping_Cart__c = :response.cart.Id
-                WITH USER_MODE
-                ORDER BY CreatedDate DESC
-            ];
-
-            return response;
+            return fetchCartDetails(contactId);
 
         } catch (AuraHandledException e) {
             throw e;
 
         } catch (Exception e) {
             logError('getCart', e);
+            throw buildException(
+                'Unable to load your shopping cart.'
+            );
+        }
+    }
+
+    // ==========================================
+    // GET FRESH CART DETAILS - NO CACHE
+    // ==========================================
+
+    @AuraEnabled
+    public static CartResponse getCartFresh() {
+
+        try {
+
+            Id contactId = getCurrentContactId();
+
+            return fetchCartDetails(contactId);
+
+        } catch (AuraHandledException e) {
+            throw e;
+
+        } catch (Exception e) {
+            logError('getCartFresh', e);
             throw buildException(
                 'Unable to load your shopping cart.'
             );
@@ -238,8 +263,6 @@ public with sharing class CartController {
                     );
                 }
 
-                // Update only the field that actually changes, so
-                // user-mode FLS is checked for Quantity__c alone.
                 Cart_Item__c itemToUpdate = new Cart_Item__c(
                     Id = existingItem.Id,
                     Quantity__c = updatedQuantity
@@ -281,7 +304,38 @@ public with sharing class CartController {
             );
         }
     }
+    // ==========================================
+// GET CART COUNT - FOR HEADER BADGE
+// ==========================================
 
+@AuraEnabled
+public static Integer getCartCount() {
+    try {
+        Id contactId = getCurrentContactId();
+
+        List<AggregateResult> results = [
+            SELECT SUM(Quantity__c) totalQuantity
+            FROM Cart_Item__c
+            WHERE Shopping_Cart__r.Customer__c = :contactId
+            AND Shopping_Cart__r.Cart_Status__c = 'Active'
+            WITH USER_MODE
+        ];
+
+        if (results.isEmpty() ||
+            results[0].get('totalQuantity') == null) {
+            return 0;
+        }
+
+        return ((Decimal) results[0].get('totalQuantity')).intValue();
+
+    } catch (AuraHandledException e) {
+        throw e;
+
+    } catch (Exception e) {
+        logError('getCartCount', e);
+        throw buildException('Unable to load cart count.');
+    }
+}
     // ==========================================
     // UPDATE CART ITEM QUANTITY
     // ==========================================
@@ -305,8 +359,6 @@ public with sharing class CartController {
                 );
             }
 
-            // Ownership is validated in the WHERE clause:
-            // the item must belong to an Active cart of this customer.
             List<Cart_Item__c> items = [
                 SELECT Id,
                        Quantity__c,
@@ -337,7 +389,6 @@ public with sharing class CartController {
                 );
             }
 
-            // Update only Quantity__c (not the queried lookup fields).
             Cart_Item__c itemToUpdate = new Cart_Item__c(
                 Id = item.Id,
                 Quantity__c = quantity

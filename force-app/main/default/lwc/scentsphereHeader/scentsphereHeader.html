@@ -1,6 +1,8 @@
-
 <template>
     <template if:true={showHeader}>
+
+      <div class="header-spacer">
+       <div class="header-fixed">
 
         <!-- Announcement Bar -->
         <div class="announcement-bar">
@@ -144,7 +146,9 @@
                             alternative-text="Cart">
                         </lightning-icon>
 
-                        <span class="count-badge">0</span>
+                        <span class="count-badge">
+                            {cartCountLabel}
+                        </span>
 
                     </button>
 
@@ -200,6 +204,9 @@
                 </div>
             </div>
         </header>
+
+       </div>
+      </div>
 
     </template>
 </template>
