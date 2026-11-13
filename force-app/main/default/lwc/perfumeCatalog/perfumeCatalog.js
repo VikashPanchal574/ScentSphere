@@ -1,6 +1,9 @@
 
 import { LightningElement, wire } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import {
+    NavigationMixin,
+    CurrentPageReference
+} from 'lightning/navigation';
 
 import getActivePerfumes
     from '@salesforce/apex/PerfumeCatalogController.getActivePerfumes';
@@ -18,6 +21,37 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
     selectedBrand = '';
     selectedGender = '';
     selectedSort = 'newest';
+
+    // ==========================================
+    // RECEIVE SEARCH FROM HEADER
+    // ==========================================
+
+    @wire(CurrentPageReference)
+    wiredPageReference(pageReference) {
+
+        if (!pageReference) {
+            return;
+        }
+
+        const headerSearch = pageReference.state?.c__search;
+
+        const newSearchTerm = (
+            typeof headerSearch === 'string'
+                ? headerSearch
+                : ''
+        ).trim().toLowerCase();
+
+        if (this.searchTerm !== newSearchTerm) {
+
+            this.searchTerm = newSearchTerm;
+
+            this.applyFilters();
+        }
+    }
+
+    // ==========================================
+    // LOAD ACTIVE PERFUMES
+    // ==========================================
 
     @wire(getActivePerfumes)
     wiredPerfumes({ data, error }) {
@@ -68,7 +102,6 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
 
     handleCardClick(event) {
 
-        // Prevent duplicate navigation from buttons
         if (event.target.closest('button')) {
             return;
         }
@@ -99,7 +132,6 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
         );
     }
 
-    // Prevent wishlist clicks from navigating to product details
     stopCardNavigation(event) {
         event.stopPropagation();
     }
@@ -174,7 +206,11 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
     // ==========================================
 
     handleSearch(event) {
-        this.searchTerm = event.target.value.toLowerCase();
+
+        this.searchTerm = (
+            event.target.value || ''
+        ).trim().toLowerCase();
+
         this.applyFilters();
     }
 
@@ -199,27 +235,48 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
     }
 
     // ==========================================
-    // APPLY FILTERS
+    // APPLY ALL FILTERS
     // ==========================================
 
     applyFilters() {
 
         let result = [...this.allProducts];
 
+        // Search across available product information
         if (this.searchTerm) {
 
-            result = result.filter(product =>
+            const searchTerms = this.searchTerm
+                .split(/\s+/)
+                .filter(term => term);
 
-                (product.Product_Name__c || '')
-                    .toLowerCase()
-                    .includes(this.searchTerm) ||
+            result = result.filter(product => {
 
-                (product.Brand__c || '')
-                    .toLowerCase()
-                    .includes(this.searchTerm)
-            );
+                const searchableText = [
+
+                    product.Product_Name__c,
+                    product.Brand__c,
+                    product.Description__c,
+                    product.Fragrance_Notes__c,
+                    product.Category__c,
+                    product.Gender__c,
+                    product.Size__c,
+                    product.Gift_Collection__c
+
+                ]
+                    .filter(value =>
+                        value !== null && value !== undefined
+                    )
+                    .join(' ')
+                    .toLowerCase();
+
+                // Every search word must match somewhere
+                return searchTerms.every(term =>
+                    searchableText.includes(term)
+                );
+            });
         }
 
+        // Category Filter
         if (this.selectedCategory) {
 
             result = result.filter(
@@ -228,6 +285,7 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
             );
         }
 
+        // Brand Filter
         if (this.selectedBrand) {
 
             result = result.filter(
@@ -236,6 +294,7 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
             );
         }
 
+        // Gender Filter
         if (this.selectedGender) {
 
             result = result.filter(
@@ -244,6 +303,7 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
             );
         }
 
+        // Sorting
         if (this.selectedSort === 'lowToHigh') {
 
             result.sort(

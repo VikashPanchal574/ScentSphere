@@ -314,12 +314,45 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     // Search
-    handleSearch(event) {
+    // Search Input Handler
+handleSearch(event) {
 
-        this.searchTerm = event.target.value;
+    this.searchTerm = event.target.value;
+}
 
-        console.log('Search perfume:', this.searchTerm);
+// Search Navigation Handler
+handleSearchKeydown(event) {
+
+    // Search only when Enter is pressed
+    if (event.key !== 'Enter') {
+        return;
     }
+
+    event.preventDefault();
+
+    const searchValue = this.searchTerm.trim();
+
+    // Do nothing when search is empty
+    if (!searchValue) {
+        return;
+    }
+
+    // Navigate to Shop page with search keyword
+    this[NavigationMixin.Navigate]({
+
+        type: 'comm__namedPage',
+
+        attributes: {
+            name: 'Shop__c'
+        },
+
+        state: {
+            c__search: searchValue
+        }
+    });
+
+    this.closeMenu();
+}
 
     // Home
     handleHome(event) {

@@ -1,212 +1,204 @@
 <template>
     <template if:true={showHeader}>
 
-      <div class="header-spacer">
-       <div class="header-fixed">
+        <div class="header-spacer">
+            <div class="header-fixed">
 
-        <!-- Announcement Bar -->
-        <div class="announcement-bar">
-            <div class="announcement-content">
-                <span>Free Shipping on Orders Above ₹1,999</span>
-                <span class="announcement-separator">✦</span>
-                <span>First Order? Use Code <strong>SCENT10</strong> for 10% Off</span>
-                <span class="announcement-separator">✦</span>
-                <span>Luxury Fragrances, Crafted for You</span>
-            </div>
-        </div>
-
-        <!-- Main Header -->
-        <header class="main-header">
-            <div class="header-container">
-
-                <!-- Mobile Menu -->
-                <button
-                    class="menu-toggle"
-                    onclick={toggleMenu}
-                    aria-label="Toggle menu"
-                    aria-expanded={menuAriaExpanded}
-                    type="button">
-                    {menuIcon}
-                </button>
-
-                <!-- Logo -->
-                <a
-                    href="#"
-                    class="brand"
-                    onclick={handleHome}
-                    aria-label="ScentSphere Home">
-
-                    <img
-                        src={logoUrl}
-                        class="brand-logo"
-                        alt="ScentSphere - The Art of Fragrance"/>
-                </a>
-
-                <!-- Navigation -->
-                <nav
-                    class={navClass}
-                    aria-label="Main navigation">
-
-                    <a
-                        href="#"
-                        class={homeClass}
-                        onclick={handleHome}>
-                        Home
-                    </a>
-
-                    <a
-                        href="#"
-                        class={shopClass}
-                        onclick={handleShop}>
-                        Shop
-                    </a>
-
-                    <a
-                        href="#"
-                        class={collectionsClass}
-                        onclick={handleCollections}>
-                        Collections
-                    </a>
-
-                    <a
-                        href="#"
-                        class={giftsClass}
-                        onclick={handleGifts}>
-                        Gifts
-                    </a>
-
-                    <!-- About -->
-                    <a
-                        href="#"
-                        class={aboutClass}
-                        onclick={handleAbout}>
-                        About
-                    </a>
-
-                    <!-- Contact -->
-                    <a
-                        href="#"
-                        class={contactClass}
-                        onclick={handleContact}>
-                        Contact
-                    </a>
-
-                </nav>
-
-                <!-- Header Actions -->
-                <div class="header-actions">
-
-                    <!-- Search -->
-                    <div class="search-box">
-
-                        <lightning-icon
-                            icon-name="utility:search"
-                            size="x-small"
-                            alternative-text="Search">
-                        </lightning-icon>
-
-                        <input
-                            type="search"
-                            placeholder="Search perfumes..."
-                            value={searchTerm}
-                            oninput={handleSearch}
-                            aria-label="Search perfumes"/>
-
+                <!-- Announcement Bar -->
+                <div class="announcement-bar">
+                    <div class="announcement-content">
+                        <span class="announcement-item">
+                            <svg class="announcement-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M2.5 6.5h11v9h-11z M13.5 9.5h4l3 3v3h-7" />
+                                <circle cx="7" cy="17.5" r="1.7" />
+                                <circle cx="17" cy="17.5" r="1.7" />
+                            </svg>
+                            Free Shipping on Orders Above ₹1,999
+                        </span>
+                        <span class="announcement-separator"></span>
+                        <span class="announcement-item">
+                            <svg class="announcement-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="3" y="9" width="18" height="4" rx="1" />
+                                <path
+                                    d="M5 13v7h14v-7 M12 9v11 M12 9c-2.5 0-4.5-.8-4.5-2.6S9.5 4 12 9z M12 9c2.5 0 4.5-.8 4.5-2.6S14.5 4 12 9z" />
+                            </svg>
+                            <span>First Order? Use Code <strong>SCENT10</strong> for 10% Off</span>
+                        </span>
+                        <span class="announcement-separator"></span>
+                        <span class="announcement-item">
+                            <svg class="announcement-icon announcement-icon-fill" viewBox="0 0 24 24"
+                                aria-hidden="true">
+                                <path
+                                    d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z" />
+                            </svg>
+                            Luxury Fragrances, Crafted for You
+                        </span>
                     </div>
+                </div>
 
-                    <!-- Wishlist -->
-                    <button
-                        class="action-button wishlist-btn"
-                        title="Wishlist"
-                        onclick={handleWishlist}
-                        type="button">
+                <!-- Main Header -->
+                <header class="main-header">
+                    <div class="header-container">
 
-                        <lightning-icon
-                            icon-name="utility:heart"
-                            size="medium"
-                            alternative-text="Wishlist">
-                        </lightning-icon>
-
-                        <span class="count-badge">
-                            {wishlistCountLabel}
-                        </span>
-
-                    </button>
-
-                    <!-- Shopping Cart -->
-                    <button
-                        class="action-button cart-btn"
-                        title="Shopping Cart"
-                        onclick={handleCart}
-                        type="button">
-
-                        <lightning-icon
-                            icon-name="utility:cart"
-                            size="medium"
-                            alternative-text="Cart">
-                        </lightning-icon>
-
-                        <span class="count-badge">
-                            {cartCountLabel}
-                        </span>
-
-                    </button>
-
-                    <span class="action-divider"></span>
-
-                    <!-- Guest User -->
-                    <template if:true={isGuest}>
-
-                        <button
-                            class="account-button"
-                            onclick={handleLogin}
-                            type="button">
-
-                            <lightning-icon
-                                icon-name="utility:user"
-                                size="x-small"
-                                alternative-text="Account">
-                            </lightning-icon>
-
-                            <span>Sign In</span>
-
+                        <!-- Mobile Menu -->
+                        <button class="menu-toggle" onclick={toggleMenu} aria-label="Toggle menu"
+                            aria-expanded={menuAriaExpanded} type="button">
+                            {menuIcon}
                         </button>
 
-                    </template>
+                        <!-- Logo -->
+                        <a href="#" class="brand" onclick={handleHome} aria-label="ScentSphere Home">
 
-                    <!-- Logged In User -->
-                    <template if:false={isGuest}>
+                            <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+                                <g transform="translate(32 32)" fill="none" stroke="#d4a050" stroke-width="1.3"
+                                    stroke-linejoin="round">
+                                    <path d="M0 -29 C7 -21 7 -9 0 -3 C-7 -9 -7 -21 0 -29Z" />
+                                    <path d="M0 -29 C7 -21 7 -9 0 -3 C-7 -9 -7 -21 0 -29Z" transform="rotate(45)" />
+                                    <path d="M0 -29 C7 -21 7 -9 0 -3 C-7 -9 -7 -21 0 -29Z" transform="rotate(90)" />
+                                    <path d="M0 -29 C7 -21 7 -9 0 -3 C-7 -9 -7 -21 0 -29Z" transform="rotate(135)" />
+                                    <path d="M0 -29 C7 -21 7 -9 0 -3 C-7 -9 -7 -21 0 -29Z" transform="rotate(180)" />
+                                    <path d="M0 -29 C7 -21 7 -9 0 -3 C-7 -9 -7 -21 0 -29Z" transform="rotate(225)" />
+                                    <path d="M0 -29 C7 -21 7 -9 0 -3 C-7 -9 -7 -21 0 -29Z" transform="rotate(270)" />
+                                    <path d="M0 -29 C7 -21 7 -9 0 -3 C-7 -9 -7 -21 0 -29Z" transform="rotate(315)" />
+                                    <path d="M0 -17 C3.6 -12 3.6 -6 0 -2 C-3.6 -6 -3.6 -12 0 -17Z"
+                                        transform="rotate(22.5)" />
+                                    <path d="M0 -17 C3.6 -12 3.6 -6 0 -2 C-3.6 -6 -3.6 -12 0 -17Z"
+                                        transform="rotate(67.5)" />
+                                    <path d="M0 -17 C3.6 -12 3.6 -6 0 -2 C-3.6 -6 -3.6 -12 0 -17Z"
+                                        transform="rotate(112.5)" />
+                                    <path d="M0 -17 C3.6 -12 3.6 -6 0 -2 C-3.6 -6 -3.6 -12 0 -17Z"
+                                        transform="rotate(157.5)" />
+                                    <path d="M0 -17 C3.6 -12 3.6 -6 0 -2 C-3.6 -6 -3.6 -12 0 -17Z"
+                                        transform="rotate(202.5)" />
+                                    <path d="M0 -17 C3.6 -12 3.6 -6 0 -2 C-3.6 -6 -3.6 -12 0 -17Z"
+                                        transform="rotate(247.5)" />
+                                    <path d="M0 -17 C3.6 -12 3.6 -6 0 -2 C-3.6 -6 -3.6 -12 0 -17Z"
+                                        transform="rotate(292.5)" />
+                                    <path d="M0 -17 C3.6 -12 3.6 -6 0 -2 C-3.6 -6 -3.6 -12 0 -17Z"
+                                        transform="rotate(337.5)" />
+                                    <circle r="2" fill="#c9923e" stroke="none" />
+                                </g>
+                            </svg>
+                            <span class="brand-text">
+                                <span class="brand-name">SCENTSPHERE</span>
+                                <span class="brand-tag">THE ART OF FRAGRANCE</span>
+                            </span>
+                        </a>
 
-                        <button
-                            class="account-chip"
-                            onclick={handleMyAccount}
-                            title="My Account"
-                            type="button">
+                        <!-- Navigation -->
+                        <nav class={navClass} aria-label="Main navigation">
 
-                            <span class="account-avatar">
+                            <a href="#" class={homeClass} onclick={handleHome}>
+                                Home
+                            </a>
 
-                                <lightning-icon
-                                    icon-name="utility:user"
-                                    size="x-small"
-                                    alternative-text="Account">
+                            <a href="#" class={shopClass} onclick={handleShop}>
+                                Shop
+                            </a>
+
+                            <a href="#" class={collectionsClass} onclick={handleCollections}>
+                                Collections
+                            </a>
+
+                            <a href="#" class={giftsClass} onclick={handleGifts}>
+                                Gifts
+                            </a>
+
+                            <!-- About -->
+                            <a href="#" class={aboutClass} onclick={handleAbout}>
+                                About
+                            </a>
+
+                            <!-- Contact -->
+                            <a href="#" class={contactClass} onclick={handleContact}>
+                                Contact
+                            </a>
+
+                        </nav>
+
+                        <!-- Header Actions -->
+                        <div class="header-actions">
+
+                            <!-- Search -->
+                            <div class="search-box">
+
+                                <lightning-icon icon-name="utility:search" size="x-small" alternative-text="Search">
                                 </lightning-icon>
 
-                            </span>
+                                <input type="search" placeholder="Search perfumes, notes, collections..."
+                                    value={searchTerm} oninput={handleSearch} onkeydown={handleSearchKeydown}
+                                    aria-label="Search perfumes" />
 
-                            <span class="account-label">
-                                My Account
-                            </span>
+                            </div>
+                            <!-- Wishlist -->
+                            <button class="action-button wishlist-btn" title="Wishlist" onclick={handleWishlist}
+                                type="button">
 
-                        </button>
+                                <lightning-icon icon-name="utility:heart" size="medium" alternative-text="Wishlist">
+                                </lightning-icon>
 
-                    </template>
+                                <span class="count-badge">
+                                    {wishlistCountLabel}
+                                </span>
 
-                </div>
+                            </button>
+
+                            <!-- Shopping Cart -->
+                            <button class="action-button cart-btn" title="Shopping Cart" onclick={handleCart}
+                                type="button">
+
+                                <lightning-icon icon-name="utility:cart" size="medium" alternative-text="Cart">
+                                </lightning-icon>
+
+                                <span class="count-badge">
+                                    {cartCountLabel}
+                                </span>
+
+                            </button>
+
+                            <span class="action-divider"></span>
+
+                            <!-- Guest User -->
+                            <template if:true={isGuest}>
+
+                                <button class="account-button" onclick={handleLogin} type="button">
+
+                                    <lightning-icon icon-name="utility:user" size="x-small" alternative-text="Account">
+                                    </lightning-icon>
+
+                                    <span>Sign In</span>
+
+                                </button>
+
+                            </template>
+
+                            <!-- Logged In User -->
+                            <template if:false={isGuest}>
+
+                                <button class="account-chip" onclick={handleMyAccount} title="My Account" type="button">
+
+                                    <span class="account-avatar">
+
+                                        <lightning-icon icon-name="utility:user" size="x-small"
+                                            alternative-text="Account">
+                                        </lightning-icon>
+
+                                    </span>
+
+                                    <span class="account-label">
+                                        My Account
+                                    </span>
+
+                                </button>
+
+                            </template>
+
+                        </div>
+                    </div>
+                </header>
+
             </div>
-        </header>
-
-       </div>
-      </div>
+        </div>
 
     </template>
 </template>

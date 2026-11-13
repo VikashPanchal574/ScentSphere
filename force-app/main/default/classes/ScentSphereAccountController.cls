@@ -79,15 +79,18 @@ public with sharing class ScentSphereAccountController {
                 result.customer = contacts[0];
             }
 
-            result.orders = [
-                SELECT Id, Name, Order_Date__c, Order_Status__c,
-                       Payment_Status__c, Shipping_Address__c,
-                       Total_Amount__c
-                FROM Customer_Order__c
-                WHERE Customer__c = :currentUser.ContactId
-                WITH USER_MODE
-                ORDER BY Order_Date__c DESC NULLS LAST
-            ];
+            
+result.orders = [
+    SELECT Id, Name, Order_Date__c, Order_Status__c,
+           Payment_Status__c, Shipping_Address__c,
+           Total_Amount__c
+    FROM Customer_Order__c
+    WHERE Customer__c = :currentUser.ContactId
+    AND Order_Status__c = 'Confirmed'
+    WITH USER_MODE
+    ORDER BY Order_Date__c DESC NULLS LAST
+];
+
 
             return result;
 
