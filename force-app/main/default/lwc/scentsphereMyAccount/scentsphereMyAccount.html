@@ -5,18 +5,22 @@
         <div class="page-heading">
             <p class="eyebrow">SCENTSPHERE MEMBER AREA</p>
             <h1>My Account</h1>
-            <p class="subtitle">Manage your profile and discover your order history.</p>
+            <p class="subtitle">
+                Manage your profile and discover your order history.
+            </p>
         </div>
 
         <template if:true={isLoading}>
             <div class="loading">
-                <lightning-spinner alternative-text="Loading account"></lightning-spinner>
+                <lightning-spinner alternative-text="Loading account">
+                </lightning-spinner>
             </div>
         </template>
 
         <template if:true={hasError}>
             <div class="message error">
-                Unable to load your account. Please refresh the page or contact support.
+                Unable to load your account. Please refresh the page
+                or contact support.
             </div>
         </template>
 
@@ -32,11 +36,15 @@
                         <div>
                             <p class="eyebrow">WELCOME BACK</p>
                             <h2>{fullName}</h2>
-                            <p class="member-since">Member since {customerSince}</p>
+                            <p class="member-since">
+                                Member since {customerSince}
+                            </p>
                         </div>
                     </div>
 
-                    <div class="section-title">Personal Information</div>
+                    <div class="section-title">
+                        Personal Information
+                    </div>
 
                     <div class="detail-item">
                         <span>First Name</span>
@@ -73,7 +81,6 @@
                         <strong>{accountName}</strong>
                     </div>
 
-                    <!-- Logout -->
                     <button
                         class="logout-button"
                         onclick={handleLogout}>
@@ -118,18 +125,47 @@
                                 </thead>
 
                                 <tbody>
-                                    <template for:each={formattedOrders} for:item="order">
-                                        <tr key={order.Id}>
-                                            <td class="order-number">{order.Name}</td>
+                                    <template
+                                        for:each={formattedOrders}
+                                        for:item="order">
+
+                                        <tr
+                                            key={order.Id}
+                                            class="order-row"
+                                            data-id={order.Id}
+                                            onclick={handleOrderClick}
+                                            onkeydown={handleOrderKeydown}
+                                            tabindex="0"
+                                            role="button"
+                                            aria-label={order.accessibleLabel}>
+
+                                            <td class="order-number">
+                                                {order.Name}
+                                            </td>
+
                                             <td>{order.formattedDate}</td>
-                                            <td class="amount">{order.formattedAmount}</td>
-                                            <td>{order.Order_Status__c}</td>
-                                            <td>{order.Payment_Status__c}</td>
+
+                                            <td class="amount">
+                                                {order.formattedAmount}
+                                            </td>
+
+                                            <td>
+                                                {order.Order_Status__c}
+                                            </td>
+
+                                            <td>
+                                                {order.Payment_Status__c}
+                                            </td>
+
                                         </tr>
                                     </template>
                                 </tbody>
                             </table>
                         </div>
+
+                        <p class="order-hint">
+                            Select any order row to view complete details.
+                        </p>
 
                     </template>
 
@@ -145,7 +181,9 @@
                             </div>
 
                             <h3>No orders yet</h3>
-                            <p>Your perfume purchases will appear here.</p>
+                            <p>
+                                Your perfume purchases will appear here.
+                            </p>
 
                         </div>
                     </template>
@@ -156,4 +194,203 @@
         </template>
 
     </div>
+
+    <!-- ORDER DETAILS MODAL -->
+    <template if:true={isOrderDetailsOpen}>
+
+        <div
+            class="modal-backdrop"
+            onclick={handleModalBackdropClick}>
+
+            <section
+                class="order-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="order-details-title">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+
+                    <div>
+                        <p class="eyebrow">SCENTSPHERE PURCHASE</p>
+                        <h2 id="order-details-title">
+                            Order Details
+                        </h2>
+                    </div>
+
+                    <button
+                        class="modal-close"
+                        onclick={handleCloseOrderDetails}
+                        aria-label="Close order details">
+
+                        <lightning-icon
+                            icon-name="utility:close"
+                            size="small"
+                            alternative-text="Close">
+                        </lightning-icon>
+
+                    </button>
+
+                </div>
+
+                <!-- Loading -->
+                <template if:true={isLoadingOrderDetails}>
+                    <div class="modal-loading">
+                        <lightning-spinner
+                            alternative-text="Loading order details">
+                        </lightning-spinner>
+                    </div>
+                </template>
+
+                <!-- Error -->
+                <template if:true={orderDetailsError}>
+                    <div class="message error">
+                        {orderDetailsError}
+                    </div>
+                </template>
+
+                <!-- Order Content -->
+                <template if:true={orderDetails}>
+
+                    <div class="modal-body">
+
+                        <!-- Order Information -->
+                        <div class="order-info-grid">
+
+                            <div class="info-box">
+                                <span>ORDER NUMBER</span>
+                                <strong>{selectedOrder.Name}</strong>
+                            </div>
+
+                            <div class="info-box">
+                                <span>ORDER DATE</span>
+                                <strong>{formattedOrderDate}</strong>
+                            </div>
+
+                            <div class="info-box">
+                                <span>ORDER STATUS</span>
+                                <strong>
+                                    {selectedOrder.Order_Status__c}
+                                </strong>
+                            </div>
+
+                            <div class="info-box">
+                                <span>PAYMENT STATUS</span>
+                                <strong>
+                                    {selectedOrder.Payment_Status__c}
+                                </strong>
+                            </div>
+
+                        </div>
+
+                        <!-- Product Items -->
+                        <div class="modal-section">
+                            <h3>Ordered Products</h3>
+
+                            <template if:true={hasOrderItems}>
+
+                                <div class="product-list">
+
+                                    <template
+                                        for:each={formattedOrderItems}
+                                        for:item="item">
+
+                                        <div
+                                            class="product-item"
+                                            key={item.Id}>
+
+                                            <div class="product-image">
+                                                <template if:true={item.imageUrl}>
+                                                    <img
+                                                        src={item.imageUrl}
+                                                        alt={item.productName}/>
+                                                </template>
+
+                                                <template if:false={item.imageUrl}>
+                                                    <lightning-icon
+                                                        icon-name="utility:product"
+                                                        size="large"
+                                                        alternative-text="Product">
+                                                    </lightning-icon>
+                                                </template>
+                                            </div>
+
+                                            <div class="product-info">
+
+                                                <h4>
+                                                    {item.productName}
+                                                </h4>
+
+                                                <template if:true={item.brand}>
+                                                    <p>{item.brand}</p>
+                                                </template>
+
+                                                <template if:true={item.size}>
+                                                    <p>{item.size}</p>
+                                                </template>
+
+                                                <p>
+                                                    Quantity: {item.quantity}
+                                                </p>
+
+                                                <p>
+                                                    Unit Price:
+                                                    {item.formattedUnitPrice}
+                                                </p>
+
+                                            </div>
+
+                                            <div class="product-subtotal">
+                                                <strong>
+                                                    {item.formattedSubtotal}
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                    </template>
+                                </div>
+
+                            </template>
+
+                            <template if:false={hasOrderItems}>
+                                <p class="empty-detail">
+                                    No product items found for this order.
+                                </p>
+                            </template>
+
+                        </div>
+
+                        <!-- Shipping Address -->
+                        <div class="modal-section">
+                            <h3>Shipping Address</h3>
+
+                            <div class="shipping-address">
+                                {formattedShippingAddress}
+                            </div>
+                        </div>
+
+                        <!-- Total -->
+                        <div class="modal-total">
+                            <span>Total Amount</span>
+                            <strong>{formattedOrderTotal}</strong>
+                        </div>
+
+                    </div>
+
+                </template>
+
+                <div class="modal-footer">
+                    <button
+                        class="close-details-button"
+                        onclick={handleCloseOrderDetails}>
+                        Close
+                    </button>
+                </div>
+
+            </section>
+        </div>
+
+    </template>
+
 </template>

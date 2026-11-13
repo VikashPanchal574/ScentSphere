@@ -172,10 +172,31 @@ td {
     white-space: nowrap;
 }
 
+/* Entire order row is clickable */
+.order-row {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.order-row:hover {
+    background: #faf3eb;
+}
+
+.order-row:focus-visible {
+    outline: 2px solid #b78342;
+    outline-offset: -2px;
+}
+
 .order-number,
 .amount {
     color: #321728;
     font-weight: 700;
+}
+
+.order-hint {
+    color: #95878c;
+    font-size: 11px;
+    margin-top: 14px;
 }
 
 .empty-orders {
@@ -211,6 +232,264 @@ td {
     color: #9c342b;
 }
 
+/* Logout */
+.logout-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 24px;
+    padding: 12px 18px;
+    background: #321728;
+    color: #fffdf9;
+    border: 1px solid #321728;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+    background: #4a263c;
+}
+
+/* ===================================
+   ORDER DETAILS MODAL
+=================================== */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(25, 14, 21, 0.65);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.order-modal {
+    background: #fffdf9;
+    width: 100%;
+    max-width: 760px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+    animation: modalAppear 0.2s ease-out;
+}
+
+@keyframes modalAppear {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 25px 30px;
+    background: #321728;
+    color: #ffffff;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-header .eyebrow {
+    color: #e5c58e;
+}
+
+.modal-header h2 {
+    font-family: Georgia, serif;
+    font-size: 26px;
+    margin: 0;
+    color: #ffffff;
+}
+
+.modal-close {
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.modal-body {
+    padding: 25px 30px;
+}
+
+.modal-loading {
+    min-height: 150px;
+    position: relative;
+}
+
+.order-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.info-box {
+    background: #f8f3ed;
+    border-radius: 7px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    overflow-wrap: anywhere;
+}
+
+.info-box span {
+    color: #8c777e;
+    font-size: 10px;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.info-box strong {
+    color: #321728;
+    font-size: 13px;
+}
+
+.modal-section {
+    margin-top: 28px;
+}
+
+.modal-section h3 {
+    font-family: Georgia, serif;
+    font-size: 19px;
+    color: #321728;
+    margin: 0 0 15px;
+}
+
+.product-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    padding: 16px 0;
+    border-bottom: 1px solid #eee5dc;
+}
+
+.product-image {
+    width: 82px;
+    height: 96px;
+    flex-shrink: 0;
+    background: #f8f3ed;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 5px;
+}
+
+.product-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-info h4 {
+    font-family: Georgia, serif;
+    font-size: 16px;
+    color: #321728;
+    margin: 0 0 6px;
+}
+
+.product-info p {
+    color: #82767c;
+    font-size: 12px;
+    margin: 4px 0;
+}
+
+.product-subtotal {
+    color: #321728;
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.shipping-address {
+    padding: 17px;
+    background: #f8f3ed;
+    border-left: 3px solid #b78342;
+    border-radius: 5px;
+    color: #554950;
+    font-size: 13px;
+    line-height: 1.8;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+}
+
+.modal-total {
+    margin-top: 25px;
+    padding: 20px 0 5px;
+    border-top: 1px solid #e9dfd4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #321728;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.modal-total strong {
+    font-family: Georgia, serif;
+    font-size: 24px;
+}
+
+.modal-footer {
+    padding: 17px 30px 25px;
+    text-align: right;
+}
+
+.close-details-button {
+    background: #321728;
+    color: #ffffff;
+    border: none;
+    padding: 11px 28px;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.close-details-button:hover {
+    background: #563047;
+}
+
+.empty-detail {
+    color: #91858a;
+    font-size: 13px;
+    padding: 15px 0;
+}
+
 @media (max-width: 850px) {
     .account-grid {
         grid-template-columns: 1fr;
@@ -235,26 +514,51 @@ td {
         align-items: flex-start;
         flex-direction: column;
     }
-}
 
-.logout-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    margin-top: 24px;
-    padding: 12px 18px;
-    background: #321728;
-    color: #fffdf9;
-    border: 1px solid #321728;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
+    .modal-backdrop {
+        padding: 10px;
+    }
 
-.logout-button:hover {
-    background: #4a263c;
+    .order-modal {
+        max-height: 94vh;
+    }
+
+    .modal-header,
+    .modal-body {
+        padding: 20px;
+    }
+
+    .modal-header h2 {
+        font-size: 22px;
+    }
+
+    .order-info-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .info-box {
+        padding: 12px;
+    }
+
+    .product-item {
+        gap: 10px;
+    }
+
+    .product-image {
+        width: 65px;
+        height: 82px;
+    }
+
+    .product-info h4 {
+        font-size: 14px;
+    }
+
+    .product-subtotal {
+        font-size: 11px;
+    }
+
+    .modal-footer {
+        padding: 15px 20px 20px;
+    }
 }

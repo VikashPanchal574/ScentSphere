@@ -5,7 +5,9 @@
         <!-- Header -->
         <div class="catalog-header">
             <p class="eyebrow">THE SCENTSPHERE COLLECTION</p>
+
             <h1>Discover Your Signature Scent</h1>
+
             <p class="subtitle">
                 Explore fragrances crafted to leave a lasting impression.
             </p>
@@ -79,6 +81,7 @@
 
         <!-- Products -->
         <template if:true={hasProducts}>
+
             <div class="product-grid">
 
                 <template for:each={products} for:item="product">
@@ -108,11 +111,24 @@
                                 </div>
                             </template>
 
+                            <!-- Out Of Stock Overlay -->
+                            <template if:true={product.isOutOfStock}>
+                                <div class="out-of-stock-overlay">
+                                    <span class="out-of-stock-strip">
+                                        OUT OF STOCK
+                                    </span>
+                                </div>
+                            </template>
+
                             <!-- Wishlist Heart Button -->
-                            <div class="wishlist-action">
+                            <div
+                                class="wishlist-action"
+                                onclick={stopCardNavigation}>
+
                                 <c-wishlist-button
                                     perfume-id={product.Id}>
                                 </c-wishlist-button>
+
                             </div>
 
                         </div>
@@ -158,14 +174,17 @@
                 </template>
 
             </div>
+
         </template>
 
         <!-- Empty State -->
         <template if:true={showEmpty}>
+
             <div class="message empty-message">
                 <h3>No fragrances found</h3>
                 <p>Try changing your search or filters.</p>
             </div>
+
         </template>
 
     </section>

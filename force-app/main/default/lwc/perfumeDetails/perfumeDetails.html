@@ -1,22 +1,24 @@
+
 <template>
     <section class="details-container">
 
-        <!-- Back to Shop -->
+        <!-- Back Navigation -->
         <div class="back-navigation">
-    <button
-        class="back-button"
-        onclick={handleBackNavigation}
-        type="button">
+            <button
+                class="back-button"
+                onclick={handleBackNavigation}
+                type="button">
+                <span>←</span>
+                {backButtonLabel}
+            </button>
+        </div>
 
-        <span>←</span>
-        {backButtonLabel}
-
-    </button>
-</div>
         <!-- Loading -->
         <template if:true={isLoading}>
             <div class="message">
-                <lightning-spinner alternative-text="Loading perfume details" size="medium">
+                <lightning-spinner
+                    alternative-text="Loading perfume details"
+                    size="medium">
                 </lightning-spinner>
             </div>
         </template>
@@ -35,7 +37,10 @@
                 <!-- Product Image -->
                 <div class="image-section">
                     <template if:true={perfume.imageUrl}>
-                        <img src={perfume.imageUrl} alt={perfume.Product_Name__c} class="product-image" />
+                        <img
+                            src={perfume.imageUrl}
+                            alt={perfume.Product_Name__c}
+                            class="product-image" />
                     </template>
 
                     <template if:false={perfume.imageUrl}>
@@ -48,9 +53,7 @@
                 <!-- Product Information -->
                 <div class="info-section">
 
-                    <p class="eyebrow">
-                        {perfume.Brand__c}
-                    </p>
+                    <p class="eyebrow">{perfume.Brand__c}</p>
 
                     <h1>{perfume.Product_Name__c}</h1>
 
@@ -99,18 +102,32 @@
                         </div>
                     </template>
 
+                    <!-- Out of Stock Message -->
+                    <template if:true={isOutOfStock}>
+                        <div class="out-of-stock-message">
+                            <span>OUT OF STOCK</span>
+                            <p>This fragrance is currently unavailable.</p>
+                        </div>
+                    </template>
+
                     <!-- Quantity -->
                     <div class="quantity-section">
                         <span>Quantity</span>
 
                         <div class="quantity-control">
-                            <button onclick={handleDecrease} disabled={isOutOfStock}>
+                            <button
+                                onclick={handleDecrease}
+                                disabled={isOutOfStock}
+                                type="button">
                                 −
                             </button>
 
                             <span>{quantity}</span>
 
-                            <button onclick={handleIncrease} disabled={isIncreaseDisabled}>
+                            <button
+                                onclick={handleIncrease}
+                                disabled={isIncreaseDisabled}
+                                type="button">
                                 +
                             </button>
                         </div>
@@ -123,21 +140,40 @@
                     </div>
 
                     <!-- Add to Cart -->
-                    <button class="add-to-cart-button" onclick={handleAddToCart} disabled={isOutOfStock}>
+                    <button
+                        class="add-to-cart-button"
+                        onclick={handleAddToCart}
+                        disabled={isOutOfStock}>
+
                         <template if:true={isAddingToCart}>
-                            Adding...
+                            <lightning-spinner
+                                alternative-text="Adding to cart"
+                                size="small">
+                            </lightning-spinner>
+                            <span>Adding to Cart...</span>
                         </template>
+
                         <template if:false={isAddingToCart}>
-                            Add to Cart
+                            <template if:true={isOutOfStock}>
+                                <span>Currently Unavailable</span>
+                            </template>
+                            <template if:false={isOutOfStock}>
+                                <span>Add to Cart</span>
+                                <span class="cart-arrow">→</span>
+                            </template>
                         </template>
                     </button>
+
+                    <!-- Success Message -->
                     <template if:true={cartMessage}>
                         <p class="success-message">{cartMessage}</p>
                     </template>
 
+                    <!-- Error Message -->
                     <template if:true={cartError}>
                         <p class="error-message">{cartError}</p>
                     </template>
+
                 </div>
             </div>
         </template>

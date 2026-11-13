@@ -1,40 +1,56 @@
 <template>
     <section class="hero-section">
 
+        <div class="hero-glow hero-glow-one" aria-hidden="true"></div>
+        <div class="hero-glow hero-glow-two" aria-hidden="true"></div>
+
         <div class="hero-container">
 
             <!-- Left Content -->
             <div class="hero-content">
 
-                <div class="eyebrow">
+                <div class="eyebrow rise rise-0">
                     <span class="eyebrow-line"></span>
-                    <span class="eyebrow-text">THE WORLD OF FINE FRAGRANCES</span>
+                    <span class="eyebrow-text">
+                        THE ART OF FINE FRAGRANCES
+                    </span>
                 </div>
 
-                <h1>
+                <h1 class="rise rise-1">
                     Discover Your
-                    <span>Signature Scent</span>
+                    <span>Signature Scent.</span>
                 </h1>
 
-                <p class="hero-description">
-                    Experience the art of fine perfumery.
-                    Explore captivating fragrances crafted to
-                    express your personality and leave a lasting impression.
+                <p class="hero-description rise rise-2">
+                    Find a fragrance that reflects your personality.
+                    Explore captivating scents crafted to make
+                    every moment unforgettable.
                 </p>
 
-                <div class="hero-buttons">
-                    <button class="primary-button" onclick={handleShopNow}>
+                <!-- Action Buttons -->
+                <div class="hero-buttons rise rise-3">
+
+                    <button
+                        type="button"
+                        class="primary-button"
+                        onclick={handleShopNow}
+                    >
                         Shop Now
-                        <span>→</span>
+                        <span class="button-arrow">→</span>
                     </button>
 
-                    <button class="secondary-button" onclick={handleExplore}>
+                    <button
+                        type="button"
+                        class="secondary-button"
+                        onclick={handleExplore}
+                    >
                         Explore Collections
                     </button>
+
                 </div>
 
                 <!-- Trust Features -->
-                <div class="trust-features">
+                <div class="trust-features rise rise-4">
 
                     <div class="trust-item">
                         <span class="trust-icon">✦</span>
@@ -61,30 +77,105 @@
                     </div>
 
                 </div>
-            </div>
 
-            <!-- Right Image -->
-            <div class="hero-image-container">
-
-                <div class="image-decoration decoration-one"></div>
-                <div class="image-decoration decoration-two"></div>
-
-                <img src={heroImage} alt="Luxury perfume bottle with elegant floral arrangement" class="hero-image" />
-
-                <div class="image-caption">
-                    <span>THE SCENT OF ELEGANCE</span>
-                    <small>Discover something extraordinary</small>
+                <!-- Social Proof (placeholder text: replace with real data or delete this block) -->
+                <div class="hero-proof rise rise-5">
+                    <span class="proof-stars" aria-hidden="true">★★★★★</span>
+                    <span>4.8/5 from 10,000+ happy customers</span>
+                    <span class="proof-dot" aria-hidden="true"></span>
+                    <span>Free shipping above ₹999</span>
                 </div>
 
             </div>
 
-        </div>
+            <!-- Right Visual -->
+            <div class="hero-visual rise rise-3">
 
-        <!-- Bottom Slider Indicator -->
-        <div class="hero-indicators">
-            <span class="indicator active"></span>
-            <span class="indicator"></span>
-            <span class="indicator"></span>
+                <div class="visual-heading">
+                    <span>SCENTSPHERE</span>
+                    <span class="visual-edition">
+                        THE SIGNATURE COLLECTION
+                    </span>
+                </div>
+
+                <div
+                    class={containerClass}
+                    role="region"
+                    aria-roledescription="carousel"
+                    aria-label="Signature collection"
+                    onmouseenter={handlePause}
+                    onmouseleave={handleResume}
+                    onfocusin={handlePause}
+                    onfocusout={handleResume}
+                >
+
+                    <template for:each={slideItems} for:item="slide">
+                        <div
+                            key={slide.id}
+                            class={slide.className}
+                            aria-hidden={slide.ariaHidden}
+                        >
+                            <img
+                                src={slide.image}
+                                alt={slide.alt}
+                                class="hero-image"
+                            />
+
+                            <div class="image-overlay"></div>
+
+                            <div class="image-caption">
+                                <span class="caption-eyebrow">
+                                    {slide.eyebrow}
+                                </span>
+
+                                <h2>{slide.title}</h2>
+
+                                <p>{slide.subtitle}</p>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Arrows and dots show up only when there is more than one slide -->
+                    <template lwc:if={hasMultipleSlides}>
+
+                        <button
+                            type="button"
+                            class="hero-arrow hero-arrow-prev"
+                            aria-label="Previous fragrance"
+                            onclick={handlePrev}
+                        >‹</button>
+
+                        <button
+                            type="button"
+                            class="hero-arrow hero-arrow-next"
+                            aria-label="Next fragrance"
+                            onclick={handleNext}
+                        >›</button>
+
+                        <div class="hero-dots">
+                            <template for:each={slideItems} for:item="slide">
+                                <button
+                                    key={slide.id}
+                                    type="button"
+                                    class={slide.dotClass}
+                                    data-index={slide.index}
+                                    aria-label={slide.dotLabel}
+                                    onclick={handleDot}
+                                ></button>
+                            </template>
+                        </div>
+
+                    </template>
+
+                </div>
+
+                <div class="visual-footer">
+                    <span>CRAFTED TO BE REMEMBERED</span>
+                    <span class="footer-line"></span>
+                </div>
+
+            </div>
+
         </div>
 
     </section>

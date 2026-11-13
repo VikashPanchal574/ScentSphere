@@ -1,13 +1,24 @@
 
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-import getAccountData from '@salesforce/apex/ScentSphereAccountController.getAccountData';
+
+import getAccountData
+    from '@salesforce/apex/ScentSphereAccountController.getAccountData';
+
+import getOrderDetails
+    from '@salesforce/apex/ScentSphereAccountController.getOrderDetails';
 
 export default class ScentsphereMyAccount extends NavigationMixin(LightningElement) {
 
     accountData;
     error;
     isLoading = true;
+
+    // Order details modal
+    isOrderDetailsOpen = false;
+    isLoadingOrderDetails = false;
+    orderDetailsError = '';
+    orderDetails;
 
     @wire(getAccountData)
     wiredAccountData({ data, error }) {
@@ -16,10 +27,15 @@ export default class ScentsphereMyAccount extends NavigationMixin(LightningEleme
         if (data) {
             this.accountData = data;
             this.error = undefined;
+
         } else if (error) {
             this.error = error;
             this.accountData = undefined;
-            console.error('My Account Error:', JSON.stringify(error));
+
+            console.error(
+                'My Account Error:',
+                JSON.stringify(error)
+            );
         }
     }
 
@@ -40,15 +56,18 @@ export default class ScentsphereMyAccount extends NavigationMixin(LightningEleme
     }
 
     get firstName() {
-        return this.customerUser.FirstName || this.customer.FirstName || '—';
+        return this.customerUser.FirstName ||
+            this.customer.FirstName || '—';
     }
 
     get lastName() {
-        return this.customerUser.LastName || this.customer.LastName || '—';
+        return this.customerUser.LastName ||
+            this.customer.LastName || '—';
     }
 
     get email() {
-        return this.customerUser.Email || this.customer.Email || '—';
+        return this.customerUser.Email ||
+            this.customer.Email || '—';
     }
 
     get username() {
@@ -56,19 +75,26 @@ export default class ScentsphereMyAccount extends NavigationMixin(LightningEleme
     }
 
     get phone() {
-        return this.customerUser.Phone || this.customer.Phone || '—';
+        return this.customerUser.Phone ||
+            this.customer.Phone || '—';
     }
 
     get fullName() {
-        const first = this.customerUser.FirstName || this.customer.FirstName || '';
-        const last = this.customerUser.LastName || this.customer.LastName || '';
+        const first =
+            this.customerUser.FirstName || this.customer.FirstName || '';
+
+        const last =
+            this.customerUser.LastName || this.customer.LastName || '';
 
         return `${first} ${last}`.trim() || 'ScentSphere Customer';
     }
 
     get initials() {
-        const first = this.customerUser.FirstName || this.customer.FirstName || '';
-        const last = this.customerUser.LastName || this.customer.LastName || '';
+        const first =
+            this.customerUser.FirstName || this.customer.FirstName || '';
+
+        const last =
+            this.customerUser.LastName || this.customer.LastName || '';
 
         return (first.charAt(0) + last.charAt(0)).toUpperCase() || 'S';
     }
@@ -87,15 +113,18 @@ export default class ScentsphereMyAccount extends NavigationMixin(LightningEleme
     get formattedOrders() {
         return this.orders.map(order => ({
             ...order,
+
             formattedDate: order.Order_Date__c
-                ? new Date(order.Order_Date__c + 'T00:00:00').toLocaleDateString('en-IN')
+                ? new Date(
+                    order.Order_Date__c + 'T00:00:00'
+                ).toLocaleDateString('en-IN')
                 : '—',
 
-            formattedAmount: new Intl.NumberFormat('en-IN', {
-                style: 'currency',
-                currency: 'INR',
-                maximumFractionDigits: 2
-            }).format(order.Total_Amount__c || 0)
+            formattedAmount: this.formatCurrency(
+                order.Total_Amount__c
+            ),
+
+            accessibleLabel: `View details for order ${order.Name}`
         }));
     }
 
@@ -108,7 +137,9 @@ export default class ScentsphereMyAccount extends NavigationMixin(LightningEleme
             this.customer.MailingCountry
         ].filter(Boolean);
 
-        return parts.length ? parts.join(', ') : 'Address not available';
+        return parts.length
+            ? parts.join(', ')
+            : 'Address not available';
     }
 
     get accountName() {
@@ -119,9 +150,174 @@ export default class ScentsphereMyAccount extends NavigationMixin(LightningEleme
         return !!this.error;
     }
 
+    // ==========================================
+    // OPEN ORDER DETAILS
+    // ==========================================
+
+    handleOrderClick(event) {
+        const orderId = event.currentTarget.dataset.id;
+
+        this.loadOrderDetails(orderId);
+    }
+
+    // Keyboard accessibility for clickable rows
+    handleOrderKeydown(event) {
+
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+
+            const orderId = event.currentTarget.dataset.id;
+
+            this.loadOrderDetails(orderId);
+        }
+    }
+
+    async loadOrderDetails(orderId) {
+
+        if (!orderId) {
+            return;
+        }
+
+        this.isOrderDetailsOpen = true;
+        this.isLoadingOrderDetails = true;
+        this.orderDetailsError = '';
+        this.orderDetails = undefined;
+
+        try {
+
+            const response = await getOrderDetails({
+                orderId: orderId
+            });
+
+            this.orderDetails = response;
+
+        } catch (error) {
+
+            console.error(
+                'Order Details Error:',
+                JSON.stringify(error)
+            );
+
+            this.orderDetailsError =
+                error?.body?.message ||
+                'Unable to load order details. Please try again.';
+
+        } finally {
+
+            this.isLoadingOrderDetails = false;
+        }
+    }
+
+    // ==========================================
+    // ORDER DETAILS GETTERS
+    // ==========================================
+
+    get selectedOrder() {
+        return this.orderDetails?.orderRecord || {};
+    }
+
+    get formattedOrderDate() {
+
+        const date = this.selectedOrder.Order_Date__c;
+
+        return date
+            ? new Date(date + 'T00:00:00').toLocaleDateString(
+                'en-IN',
+                {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                }
+            )
+            : '—';
+    }
+
+    get formattedOrderTotal() {
+        return this.formatCurrency(
+            this.selectedOrder.Total_Amount__c
+        );
+    }
+
+    get formattedShippingAddress() {
+        return this.selectedOrder.Shipping_Address__c ||
+            'Shipping address not available.';
+    }
+
+    get formattedOrderItems() {
+
+        const items = this.orderDetails?.items || [];
+
+        return items.map(item => {
+
+            const quantity = Number(item.Quantity__c || 0);
+            const unitPrice = Number(item.Unit_Price__c || 0);
+
+            return {
+                ...item,
+
+                productName:
+                    item.Perfume__r?.Product_Name__c ||
+                    'Perfume',
+
+                brand:
+                    item.Perfume__r?.Brand__c || '',
+
+                size:
+                    item.Perfume__r?.Size__c || '',
+
+                imageUrl:
+                    item.Perfume__r?.Product_Image_URL__c || '',
+
+                quantity: quantity,
+
+                formattedUnitPrice:
+                    this.formatCurrency(unitPrice),
+
+                formattedSubtotal:
+                    this.formatCurrency(quantity * unitPrice)
+            };
+        });
+    }
+
+    get hasOrderItems() {
+        return this.formattedOrderItems.length > 0;
+    }
+
+    // ==========================================
+    // MODAL CONTROLS
+    // ==========================================
+
+    handleCloseOrderDetails() {
+        this.isOrderDetailsOpen = false;
+        this.orderDetails = undefined;
+        this.orderDetailsError = '';
+    }
+
+    handleModalBackdropClick(event) {
+
+        if (event.target === event.currentTarget) {
+            this.handleCloseOrderDetails();
+        }
+    }
+
+    // ==========================================
+    // COMMON HELPERS
+    // ==========================================
+
+    formatCurrency(value) {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 2
+        }).format(Number(value || 0));
+    }
+
     handleLogout() {
+
         this[NavigationMixin.Navigate]({
+
             type: 'comm__loginPage',
+
             attributes: {
                 actionName: 'logout'
             }
