@@ -294,24 +294,29 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         this.closeMenu();
     }
 
-    // Navigate to About or Contact section
-    navigateToSection(sectionName) {
+// Navigate directly to About or Contact section
+navigateToSection(sectionName) {
 
-        this[NavigationMixin.Navigate]({
+    this[NavigationMixin.Navigate]({
 
-            type: 'comm__namedPage',
+        type: 'comm__namedPage',
 
-            attributes: {
-                name: 'About_Contact__c'
-            },
+        attributes: {
+            name: 'About_Contact__c'
+        },
 
-            state: {
-                c__section: sectionName
-            }
-        });
+        state: {
+            c__section: sectionName,
 
-        this.closeMenu();
-    }
+            // Unique navigation request ensures
+            // repeated clicks trigger a new page reference
+            c__navRequest: String(Date.now())
+        }
+    });
+
+    this.closeMenu();
+}
+
 
     // Search
     // Search Input Handler

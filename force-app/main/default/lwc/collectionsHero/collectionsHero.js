@@ -1,3 +1,4 @@
+
 import { LightningElement, wire } from 'lwc';
 
 import {
@@ -8,6 +9,8 @@ import {
 import getPerfumesByCategory from
     '@salesforce/apex/CollectionsController.getPerfumesByCategory';
 
+const PRODUCTS_PER_LOAD = 8;
+
 export default class CollectionsHero extends NavigationMixin(LightningElement) {
 
     selectedCategory = 'All';
@@ -16,6 +19,9 @@ export default class CollectionsHero extends NavigationMixin(LightningElement) {
     errorMessage = '';
 
     currentPageReference;
+
+    // Pagination
+    displayedCount = PRODUCTS_PER_LOAD;
 
     collectionTypes = [
         {
@@ -80,26 +86,47 @@ export default class CollectionsHero extends NavigationMixin(LightningElement) {
     @wire(CurrentPageReference)
     getCurrentPageReference(pageReference) {
 
-        if (pageReference) {
+        if (!pageReference) {
+            return;
+        }
 
-            this.currentPageReference = pageReference;
+        this.currentPageReference = pageReference;
 
-            const category =
-                pageReference.state?.c__category || 'All';
+        const category = pageReference.state?.c__category || 'All';
 
-            if (
-                category !== this.selectedCategory ||
-                this.perfumes.length === 0
-            ) {
-                this.loadPerfumes(category);
-            }
+        if (
+            category !== this.selectedCategory ||
+            this.perfumes.length === 0
+        ) {
+            this.loadPerfumes(category);
         }
     }
 
+    // Dynamic category heading
     get selectedCategoryLabel() {
+
         return this.selectedCategory === 'All'
             ? 'All Fragrances'
             : `${this.selectedCategory} Fragrances`;
+    }
+
+    // Show only currently loaded products
+    get visiblePerfumes() {
+        return this.perfumes.slice(0, this.displayedCount);
+    }
+
+    // Show Load More button only when more products remain
+    get showLoadMore() {
+        return !this.isLoading &&
+            this.perfumes.length > this.displayedCount;
+    }
+
+    // Number of currently visible products
+    get visibleCount() {
+        return Math.min(
+            this.displayedCount,
+            this.perfumes.length
+        );
     }
 
     get hasPerfumes() {
@@ -123,13 +150,26 @@ export default class CollectionsHero extends NavigationMixin(LightningElement) {
         this.isLoading = true;
         this.errorMessage = '';
 
+        // Reset pagination whenever category changes
+        this.displayedCount = PRODUCTS_PER_LOAD;
+
         try {
 
             const result = await getPerfumesByCategory({
                 category: category
             });
 
-            this.perfumes = result;
+            this.perfumes = (result || []).map(perfume => {
+
+                const stockQuantity = Number(
+                    perfume.Stock_Quantity__c ?? 0
+                );
+
+                return {
+                    ...perfume,
+                    isOutOfStock: stockQuantity <= 0
+                };
+            });
 
         } catch (error) {
 
@@ -140,9 +180,21 @@ export default class CollectionsHero extends NavigationMixin(LightningElement) {
                 error?.message ||
                 'Unable to load perfumes. Please try again.';
 
+            console.error(
+                'Collections Perfumes Error:',
+                error
+            );
+
         } finally {
+
             this.isLoading = false;
         }
+    }
+
+    // Load the next 8 perfumes
+    handleLoadMore() {
+
+        this.displayedCount += PRODUCTS_PER_LOAD;
     }
 
     // Category selection and smooth scrolling
@@ -150,24 +202,26 @@ export default class CollectionsHero extends NavigationMixin(LightningElement) {
 
         const category = event.currentTarget.dataset.category;
 
-        if (category) {
+        if (!category) {
+            return;
+        }
 
-            this.loadPerfumes(category);
+        this.loadPerfumes(category);
 
-            const resultsSection = this.template.querySelector(
-                '[data-target="perfume-results"]'
-            );
+        const resultsSection = this.template.querySelector(
+            '[data-target="perfume-results"]'
+        );
 
-            if (resultsSection) {
-                resultsSection.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+        if (resultsSection) {
+
+            resultsSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
         }
     }
 
-    // Show all perfumes
+    // Show all non-gift fragrances
     handleShowAll() {
         this.loadPerfumes('All');
     }
@@ -180,6 +234,7 @@ export default class CollectionsHero extends NavigationMixin(LightningElement) {
         );
 
         if (collectionSection) {
+
             collectionSection.scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
@@ -187,12 +242,43 @@ export default class CollectionsHero extends NavigationMixin(LightningElement) {
         }
     }
 
-    // Navigate to Product Details with Collections context
+    // Clicking anywhere on the product card opens Product Details
+    handleCardClick(event) {
+
+        this.navigateToPerfume(
+            event.currentTarget.dataset.id
+        );
+    }
+
+    // Keyboard navigation
+    handleCardKeydown(event) {
+
+        if (event.target !== event.currentTarget) {
+            return;
+        }
+
+        if (event.key === 'Enter' || event.key === ' ') {
+
+            event.preventDefault();
+
+            this.navigateToPerfume(
+                event.currentTarget.dataset.id
+            );
+        }
+    }
+
+    // View Details button
     handleViewDetails(event) {
 
         event.stopPropagation();
 
-        const perfumeId = event.currentTarget.dataset.id;
+        this.navigateToPerfume(
+            event.currentTarget.dataset.id
+        );
+    }
+
+    // Product Details navigation
+    navigateToPerfume(perfumeId) {
 
         if (!perfumeId) {
             return;

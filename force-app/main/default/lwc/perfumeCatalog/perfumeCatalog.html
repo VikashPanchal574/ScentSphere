@@ -13,16 +13,16 @@
             </p>
         </div>
 
-       <!-- Search -->
-<div class="search-section">
-    <lightning-input
-        type="search"
-        label="Search fragrances"
-        placeholder="Search by perfume name, brand, notes or collection..."
-        value={searchTerm}
-        onchange={handleSearch}>
-    </lightning-input>
-</div>>
+        <!-- Search -->
+        <div class="search-section">
+            <lightning-input
+                type="search"
+                label="Search fragrances"
+                placeholder="Search by perfume name, brand, notes or collection..."
+                value={searchTerm}
+                onchange={handleSearch}>
+            </lightning-input>
+        </div>
 
         <!-- Filters -->
         <div class="filter-section">
@@ -60,7 +60,10 @@
         <!-- Product Count -->
         <div class="results-header">
             <h2>Our Fragrances</h2>
-            <span>{productCount} Products</span>
+
+            <span>
+                Showing {visibleProductCount} of {productCount} Products
+            </span>
         </div>
 
         <!-- Loading -->
@@ -85,7 +88,7 @@
 
             <div class="product-grid">
 
-                <template for:each={products} for:item="product">
+                <template for:each={visibleProducts} for:item="product">
 
                     <article
                         class="product-card"
@@ -176,6 +179,22 @@
 
             </div>
 
+        </template>
+
+        <!-- Load More Button -->
+        <template if:true={showLoadMore}>
+            <div class="load-more-section">
+
+                <button
+                    class="load-more-button"
+                    onclick={handleLoadMore}>
+
+                    Load More Fragrances
+                    <span>↓</span>
+
+                </button>
+
+            </div>
         </template>
 
         <!-- Empty State -->

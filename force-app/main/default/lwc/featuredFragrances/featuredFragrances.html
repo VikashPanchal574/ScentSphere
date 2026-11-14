@@ -45,7 +45,7 @@
         <template if:true={hasProducts}>
             <div class="product-grid">
 
-                <template for:each={products} for:item="product">
+                <template for:each={visibleProducts} for:item="product">
 
                     <article
                         class="product-card"
@@ -81,7 +81,7 @@
                                 FEATURED
                             </span>
 
-                            <!-- Wishlist Heart Button -->
+                            <!-- Wishlist Button -->
                             <div class="wishlist-action">
                                 <c-wishlist-button
                                     perfume-id={product.Id}>
@@ -131,14 +131,19 @@
             </div>
         </template>
 
-        <div class="section-footer">
-            <button
-                class="view-all-button"
-                onclick={handleViewAll}>
-                Explore All Fragrances
-                <span>→</span>
-            </button>
-        </div>
+        <!-- View All / Show Less -->
+        <template if:true={showViewAll}>
+            <div class="section-footer">
+                <button
+                    class="view-all-button"
+                    onclick={handleViewAll}>
+
+                    {viewAllLabel}
+                    <span>{viewAllIcon}</span>
+
+                </button>
+            </div>
+        </template>
 
     </section>
 </template>

@@ -8,6 +8,8 @@ import {
 import getActivePerfumes
     from '@salesforce/apex/PerfumeCatalogController.getActivePerfumes';
 
+const PRODUCTS_PER_LOAD = 12;
+
 export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
 
     allProducts = [];
@@ -21,6 +23,9 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
     selectedBrand = '';
     selectedGender = '';
     selectedSort = 'newest';
+
+    // Number of products currently displayed
+    displayedCount = PRODUCTS_PER_LOAD;
 
     // ==========================================
     // RECEIVE SEARCH FROM HEADER
@@ -42,9 +47,7 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
         ).trim().toLowerCase();
 
         if (this.searchTerm !== newSearchTerm) {
-
             this.searchTerm = newSearchTerm;
-
             this.applyFilters();
         }
     }
@@ -69,7 +72,6 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
 
                     imageUrl: perfume.Product_Image_URL__c || '',
 
-                    // Zero or negative stock means unavailable
                     isOutOfStock: stockQuantity <= 0,
 
                     formattedPrice: new Intl.NumberFormat('en-IN', {
@@ -87,6 +89,7 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
 
             this.allProducts = [];
             this.products = [];
+            this.displayedCount = PRODUCTS_PER_LOAD;
 
             this.errorMessage = 'Unable to load perfumes.';
 
@@ -94,6 +97,34 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
         }
 
         this.isLoading = false;
+    }
+
+    // ==========================================
+    // LOAD MORE PRODUCTS
+    // ==========================================
+
+    // Only display the products loaded so far
+    get visibleProducts() {
+        return this.products.slice(0, this.displayedCount);
+    }
+
+    // Check whether more products are available
+    get showLoadMore() {
+        return !this.isLoading &&
+            this.products.length > this.displayedCount;
+    }
+
+    // Current visible product count
+    get visibleProductCount() {
+        return Math.min(
+            this.displayedCount,
+            this.products.length
+        );
+    }
+
+    // Display the next 12 products
+    handleLoadMore() {
+        this.displayedCount += PRODUCTS_PER_LOAD;
     }
 
     // ==========================================
@@ -269,7 +300,6 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
                     .join(' ')
                     .toLowerCase();
 
-                // Every search word must match somewhere
                 return searchTerms.every(term =>
                     searchableText.includes(term)
                 );
@@ -320,6 +350,9 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
         }
 
         this.products = result;
+
+        // Reset pagination whenever filters or search changes
+        this.displayedCount = PRODUCTS_PER_LOAD;
     }
 
     // ==========================================
@@ -337,6 +370,7 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
             this.products.length === 0;
     }
 
+    // Total matching product count
     get productCount() {
         return this.products.length;
     }

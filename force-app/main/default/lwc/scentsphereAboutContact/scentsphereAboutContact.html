@@ -222,61 +222,101 @@
 
                 </div>
 
-                <!-- Contact Form -->
-                <div class="contact-form-container">
+                
+<!-- Contact Form -->
+<div class="contact-form-container">
 
-                    <h3>Send Us a Message</h3>
+    <h3>Send Us a Message</h3>
 
-                    <lightning-record-edit-form
-                        object-api-name="Case"
-                        onsubmit={handleSubmit}
-                        onsuccess={handleSuccess}
-                        onerror={handleError}>
+    <!-- GUEST USER -->
+    <template if:true={isGuest}>
 
-                        <lightning-messages></lightning-messages>
+        <div class="guest-contact-message">
 
-                        <lightning-input-field
-                            field-name="SuppliedName"
-                            required>
-                        </lightning-input-field>
+            <div class="guest-lock-icon">✦</div>
 
-                        <lightning-input-field
-                            field-name="SuppliedEmail"
-                            required>
-                        </lightning-input-field>
+            <h4>Sign In to Contact Us</h4>
 
-                        <lightning-input-field
-                            field-name="Subject"
-                            required>
-                        </lightning-input-field>
+            <p>
+                Please log in to access this functionality
+                and send us a message. Our team will be
+                happy to assist you.
+            </p>
 
-                        <lightning-input-field
-                            field-name="Description"
-                            required>
-                        </lightning-input-field>
+            <button
+                class="login-button"
+                onclick={handleLogin}
+                type="button">
 
-                        <button
-                            class="submit-button"
-                            type="submit"
-                            disabled={isSubmitting}>
+                Sign In to Continue →
 
-                            <template if:true={isSubmitting}>
-                                Sending...
-                            </template>
+            </button>
 
-                            <template if:false={isSubmitting}>
-                                Send Message →
-                            </template>
+            <p class="guest-note">
+                Your ScentSphere account gives you access
+                to customer support and order assistance.
+            </p>
 
-                        </button>
+        </div>
 
-                    </lightning-record-edit-form>
+    </template>
 
-                    <template if:true={formMessage}>
-                        <p class="form-message">{formMessage}</p>
-                    </template>
+    <!-- AUTHENTICATED USER -->
+    <template if:false={isGuest}>
 
-                </div>
+        <lightning-record-edit-form
+            object-api-name="Case"
+            onsubmit={handleSubmit}
+            onsuccess={handleSuccess}
+            onerror={handleError}>
+
+            <lightning-messages></lightning-messages>
+
+            <lightning-input-field
+                field-name="SuppliedName"
+                required>
+            </lightning-input-field>
+
+            <lightning-input-field
+                field-name="SuppliedEmail"
+                required>
+            </lightning-input-field>
+
+            <lightning-input-field
+                field-name="Subject"
+                required>
+            </lightning-input-field>
+
+            <lightning-input-field
+                field-name="Description"
+                required>
+            </lightning-input-field>
+
+            <button
+                class="submit-button"
+                type="submit"
+                disabled={isSubmitting}>
+
+                <template if:true={isSubmitting}>
+                    Sending...
+                </template>
+
+                <template if:false={isSubmitting}>
+                    Send Message →
+                </template>
+
+            </button>
+
+        </lightning-record-edit-form>
+
+        <template if:true={formMessage}>
+            <p class="form-message">{formMessage}</p>
+        </template>
+
+    </template>
+
+</div>
+
 
             </div>
 

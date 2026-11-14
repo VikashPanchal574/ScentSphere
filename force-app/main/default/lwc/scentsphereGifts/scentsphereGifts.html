@@ -174,9 +174,13 @@
                         <span>{selectedCollectionLabel}</span>
                     </h2>
 
-                    <p>
+                    <p class="products-subtitle">
                         Discover specially selected fragrances
                         for meaningful gifting moments.
+                    </p>
+
+                    <p class="products-count">
+                        Showing {visibleCount} of {products.length} Gifts
                     </p>
 
                 </div>
@@ -261,13 +265,21 @@
 
                 <div class="gift-products-grid">
 
-                    <template for:each={products} for:item="product">
+                    <template
+                        for:each={visibleProducts}
+                        for:item="product">
 
                         <article
                             class="gift-product-card"
-                            key={product.Id}>
+                            key={product.Id}
+                            data-id={product.Id}
+                            onclick={handleCardClick}
+                            onkeydown={handleCardKeydown}
+                            tabindex="0"
+                            role="link"
+                            aria-label="View gift perfume details">
 
-                            <!-- Product Image -->
+                            <!-- PRODUCT IMAGE -->
                             <div class="product-image-wrapper">
 
                                 <template if:true={product.Product_Image_URL__c}>
@@ -275,7 +287,8 @@
                                     <img
                                         src={product.Product_Image_URL__c}
                                         alt={product.Product_Name__c}
-                                        class="product-image"/>
+                                        class="product-image"
+                                        loading="lazy"/>
 
                                 </template>
 
@@ -287,16 +300,31 @@
 
                                 </template>
 
+                                <!-- OUT OF STOCK -->
+                                <template if:true={product.isOutOfStock}>
+
+                                    <div class="out-of-stock-overlay">
+
+                                        <span class="out-of-stock-strip">
+                                            OUT OF STOCK
+                                        </span>
+
+                                    </div>
+
+                                </template>
+
                             </div>
 
-                            <!-- Product Information -->
+                            <!-- PRODUCT INFORMATION -->
                             <div class="product-info">
 
                                 <p class="product-brand">
                                     {product.Brand__c}
                                 </p>
 
-                                <h3>{product.Product_Name__c}</h3>
+                                <h3>
+                                    {product.Product_Name__c}
+                                </h3>
 
                                 <p class="product-description">
                                     {product.Description__c}
@@ -308,10 +336,13 @@
                                         <span>{product.Size__c}</span>
                                     </template>
 
-                                    <span>{product.Category__c}</span>
+                                    <template if:true={product.Category__c}>
+                                        <span>{product.Category__c}</span>
+                                    </template>
 
                                 </div>
 
+                                <!-- PRICE AND DETAILS -->
                                 <div class="product-bottom">
 
                                     <span class="product-price">
@@ -330,7 +361,9 @@
                                         data-id={product.Id}
                                         onclick={handleViewDetails}
                                         type="button">
+
                                         View Details →
+
                                     </button>
 
                                 </div>
@@ -342,6 +375,25 @@
                     </template>
 
                 </div>
+
+                <!-- LOAD MORE -->
+                <template if:true={showLoadMore}>
+
+                    <div class="load-more-section">
+
+                        <button
+                            class="load-more-button"
+                            onclick={handleLoadMore}
+                            type="button">
+
+                            Load More Gifts
+                            <span>↓</span>
+
+                        </button>
+
+                    </div>
+
+                </template>
 
             </template>
 

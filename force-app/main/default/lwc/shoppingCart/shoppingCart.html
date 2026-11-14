@@ -1,3 +1,4 @@
+
 <template>
     <section class="cart-container">
 
@@ -5,96 +6,219 @@
         <div class="cart-header">
             <div>
                 <p class="eyebrow">YOUR SELECTION</p>
+
                 <h1>Shopping Cart</h1>
+
                 <p class="subtitle">
                     Your favourite fragrances, gathered in one place.
                 </p>
             </div>
         </div>
 
+        <!-- GUEST USER MESSAGE -->
+        <template if:true={showGuestMessage}>
+
+            <div class="guest-cart">
+
+                <div class="guest-cart-icon">
+                    <lightning-icon
+                        icon-name="utility:lock"
+                        size="large"
+                        alternative-text="Login required">
+                    </lightning-icon>
+                </div>
+
+                <p class="eyebrow guest-eyebrow">
+                    YOUR SCENTSPHERE ACCOUNT
+                </p>
+
+                <h2>Sign In to Access Your Cart</h2>
+
+                <p class="guest-description">
+                    Please log in to your ScentSphere account
+                    to view your shopping cart, manage your
+                    fragrances and continue shopping.
+                </p>
+
+                <button
+                    class="guest-login-button"
+                    onclick={handleLogin}
+                    type="button">
+
+                    Sign In to Continue →
+
+                </button>
+
+                <p class="guest-note">
+                    Your favourite fragrances are waiting for you.
+                </p>
+
+                <button
+                    class="guest-continue-button"
+                    onclick={handleContinueShopping}
+                    type="button">
+
+                    ← Continue Shopping
+
+                </button>
+
+            </div>
+
+        </template>
+
         <!-- Loading -->
         <template if:true={isLoading}>
+
             <div class="status-message">
-                <lightning-spinner alternative-text="Loading cart" size="medium">
+
+                <lightning-spinner
+                    alternative-text="Loading cart"
+                    size="medium">
                 </lightning-spinner>
+
                 <p>Loading your cart...</p>
+
             </div>
+
         </template>
 
         <!-- Error -->
         <template if:true={errorMessage}>
+
             <div class="status-message error-message">
-                <lightning-icon icon-name="utility:warning" size="small">
+
+                <lightning-icon
+                    icon-name="utility:warning"
+                    size="small">
                 </lightning-icon>
+
                 <p>{errorMessage}</p>
+
             </div>
+
         </template>
 
         <!-- Empty Cart -->
         <template if:true={isEmpty}>
+
             <div class="empty-cart">
-                <lightning-icon icon-name="utility:cart" size="large">
+
+                <lightning-icon
+                    icon-name="utility:cart"
+                    size="large">
                 </lightning-icon>
 
                 <h2>Your cart is waiting</h2>
+
                 <p>
                     Discover your signature scent and add it to your cart.
                 </p>
 
-                <button class="continue-button" onclick={handleContinueShopping}>
+                <button
+                    class="continue-button"
+                    onclick={handleContinueShopping}
+                    type="button">
+
                     Continue Shopping
+
                 </button>
+
             </div>
+
         </template>
 
         <!-- Cart Items -->
         <template if:true={hasItems}>
+
             <div class="cart-layout">
 
                 <div class="cart-items-section">
+
                     <div class="section-heading">
+
                         <h2>Your Items</h2>
-                        <span>{cart.Total_Items__c} items</span>
+
+                        <span>
+                            {cart.Total_Items__c} items
+                        </span>
+
                     </div>
 
-                    <template for:each={cartItems} for:item="item">
-                        <article class="cart-item" key={item.Id}>
+                    <template
+                        for:each={cartItems}
+                        for:item="item">
+
+                        <article
+                            class="cart-item"
+                            key={item.Id}>
 
                             <div class="product-image">
+
                                 <template if:true={item.imageUrl}>
-                                    <img src={item.imageUrl} alt={item.productName}>
+
+                                    <img
+                                        src={item.imageUrl}
+                                        alt={item.productName}>
+
                                 </template>
 
                                 <template if:false={item.imageUrl}>
-                                    <lightning-icon icon-name="utility:image" size="large">
+
+                                    <lightning-icon
+                                        icon-name="utility:image"
+                                        size="large">
                                     </lightning-icon>
+
                                 </template>
+
                             </div>
 
                             <div class="product-info">
+
                                 <h3>{item.productName}</h3>
+
                                 <p class="unit-price">
                                     {item.formattedPrice}
                                 </p>
 
                                 <div class="quantity-control">
-                                    <button data-id={item.Id} onclick={handleDecrease} disabled={isUpdating}
+
+                                    <button
+                                        data-id={item.Id}
+                                        onclick={handleDecrease}
+                                        disabled={isUpdating}
                                         title="Decrease quantity">
+
                                         −
+
                                     </button>
 
-                                    <span>{item.Quantity__c}</span>
+                                    <span>
+                                        {item.Quantity__c}
+                                    </span>
 
-                                    <button data-id={item.Id} onclick={handleIncrease} disabled={isUpdating}
+                                    <button
+                                        data-id={item.Id}
+                                        onclick={handleIncrease}
+                                        disabled={isUpdating}
                                         title="Increase quantity">
+
                                         +
+
                                     </button>
+
                                 </div>
 
-                                <button class="remove-button" data-id={item.Id} onclick={handleRemove}
+                                <button
+                                    class="remove-button"
+                                    data-id={item.Id}
+                                    onclick={handleRemove}
                                     disabled={isUpdating}>
+
                                     Remove
+
                                 </button>
+
                             </div>
 
                             <div class="item-subtotal">
@@ -102,36 +226,61 @@
                             </div>
 
                         </article>
+
                     </template>
+
                 </div>
 
                 <!-- Order Summary -->
                 <aside class="order-summary">
+
                     <h2>Order Summary</h2>
 
                     <div class="summary-row">
+
                         <span>Total Items</span>
-                        <span>{cart.Total_Items__c}</span>
+
+                        <span>
+                            {cart.Total_Items__c}
+                        </span>
+
                     </div>
 
                     <div class="summary-row total-row">
+
                         <span>Total Amount</span>
-                        <strong>{formattedTotal}</strong>
+
+                        <strong>
+                            {formattedTotal}
+                        </strong>
+
                     </div>
 
-                    <button class="checkout-button" onclick={handleCheckout} disabled={isUpdating}>
+                    <button
+                        class="checkout-button"
+                        onclick={handleCheckout}
+                        disabled={isUpdating}>
+
                         Proceed to Checkout
+
                     </button>
 
                     <p class="checkout-note">
                         Review your shipping address before placing your order.
                     </p>
-                    <button class="continue-link" onclick={handleContinueShopping}>
+
+                    <button
+                        class="continue-link"
+                        onclick={handleContinueShopping}>
+
                         ← Continue Shopping
+
                     </button>
+
                 </aside>
 
             </div>
+
         </template>
 
     </section>

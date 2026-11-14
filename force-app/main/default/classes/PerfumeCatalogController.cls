@@ -1,3 +1,4 @@
+
 public with sharing class PerfumeCatalogController {
 
     @AuraEnabled(cacheable=true)
@@ -19,6 +20,7 @@ public with sharing class PerfumeCatalogController {
                        Featured_Product__c
                 FROM Perfume__c
                 WHERE Active__c = true
+                AND Gift_Collection__c = null
                 WITH USER_MODE
                 ORDER BY CreatedDate DESC
                 LIMIT 200

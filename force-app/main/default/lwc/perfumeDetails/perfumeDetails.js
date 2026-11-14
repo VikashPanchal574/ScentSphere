@@ -11,6 +11,10 @@ import {
     publish
 } from 'lightning/messageService';
 
+import Toast from 'lightning/toast';
+
+import isGuestUser from '@salesforce/user/isGuest';
+
 import CART_UPDATE
     from '@salesforce/messageChannel/CartUpdate__c';
 
@@ -31,6 +35,9 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     isAddingToCart = false;
     cartMessage = '';
     cartError = '';
+
+    // Guest user detection
+    isGuest = isGuestUser;
 
     navigationSource = 'shop';
     returnPageName;
@@ -142,8 +149,27 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
         }
     }
 
+    // Guest Sign In
+    handleLogin() {
+
+        this[NavigationMixin.Navigate]({
+
+            type: 'comm__loginPage',
+
+            attributes: {
+                actionName: 'login'
+            }
+        });
+    }
+
     // Add to cart
     async handleAddToCart() {
+
+        // Never invoke Add to Cart Apex for a guest user
+        if (this.isGuest) {
+            this.handleLogin();
+            return;
+        }
 
         if (
             !this.perfume ||
@@ -164,8 +190,16 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
                 quantity: this.quantity
             });
 
-            this.cartMessage =
-                'Perfume added to your cart successfully!';
+            // Clear previous inline success message
+            this.cartMessage = '';
+
+            // Show success toast notification
+            Toast.show({
+                label: 'Added to Cart',
+                message: `${this.perfume.Product_Name__c} has been added to your cart.`,
+                variant: 'success',
+                mode: 'dismissible'
+            }, this);
 
             // Notify Header to refresh cart badge
             publish(this.messageContext, CART_UPDATE, {
@@ -177,6 +211,8 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             this.cartError =
                 error?.body?.message ||
                 'Unable to add perfume to cart.';
+
+            console.error('Add to Cart Error:', error);
 
         } finally {
 
@@ -215,6 +251,11 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
         return this.isOutOfStock ||
             this.quantity >= Number(this.perfume?.Stock_Quantity__c || 0);
+    }
+
+    // Disable Add to Cart when out of stock or processing
+    get isAddToCartDisabled() {
+        return this.isOutOfStock || this.isAddingToCart;
     }
 
     // Calculate total price

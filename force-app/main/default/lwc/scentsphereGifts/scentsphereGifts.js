@@ -9,6 +9,7 @@ import {
 import getGiftPerfumes
     from '@salesforce/apex/CollectionsController.getGiftPerfumes';
 
+const PRODUCTS_PER_LOAD = 8;
 
 export default class ScentsphereGifts extends NavigationMixin(LightningElement) {
 
@@ -19,13 +20,35 @@ export default class ScentsphereGifts extends NavigationMixin(LightningElement) 
 
     selectedGiftCollection = 'All';
 
+    // Pagination
+    displayedCount = PRODUCTS_PER_LOAD;
+
     // Current page reference
     @wire(CurrentPageReference)
     pageReference;
 
-    // Load assigned gift perfumes when page opens
+    // Load gift perfumes when page opens
     connectedCallback() {
         this.loadGiftProducts('All');
+    }
+
+    // Display only currently visible products
+    get visibleProducts() {
+        return this.products.slice(0, this.displayedCount);
+    }
+
+    // Show Load More only when products remain
+    get showLoadMore() {
+        return !this.isLoading &&
+            this.products.length > this.displayedCount;
+    }
+
+    // Currently visible product count
+    get visibleCount() {
+        return Math.min(
+            this.displayedCount,
+            this.products.length
+        );
     }
 
     // Check whether products are available
@@ -49,7 +72,6 @@ export default class ScentsphereGifts extends NavigationMixin(LightningElement) 
 
     // Dynamic section heading
     get selectedCollectionLabel() {
-
         return this.selectedGiftCollection === 'All'
             ? 'All Gift Collections'
             : this.selectedGiftCollection;
@@ -62,13 +84,26 @@ export default class ScentsphereGifts extends NavigationMixin(LightningElement) 
         this.isLoading = true;
         this.errorMessage = '';
 
+        // Reset pagination whenever collection changes
+        this.displayedCount = PRODUCTS_PER_LOAD;
+
         try {
 
             const result = await getGiftPerfumes({
                 giftCollection: giftCollection
             });
 
-            this.products = result || [];
+            this.products = (result || []).map(product => {
+
+                const stockQuantity = Number(
+                    product.Stock_Quantity__c ?? 0
+                );
+
+                return {
+                    ...product,
+                    isOutOfStock: stockQuantity <= 0
+                };
+            });
 
         } catch (error) {
 
@@ -85,6 +120,11 @@ export default class ScentsphereGifts extends NavigationMixin(LightningElement) 
 
             this.isLoading = false;
         }
+    }
+
+    // Load next 8 gift perfumes
+    handleLoadMore() {
+        this.displayedCount += PRODUCTS_PER_LOAD;
     }
 
     // Select Gift Category
@@ -133,16 +173,48 @@ export default class ScentsphereGifts extends NavigationMixin(LightningElement) 
     }
 
     // View all assigned gift perfumes
+    // The UI still displays them in batches of 8
     handleShowAllGifts() {
         this.loadGiftProducts('All');
     }
 
-    // Navigate to Product Details with Gifts context
+    // Clicking anywhere on a product card
+    handleCardClick(event) {
+
+        this.navigateToGiftPerfume(
+            event.currentTarget.dataset.id
+        );
+    }
+
+    // Keyboard accessibility
+    handleCardKeydown(event) {
+
+        if (event.target !== event.currentTarget) {
+            return;
+        }
+
+        if (event.key === 'Enter' || event.key === ' ') {
+
+            event.preventDefault();
+
+            this.navigateToGiftPerfume(
+                event.currentTarget.dataset.id
+            );
+        }
+    }
+
+    // View Details button
     handleViewDetails(event) {
 
         event.stopPropagation();
 
-        const perfumeId = event.currentTarget.dataset.id;
+        this.navigateToGiftPerfume(
+            event.currentTarget.dataset.id
+        );
+    }
+
+    // Navigate to Product Details with Gifts context
+    navigateToGiftPerfume(perfumeId) {
 
         if (!perfumeId) {
             return;
@@ -161,7 +233,8 @@ export default class ScentsphereGifts extends NavigationMixin(LightningElement) 
                 c__source: 'gifts',
                 c__returnPage:
                     this.pageReference?.attributes?.name ||
-                    'Gifts__c'
+                    'Gifts__c',
+                c__giftCollection: this.selectedGiftCollection
             }
         });
     }

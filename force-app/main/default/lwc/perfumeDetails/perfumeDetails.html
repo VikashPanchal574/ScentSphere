@@ -139,39 +139,68 @@
                         <strong>{totalPrice}</strong>
                     </div>
 
-                    <!-- Add to Cart -->
-                    <button
-                        class="add-to-cart-button"
-                        onclick={handleAddToCart}
-                        disabled={isOutOfStock}>
+                    <!-- GUEST USER: SIGN IN BUTTON -->
+                    <template if:true={isGuest}>
+                        <template if:false={isOutOfStock}>
+                            <button
+                                class="add-to-cart-button"
+                                onclick={handleLogin}
+                                type="button">
 
-                        <template if:true={isAddingToCart}>
-                            <lightning-spinner
-                                alternative-text="Adding to cart"
-                                size="small">
-                            </lightning-spinner>
-                            <span>Adding to Cart...</span>
-                        </template>
-
-                        <template if:false={isAddingToCart}>
-                            <template if:true={isOutOfStock}>
-                                <span>Currently Unavailable</span>
-                            </template>
-                            <template if:false={isOutOfStock}>
-                                <span>Add to Cart</span>
+                                <span>Sign In to Add to Cart</span>
                                 <span class="cart-arrow">→</span>
-                            </template>
+
+                            </button>
                         </template>
-                    </button>
+                    </template>
+
+                    <!-- AUTHENTICATED USER: ADD TO CART -->
+                    <template if:false={isGuest}>
+
+                        <button
+                            class="add-to-cart-button"
+                            onclick={handleAddToCart}
+                            disabled={isAddToCartDisabled}
+                            type="button">
+
+                            <template if:true={isAddingToCart}>
+                                <lightning-spinner
+                                    alternative-text="Adding to cart"
+                                    size="small">
+                                </lightning-spinner>
+
+                                <span>Adding to Cart...</span>
+                            </template>
+
+                            <template if:false={isAddingToCart}>
+
+                                <template if:true={isOutOfStock}>
+                                    <span>Currently Unavailable</span>
+                                </template>
+
+                                <template if:false={isOutOfStock}>
+                                    <span>Add to Cart</span>
+                                    <span class="cart-arrow">→</span>
+                                </template>
+
+                            </template>
+
+                        </button>
+
+                    </template>
 
                     <!-- Success Message -->
                     <template if:true={cartMessage}>
-                        <p class="success-message">{cartMessage}</p>
+                        <p class="success-message">
+                            {cartMessage}
+                        </p>
                     </template>
 
                     <!-- Error Message -->
                     <template if:true={cartError}>
-                        <p class="error-message">{cartError}</p>
+                        <p class="error-message">
+                            {cartError}
+                        </p>
                     </template>
 
                 </div>

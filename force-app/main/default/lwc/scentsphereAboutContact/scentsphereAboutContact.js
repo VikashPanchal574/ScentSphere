@@ -1,14 +1,17 @@
 
 import { LightningElement, wire } from 'lwc';
-import { CurrentPageReference } from 'lightning/navigation';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
+import isGuestUser from '@salesforce/user/isGuest';
 
-export default class ScentsphereAboutContact extends LightningElement {
+export default class ScentsphereAboutContact extends NavigationMixin(LightningElement) {
 
     isSubmitting = false;
     formMessage = '';
 
-    // Section requested from Header
+    isGuest = isGuestUser;
+
     pendingSection = null;
+    scrollScheduled = false;
 
     // Read section parameter from URL
     @wire(CurrentPageReference)
@@ -21,17 +24,31 @@ export default class ScentsphereAboutContact extends LightningElement {
         const section = pageReference.state?.c__section;
 
         if (section === 'about' || section === 'contact') {
-
             this.pendingSection = section;
-
-            // Try scrolling immediately
-            this.scrollToPendingSection();
+            this.scheduleSectionScroll();
         }
     }
 
-    // Automatically scroll after page renders
+    // Retry scrolling after component rendering
     renderedCallback() {
-        this.scrollToPendingSection();
+        this.scheduleSectionScroll();
+    }
+
+    // Wait for the rendered section before scrolling
+    scheduleSectionScroll() {
+
+        if (!this.pendingSection || this.scrollScheduled) {
+            return;
+        }
+
+        this.scrollScheduled = true;
+
+        window.requestAnimationFrame(() => {
+
+            this.scrollScheduled = false;
+
+            this.scrollToPendingSection();
+        });
     }
 
     // Common navigation scrolling
@@ -41,10 +58,9 @@ export default class ScentsphereAboutContact extends LightningElement {
             return;
         }
 
-        const selector =
-            this.pendingSection === 'about'
-                ? '[data-target="about-top"]'
-                : '[data-target="contact-section"]';
+        const selector = this.pendingSection === 'about'
+            ? '[data-target="about-top"]'
+            : '[data-target="contact-section"]';
 
         const target = this.template.querySelector(selector);
 
@@ -91,12 +107,25 @@ export default class ScentsphereAboutContact extends LightningElement {
         }
     }
 
+    // Navigate guest user to Salesforce Login
+    handleLogin() {
+
+        this[NavigationMixin.Navigate]({
+
+            type: 'comm__loginPage',
+
+            attributes: {
+                actionName: 'login'
+            }
+        });
+    }
+
     // Submit Contact Form
     handleSubmit(event) {
 
         event.preventDefault();
 
-        if (this.isSubmitting) {
+        if (this.isGuest || this.isSubmitting) {
             return;
         }
 
@@ -108,9 +137,15 @@ export default class ScentsphereAboutContact extends LightningElement {
         fields.Status = 'New';
         fields.Origin = 'Web';
 
-        this.template
-            .querySelector('lightning-record-edit-form')
-            .submit(fields);
+        const form = this.template.querySelector(
+            'lightning-record-edit-form'
+        );
+
+        if (form) {
+            form.submit(fields);
+        } else {
+            this.isSubmitting = false;
+        }
     }
 
     // Successful Case Creation
