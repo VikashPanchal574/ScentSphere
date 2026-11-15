@@ -403,14 +403,8 @@ handleSearchKeydown(event) {
 
     // Wishlist
     handleWishlist() {
-
-        if (this.isGuest) {
-            this.handleLogin();
-            return;
-        }
-
-        this.navigateToPage('My_Wishlist__c');
-    }
+    this.navigateToPage('My_Wishlist__c');
+}
 
     // Shopping Cart
     handleCart() {

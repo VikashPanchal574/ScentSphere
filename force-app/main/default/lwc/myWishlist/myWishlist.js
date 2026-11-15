@@ -142,6 +142,25 @@ export default class MyWishlist extends NavigationMixin(LightningElement) {
         });
     }
 
+handleGuestLogin() {
+    this[NavigationMixin.Navigate]({
+        type: 'comm__loginPage',
+        attributes: {
+            actionName: 'login'
+        }
+    });
+}
+
+handleGuestShop() {
+    this[NavigationMixin.Navigate]({
+        type: 'comm__namedPage',
+        attributes: {
+            name: 'Shop__c'
+        }
+    });
+}
+
+
 
     // Remove perfume from wishlist
     async handleRemove(event) {

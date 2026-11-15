@@ -510,3 +510,71 @@
         font-size: 9px;
     }
 }
+
+/* Guest Wishlist */
+.guest-wishlist {
+    max-width: 650px;
+    margin: 35px auto;
+    padding: 55px 25px;
+}
+
+.guest-heart {
+    width: 75px;
+    height: 75px;
+    margin: 0 auto 22px;
+    border-radius: 50%;
+    background: #f5f0ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a17b4a;
+}
+
+.guest-wishlist h2 {
+    font-size: 28px;
+    margin-bottom: 14px;
+}
+
+.guest-wishlist p {
+    max-width: 420px;
+    margin: 0 auto;
+    line-height: 1.8;
+    font-size: 14px;
+}
+
+.guest-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.guest-login-button {
+    background: #351d27;
+    color: #fff;
+    border: 1px solid #351d27;
+    border-radius: 6px;
+    padding: 13px 22px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.guest-shop-button {
+    background: #fff;
+    color: #a17b4a;
+    border: 1px solid #a17b4a;
+    border-radius: 6px;
+    padding: 13px 22px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.guest-login-button:hover {
+    background: #512b3d;
+}
+
+.guest-shop-button:hover {
+    background: #f5f0ea;
+}

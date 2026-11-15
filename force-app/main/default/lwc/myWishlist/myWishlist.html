@@ -20,13 +20,40 @@
         </div>
 
 
-        <!-- Guest Message -->
-        <template if:true={isGuestUser}>
-            <div class="wishlist-message">
-                <h2>Login Required</h2>
-                <p>Please sign in to view your saved fragrances.</p>
-            </div>
-        </template>
+        
+<!-- Guest Wishlist Message -->
+<template if:true={isGuestUser}>
+    <div class="wishlist-message guest-wishlist">
+        <div class="guest-heart">
+            <lightning-icon
+                icon-name="utility:heart"
+                size="large"
+                alternative-text="Wishlist">
+            </lightning-icon>
+        </div>
+
+        <h2>Your Wishlist Awaits</h2>
+
+        <p>
+            Please sign in to save your favourite
+            fragrances and access your personal wishlist.
+        </p>
+
+        <div class="guest-actions">
+            <button
+                class="guest-login-button"
+                onclick={handleGuestLogin}>
+                Sign In to Your Account
+            </button>
+
+            <button
+                class="guest-shop-button"
+                onclick={handleGuestShop}>
+                Continue Shopping
+            </button>
+        </div>
+    </div>
+</template>
 
 
         <!-- Loading -->
