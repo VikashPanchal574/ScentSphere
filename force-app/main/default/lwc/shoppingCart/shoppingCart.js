@@ -21,7 +21,6 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
     cart;
     cartItems = [];
 
-    // Guest users should not wait for an Apex request
     isGuest = isGuestUser;
 
     isLoading = !isGuestUser;
@@ -49,20 +48,17 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
     }
 
     // ==========================================
-    // GUEST USER MESSAGE
+    // GUEST USER
     // ==========================================
 
     get showGuestMessage() {
         return this.isGuest && !this.isLoading;
     }
 
-    // Navigate guest user to Salesforce Login
     handleLogin() {
 
         this[NavigationMixin.Navigate]({
-
             type: 'comm__loginPage',
-
             attributes: {
                 actionName: 'login'
             }
@@ -70,20 +66,16 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
     }
 
     // ==========================================
-    // LOAD CART
+    // LOAD CART WITH STOCK INFORMATION
     // ==========================================
 
     async loadCart() {
 
-        // IMPORTANT:
-        // Never call Cart Apex methods for guest users
         if (this.isGuest) {
-
             this.cart = undefined;
             this.cartItems = [];
             this.errorMessage = '';
             this.isLoading = false;
-
             return;
         }
 
@@ -95,23 +87,68 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
 
             this.cart = data?.cart;
 
-            this.cartItems = (data?.items || []).map(item => ({
+            this.cartItems = (data?.items || []).map(item => {
 
-                ...item,
+                const perfume = item.Perfume__r;
 
-                productName: item.Perfume__r?.Product_Name__c,
+                const rawStock = perfume?.Stock_Quantity__c;
 
-                imageUrl: item.Perfume__r?.Product_Image_URL__c,
+                const stockQuantity = Number(rawStock);
 
-                formattedPrice: this.formatCurrency(
-                    item.Unit_Price__c
-                ),
+                const stockKnown =
+                    rawStock !== null &&
+                    rawStock !== undefined &&
+                    Number.isFinite(stockQuantity);
 
-                formattedSubtotal: this.formatCurrency(
-                    item.Subtotal__c
-                )
+                const isActive = perfume?.Active__c === true;
 
-            }));
+                const requestedQuantity = Number(
+                    item.Quantity__c || 0
+                );
+
+                let stockWarning = '';
+
+                // Inactive Perfume
+                if (!isActive) {
+                    stockWarning = 'Currently unavailable';
+                }
+
+                // No Stock
+                else if (!stockKnown || stockQuantity <= 0) {
+                    stockWarning = 'Out of Stock';
+                }
+
+                // Requested Quantity Exceeds Stock
+                else if (requestedQuantity > stockQuantity) {
+                    stockWarning =
+                        `Only ${stockQuantity} left in stock. Please reduce quantity.`;
+                }
+
+                return {
+                    ...item,
+
+                    productName: perfume?.Product_Name__c,
+
+                    imageUrl: perfume?.Product_Image_URL__c,
+
+                    stockQuantity,
+
+                    stockWarning,
+
+                    canIncrease:
+                        isActive &&
+                        stockKnown &&
+                        requestedQuantity < stockQuantity,
+
+                    formattedPrice: this.formatCurrency(
+                        item.Unit_Price__c
+                    ),
+
+                    formattedSubtotal: this.formatCurrency(
+                        item.Subtotal__c
+                    )
+                };
+            });
 
             this.errorMessage = '';
 
@@ -128,47 +165,64 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
             console.error('Cart Loading Error:', error);
 
         } finally {
-
             this.isLoading = false;
         }
     }
 
     // ==========================================
-    // CHECKOUT
+    // CHECKOUT - RECHECK STOCK
     // ==========================================
 
-    handleCheckout() {
+    async handleCheckout() {
 
         if (this.isGuest) {
             this.handleLogin();
             return;
         }
 
-        this[NavigationMixin.Navigate]({
+        if (this.checkoutDisabled) {
+            return;
+        }
 
-            type: 'comm__namedPage',
+        this.isUpdating = true;
 
-            attributes: {
-                name: 'Checkout__c'
+        try {
+
+            // Fetch fresh inventory before navigation
+            await this.loadCart();
+
+            if (
+                this.errorMessage ||
+                !this.hasItems ||
+                this.hasStockIssue
+            ) {
+                return;
             }
 
-        });
+            this[NavigationMixin.Navigate]({
+                type: 'comm__namedPage',
+                attributes: {
+                    name: 'Checkout__c'
+                }
+            });
+
+        } finally {
+            this.isUpdating = false;
+        }
     }
 
     // ==========================================
-    // CART UPDATE NOTIFICATION
+    // CART UPDATE MESSAGE
     // ==========================================
 
     notifyCartUpdate() {
 
         if (this.messageContext) {
-
             publish(
                 this.messageContext,
                 CART_UPDATE,
                 { updated: true }
             );
-
         }
     }
 
@@ -179,11 +233,9 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
     formatCurrency(amount) {
 
         return new Intl.NumberFormat('en-IN', {
-
             style: 'currency',
             currency: 'INR',
             maximumFractionDigits: 0
-
         }).format(amount || 0);
     }
 
@@ -195,6 +247,39 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
         return this.cartItems.length > 0;
     }
 
+    // Check if any item has stock issues
+    get hasStockIssue() {
+        return this.cartItems.some(
+            item => Boolean(item.stockWarning)
+        );
+    }
+
+    // Disable checkout when inventory invalid
+    get checkoutDisabled() {
+
+        return this.isGuest ||
+            this.isLoading ||
+            this.isUpdating ||
+            Boolean(this.errorMessage) ||
+            !this.hasItems ||
+            this.hasStockIssue;
+    }
+
+    // Per-item quantity button states
+    get displayCartItems() {
+
+        return this.cartItems.map(item => ({
+            ...item,
+
+            disableIncrease:
+                this.isUpdating || !item.canIncrease,
+
+            disableDecrease:
+                this.isUpdating ||
+                Number(item.Quantity__c) <= 1
+        }));
+    }
+
     get isEmpty() {
 
         return !this.isGuest &&
@@ -204,7 +289,6 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
     }
 
     get formattedTotal() {
-
         return this.formatCurrency(
             this.cart?.Total_Amount__c
         );
@@ -226,11 +310,14 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
             row => row.Id === itemId
         );
 
-        if (item) {
-
+        if (
+            item &&
+            item.canIncrease &&
+            !this.isUpdating
+        ) {
             await this.changeQuantity(
                 itemId,
-                item.Quantity__c + 1
+                Number(item.Quantity__c) + 1
             );
         }
     }
@@ -251,11 +338,14 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
             row => row.Id === itemId
         );
 
-        if (item && item.Quantity__c > 1) {
-
+        if (
+            item &&
+            Number(item.Quantity__c) > 1 &&
+            !this.isUpdating
+        ) {
             await this.changeQuantity(
                 itemId,
-                item.Quantity__c - 1
+                Number(item.Quantity__c) - 1
             );
         }
     }
@@ -276,10 +366,8 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
         try {
 
             await updateQuantity({
-
                 cartItemId: itemId,
                 quantity: quantity
-
             });
 
             await this.loadCart();
@@ -293,7 +381,6 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
                 'Unable to update quantity.';
 
         } finally {
-
             this.isUpdating = false;
         }
     }
@@ -316,9 +403,7 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
         try {
 
             await removeCartItem({
-
                 cartItemId: itemId
-
             });
 
             await this.loadCart();
@@ -332,7 +417,6 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
                 'Unable to remove this item.';
 
         } finally {
-
             this.isUpdating = false;
         }
     }
@@ -342,7 +426,6 @@ export default class ShoppingCart extends NavigationMixin(LightningElement) {
     // ==========================================
 
     handleContinueShopping() {
-
         window.location.assign('/scentsphere/shop');
     }
 }

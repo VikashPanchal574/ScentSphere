@@ -351,3 +351,59 @@
     right: 12px;
     z-index: 5;
 }
+
+/* ==========================================
+   OUT OF STOCK OVERLAY
+========================================== */
+
+.out-of-stock-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(45, 39, 42, 0.18);
+
+    pointer-events: none;
+}
+
+/* Center Burgundy Strip */
+.out-of-stock-strip {
+    display: block;
+    width: 100%;
+    padding: 13px 8px;
+
+    background: rgba(53, 29, 39, 0.94);
+    color: #ffffff;
+
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Keep Featured Label Visible */
+.featured-label {
+    z-index: 3;
+}
+
+/* Keep Wishlist Above Overlay */
+.wishlist-action {
+    z-index: 5;
+}
+
+/* Mobile */
+@media screen and (max-width: 480px) {
+
+    .out-of-stock-strip {
+        padding: 10px 5px;
+        font-size: 9px;
+        letter-spacing: 1.5px;
+    }
+}

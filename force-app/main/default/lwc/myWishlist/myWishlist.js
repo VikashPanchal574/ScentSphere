@@ -60,32 +60,68 @@ export default class MyWishlist extends NavigationMixin(LightningElement) {
 
 
     // Fetch customer's wishlist
-    async loadWishlist() {
+   
+async loadWishlist() {
 
-        this.isLoading = true;
-        this.errorMessage = '';
+    if (this.isGuestUser) {
+        this.isLoading = false;
+        return;
+    }
 
-        try {
+    this.isLoading = true;
+    this.errorMessage = '';
 
-            const result = await getWishlist();
+    try {
 
-            this.wishlistItems = result;
+        const result = await getWishlist();
 
-        } catch (error) {
+        this.wishlistItems = (result || []).map(item => {
 
-            this.errorMessage = this.getErrorMessage(error);
+            const perfume = item.Perfume__r;
 
-            this.showToast(
-                'Wishlist Error',
-                this.errorMessage,
-                'error'
+            const stockQuantity = Number(
+                perfume?.Stock_Quantity__c ?? 0
             );
 
-        } finally {
+            const isActive = perfume?.Active__c === true;
 
-            this.isLoading = false;
-        }
+            const isOutOfStock = stockQuantity <= 0;
+
+            return {
+                ...item,
+
+                stockQuantity,
+
+                // Stock is zero
+                isOutOfStock,
+
+                // Active perfume with stock
+                isAvailable:
+                    isActive && !isOutOfStock,
+
+                // Inactive perfume with remaining stock
+                isCurrentlyUnavailable:
+                    !isActive && !isOutOfStock
+            };
+        });
+
+    } catch (error) {
+
+        this.wishlistItems = [];
+
+        this.errorMessage = this.getErrorMessage(error);
+
+        this.showToast(
+            'Wishlist Error',
+            this.errorMessage,
+            'error'
+        );
+
+    } finally {
+
+        this.isLoading = false;
     }
+}
 
 
     // Check whether wishlist contains products

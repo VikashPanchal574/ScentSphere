@@ -33,18 +33,24 @@ private class CartControllerTest {
         insert new List<Perfume__c>{
             new Perfume__c(
                 Product_Name__c = ACTIVE_PERFUME,
+                Brand__c = 'Dior',
+                Size__c = '100 ml',
                 Price__c = 100,
                 Stock_Quantity__c = 5,
                 Active__c = true
             ),
             new Perfume__c(
                 Product_Name__c = INACTIVE_PERFUME,
+                Brand__c = 'Dior',
+                Size__c = '100 ml',
                 Price__c = 100,
                 Stock_Quantity__c = 5,
                 Active__c = false
             ),
             new Perfume__c(
                 Product_Name__c = NO_STOCK_PERFUME,
+                Brand__c = 'Dior',
+                Size__c = '100 ml',
                 Price__c = 100,
                 Stock_Quantity__c = 0,
                 Active__c = true
@@ -262,9 +268,11 @@ private class CartControllerTest {
             CartController.CartResponse emptyResponse = CartController.getCart();
             System.assertEquals(null, emptyResponse.cart, 'No cart should exist yet.');
             System.assertEquals(0, emptyResponse.items.size());
+            System.assertEquals(0, CartController.getCartCount(), 'Empty cart count should be zero.');
 
             // 1. Add.
             CartController.addToCart(perfume.Id, 1);
+            System.assertEquals(1, CartController.getCartCount(), 'Cart count should include the new item.');
 
             // 2. Read.
             CartController.CartResponse response = CartController.getCart();
@@ -277,11 +285,13 @@ private class CartControllerTest {
 
             // 3. Update.
             CartController.updateQuantity(item.Id, 2);
+            System.assertEquals(2, CartController.getCartCount(), 'Cart count should reflect the updated quantity.');
             CartController.CartResponse updated = CartController.getCart();
             System.assertEquals(2, updated.items[0].Quantity__c, 'Quantity should be 2.');
 
             // 4. Remove.
             CartController.removeCartItem(item.Id);
+            System.assertEquals(0, CartController.getCartCount(), 'Removed items should not count.');
             CartController.CartResponse finalResponse = CartController.getCart();
             System.assertEquals(0, finalResponse.items.size(), 'Cart should be empty.');
         }
@@ -470,4 +480,86 @@ private class CartControllerTest {
     // NOTE: the Guest-user branch in getCurrentContactId() cannot be reliably
     // exercised from a test (a Guest User cannot be created with runAs in a
     // normal test). Verify it manually: open the public site while logged out.
+
+@IsTest
+static void testCartFreshReportsStockReducedToZero() {
+
+    TestUsers t = createTestUsers();
+    Perfume__c perfume = getPerfume(ACTIVE_PERFUME);
+
+    System.runAs(t.customerA) {
+        CartController.addToCart(perfume.Id, 1);
+    }
+
+    // Stock changes after adding to cart
+    perfume.Stock_Quantity__c = 0;
+    System.runAs(t.owner) {
+        update perfume;
+    }
+
+    System.runAs(t.customerA) {
+
+        CartController.CartResponse response =
+            CartController.getCartFresh();
+
+        System.assertEquals(
+            1,
+            response.items.size()
+        );
+
+        System.assertEquals(
+            0,
+            response.items[0].Perfume__r.Stock_Quantity__c
+        );
+
+        System.assertEquals(
+            true,
+            response.items[0].Perfume__r.Active__c
+        );
+    }
+}
+
+@IsTest
+static void testCanReduceQuantityAfterStockDrops() {
+
+    TestUsers t = createTestUsers();
+    Perfume__c perfume = getPerfume(ACTIVE_PERFUME);
+
+    Id cartItemId;
+
+    System.runAs(t.customerA) {
+
+        CartController.addToCart(perfume.Id, 5);
+
+        cartItemId =
+            CartController.getCartFresh().items[0].Id;
+    }
+
+    // Only 2 units remain
+    perfume.Stock_Quantity__c = 2;
+    System.runAs(t.owner) {
+        update perfume;
+    }
+
+    System.runAs(t.customerA) {
+
+        CartController.updateQuantity(cartItemId, 4);
+        CartController.updateQuantity(cartItemId, 3);
+        CartController.updateQuantity(cartItemId, 2);
+
+        CartController.CartResponse response =
+            CartController.getCartFresh();
+
+        System.assertEquals(
+            2,
+            response.items[0].Quantity__c
+        );
+
+        System.assertEquals(
+            'Requested quantity exceeds available stock.',
+            updateError(cartItemId, 3)
+        );
+    }
+}
+
 }

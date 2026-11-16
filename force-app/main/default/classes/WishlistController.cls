@@ -28,28 +28,31 @@ public with sharing class WishlistController {
 
 
     // 1. Get complete wishlist
-    @AuraEnabled
-    public static List<Wishlist_Item__c> getWishlist() {
+   
+@AuraEnabled
+public static List<Wishlist_Item__c> getWishlist() {
 
-        Id contactId = getCurrentContactId();
+    Id contactId = getCurrentContactId();
 
-        return [
-            SELECT Id,
-                   Name,
-                   Customer__c,
-                   Perfume__c,
-                   Perfume__r.Product_Name__c,
-                   Perfume__r.Brand__c,
-                   Perfume__r.Price__c,
-                   Perfume__r.Product_Image_URL__c,
-                   Perfume__r.Category__c,
-                   Perfume__r.Active__c
-            FROM Wishlist_Item__c
-            WHERE Customer__c = :contactId
-            WITH USER_MODE
-            ORDER BY CreatedDate DESC
-        ];
-    }
+    return [
+        SELECT Id,
+               Name,
+               Customer__c,
+               Perfume__c,
+               Perfume__r.Product_Name__c,
+               Perfume__r.Brand__c,
+               Perfume__r.Price__c,
+               Perfume__r.Product_Image_URL__c,
+               Perfume__r.Category__c,
+               Perfume__r.Active__c,
+               Perfume__r.Stock_Quantity__c
+        FROM Wishlist_Item__c
+        WHERE Customer__c = :contactId
+        WITH USER_MODE
+        ORDER BY CreatedDate DESC
+    ];
+}
+
 
 
     // 2. Add perfume to wishlist

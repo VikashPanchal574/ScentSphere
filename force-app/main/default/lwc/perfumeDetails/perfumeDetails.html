@@ -32,10 +32,12 @@
 
         <!-- Product Details -->
         <template if:true={perfume}>
+
             <div class="product-layout">
 
                 <!-- Product Image -->
                 <div class="image-section">
+
                     <template if:true={perfume.imageUrl}>
                         <img
                             src={perfume.imageUrl}
@@ -48,6 +50,7 @@
                             SCENTSPHERE
                         </div>
                     </template>
+
                 </div>
 
                 <!-- Product Information -->
@@ -106,15 +109,19 @@
                     <template if:true={isOutOfStock}>
                         <div class="out-of-stock-message">
                             <span>OUT OF STOCK</span>
-                            <p>This fragrance is currently unavailable.</p>
+                            <p>
+                                This fragrance is currently unavailable.
+                            </p>
                         </div>
                     </template>
 
                     <!-- Quantity -->
                     <div class="quantity-section">
+
                         <span>Quantity</span>
 
                         <div class="quantity-control">
+
                             <button
                                 onclick={handleDecrease}
                                 disabled={isOutOfStock}
@@ -130,6 +137,7 @@
                                 type="button">
                                 +
                             </button>
+
                         </div>
                     </div>
 
@@ -139,9 +147,11 @@
                         <strong>{totalPrice}</strong>
                     </div>
 
-                    <!-- GUEST USER: SIGN IN BUTTON -->
+                    <!-- Guest User: Sign In -->
                     <template if:true={isGuest}>
+
                         <template if:false={isOutOfStock}>
+
                             <button
                                 class="add-to-cart-button"
                                 onclick={handleLogin}
@@ -151,10 +161,12 @@
                                 <span class="cart-arrow">→</span>
 
                             </button>
+
                         </template>
+
                     </template>
 
-                    <!-- AUTHENTICATED USER: ADD TO CART -->
+                    <!-- Logged-In User: Add to Cart -->
                     <template if:false={isGuest}>
 
                         <button
@@ -164,12 +176,14 @@
                             type="button">
 
                             <template if:true={isAddingToCart}>
+
                                 <lightning-spinner
                                     alternative-text="Adding to cart"
                                     size="small">
                                 </lightning-spinner>
 
                                 <span>Adding to Cart...</span>
+
                             </template>
 
                             <template if:false={isAddingToCart}>
@@ -205,6 +219,226 @@
 
                 </div>
             </div>
+
+            <!-- ======================================
+                 RELATED FRAGRANCES SECTION
+            ======================================= -->
+
+            <section class="related-section">
+
+                <div class="related-heading">
+
+                    <p class="eyebrow">DISCOVER MORE</p>
+
+                    <h2>More From This Category</h2>
+
+                    <p>
+                        Explore more fragrances from our
+                        {perfume.Category__c} collection.
+                    </p>
+
+                </div>
+
+                <!-- Related Products Loading -->
+                <template if:true={relatedLoading}>
+
+                    <div class="related-message">
+
+                        <lightning-spinner
+                            alternative-text="Loading related fragrances"
+                            size="medium">
+                        </lightning-spinner>
+
+                    </div>
+
+                </template>
+
+                <!-- Related Products Error -->
+                <template if:true={relatedError}>
+
+                    <div class="related-message">
+
+                        <p class="error-message">
+                            {relatedError}
+                        </p>
+
+                        <button
+                            class="related-retry-button"
+                            onclick={handleRelatedRetry}
+                            type="button">
+                            Try Again
+                        </button>
+
+                    </div>
+
+                </template>
+
+                <!-- Related Product Cards -->
+                <template if:true={hasRelatedProducts}>
+
+                    <div class="related-grid">
+
+                        <template
+                            for:each={relatedProducts}
+                            for:item="item">
+
+                            <!-- FULL CLICKABLE CARD -->
+                            <article
+                                class="related-card"
+                                key={item.Id}
+                                data-id={item.Id}
+                                onclick={handleRelatedProductClick}
+                                onkeydown={handleRelatedCardKeydown}
+                                tabindex="0"
+                                role="link"
+                                aria-label={item.Product_Name__c}>
+
+                                <!-- Product Image -->
+                                <div class="related-image-wrapper">
+
+                                    <template if:true={item.imageUrl}>
+
+                                        <img
+                                            src={item.imageUrl}
+                                            alt={item.Product_Name__c}
+                                            class="related-image"
+                                            data-id={item.Id}
+                                            onerror={handleRelatedImageError}
+                                            loading="lazy" />
+
+                                    </template>
+
+                                    <template if:false={item.imageUrl}>
+
+                                        <div class="related-image-placeholder">
+                                            <span>✦</span>
+                                            <small>SCENTSPHERE</small>
+                                        </div>
+
+                                    </template>
+
+                                    <!-- Out Of Stock Overlay -->
+                                    <template if:true={item.isOutOfStock}>
+
+                                        <div class="related-stock-overlay">
+
+                                            <span>
+                                                OUT OF STOCK
+                                            </span>
+
+                                        </div>
+
+                                    </template>
+
+                                </div>
+
+                                <!-- Product Information -->
+                                <div class="related-product-info">
+
+                                    <p class="related-brand">
+                                        {item.Brand__c}
+                                    </p>
+
+                                    <h3>
+                                        {item.Product_Name__c}
+                                    </h3>
+
+                                    <p class="related-category">
+
+                                        {item.Category__c}
+
+                                        <template if:true={item.Size__c}>
+                                            · {item.Size__c}
+                                        </template>
+
+                                    </p>
+
+                                    <!-- Stock Status -->
+                                    <template if:true={item.isOutOfStock}>
+
+                                        <p class="related-unavailable">
+                                            Out of Stock
+                                        </p>
+
+                                    </template>
+
+                                    <!-- Price and Details -->
+                                    <div class="related-bottom">
+
+                                        <strong class="related-price">
+                                            {item.formattedPrice}
+                                        </strong>
+
+                                        <!-- Span avoids nested clickable controls -->
+                                        <span class="related-view-button">
+                                            View Details →
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </article>
+
+                        </template>
+
+                    </div>
+
+                </template>
+
+                <!-- No Related Products -->
+                <template if:true={relatedEmpty}>
+
+                    <div class="related-message">
+
+                        <p>
+                            No other fragrances in this category yet.
+                            Explore our full collection instead.
+                        </p>
+
+                        <button
+                            class="related-retry-button"
+                            onclick={handleBackToShop}
+                            type="button">
+                            Explore Shop →
+                        </button>
+
+                    </div>
+
+                </template>
+
+                <!-- Pagination -->
+                <template if:true={showRelatedPagination}>
+
+                    <div class="related-pagination">
+
+                        <button
+                            class="pagination-button"
+                            onclick={handleRelatedPrevious}
+                            disabled={relatedPreviousDisabled}
+                            type="button">
+                            ← Previous
+                        </button>
+
+                        <span class="page-indicator">
+                            Page {relatedPageNumber}
+                            of {relatedTotalPages}
+                        </span>
+
+                        <button
+                            class="pagination-button"
+                            onclick={handleRelatedNext}
+                            disabled={relatedNextDisabled}
+                            type="button">
+                            Next →
+                        </button>
+
+                    </div>
+
+                </template>
+
+            </section>
+
         </template>
 
     </section>

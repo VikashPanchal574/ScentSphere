@@ -578,3 +578,61 @@
 .guest-shop-button:hover {
     background: #f5f0ea;
 }
+
+/* =====================================
+   WISHLIST OUT OF STOCK OVERLAY
+===================================== */
+
+.wishlist-image {
+    position: relative;
+}
+
+.out-of-stock-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(45, 39, 42, 0.18);
+
+    pointer-events: none;
+}
+
+.out-of-stock-strip {
+    display: block;
+    width: 100%;
+    padding: 13px 8px;
+
+    background: rgba(53, 29, 39, 0.94);
+    color: #ffffff;
+
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Status Colors */
+.availability.available {
+    color: #31845b;
+}
+
+.availability.unavailable {
+    color: #ba3333;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+    .out-of-stock-strip {
+        padding: 10px 5px;
+        font-size: 9px;
+        letter-spacing: 1.5px;
+    }
+}

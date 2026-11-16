@@ -11,64 +11,93 @@ export default class FeaturedFragrances extends NavigationMixin(LightningElement
     isLoading = true;
     errorMessage = '';
 
-    // Controls whether all featured products are displayed
     showAllProducts = false;
 
-    // Format perfume data received from Apex
+    // ==========================================
+    // FORMAT PRODUCTS WITH STOCK STATUS
+    // ==========================================
+
     formatProducts(data) {
-        return data.map(perfume => ({
-            ...perfume,
 
-            imageUrl: perfume.imageUrl || '',
+        return data.map(perfume => {
 
-            formattedPrice: new Intl.NumberFormat('en-IN', {
-                style: 'currency',
-                currency: 'INR',
-                maximumFractionDigits: 0
-            }).format(perfume.price || 0)
-        }));
+            const stockQuantity = Number(
+                perfume.stockQuantity ?? 0
+            );
+
+            return {
+                ...perfume,
+
+                imageUrl: perfume.imageUrl || '',
+
+                stockQuantity,
+
+                // Detect Out of Stock
+                isOutOfStock: stockQuantity <= 0,
+
+                formattedPrice: new Intl.NumberFormat('en-IN', {
+                    style: 'currency',
+                    currency: 'INR',
+                    maximumFractionDigits: 0
+                }).format(perfume.price || 0)
+            };
+        });
     }
 
-    // Fetch featured perfumes
+    // ==========================================
+    // FETCH FEATURED PERFUMES
+    // ==========================================
+
     @wire(getFeaturedPerfumes)
     wiredPerfumes({ data, error }) {
+
         if (data) {
+
             this.products = this.formatProducts(data);
+
             this.showAllProducts = false;
             this.errorMessage = '';
             this.isLoading = false;
 
         } else if (error) {
+
             this.products = [];
             this.showAllProducts = false;
+
             this.errorMessage =
                 'Unable to load fragrances. Please try again.';
+
             this.isLoading = false;
 
-            console.error('Featured Perfumes Error:', error);
+            console.error(
+                'Featured Perfumes Error:',
+                error
+            );
         }
     }
 
-    // Initially display only 4 products
+    // ==========================================
+    // DISPLAY PRODUCTS
+    // ==========================================
+
     get visibleProducts() {
+
         return this.showAllProducts
             ? this.products
             : this.products.slice(0, 4);
     }
 
-    // Show View All button only when more than 4 products exist
     get showViewAll() {
         return this.products.length > 4 && !this.isLoading;
     }
 
-    // Dynamic button label
     get viewAllLabel() {
+
         return this.showAllProducts
             ? 'Show Less'
             : 'View All Featured Fragrances';
     }
 
-    // Dynamic button arrow
     get viewAllIcon() {
         return this.showAllProducts ? '↑' : '→';
     }
@@ -78,18 +107,26 @@ export default class FeaturedFragrances extends NavigationMixin(LightningElement
     }
 
     get showEmpty() {
+
         return !this.isLoading &&
             !this.errorMessage &&
             this.products.length === 0;
     }
 
-    // Toggle between 4 products and all featured products
+    // ==========================================
+    // VIEW ALL / SHOW LESS
+    // ==========================================
+
     handleViewAll() {
         this.showAllProducts = !this.showAllProducts;
     }
 
-    // Navigate to Product Details page
+    // ==========================================
+    // PRODUCT DETAILS NAVIGATION
+    // ==========================================
+
     handleViewDetails(event) {
+
         event.stopPropagation();
 
         const perfumeId = event.currentTarget.dataset.id;
@@ -109,20 +146,30 @@ export default class FeaturedFragrances extends NavigationMixin(LightningElement
         });
     }
 
-    // Keyboard navigation
+    // ==========================================
+    // KEYBOARD NAVIGATION
+    // ==========================================
+
     handleCardKeydown(event) {
+
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
             this.handleViewDetails(event);
         }
     }
 
-    // Handle broken product images
+    // ==========================================
+    // HANDLE BROKEN IMAGES
+    // ==========================================
+
     handleImageError(event) {
+
         const perfumeId = event.currentTarget.dataset.id;
 
         this.products = this.products.map(product => {
+
             if (product.Id === perfumeId) {
+
                 return {
                     ...product,
                     imageUrl: ''
@@ -133,22 +180,32 @@ export default class FeaturedFragrances extends NavigationMixin(LightningElement
         });
     }
 
-    // Retry loading featured perfumes
+    // ==========================================
+    // RETRY LOADING
+    // ==========================================
+
     handleRetry() {
+
         this.isLoading = true;
         this.errorMessage = '';
         this.showAllProducts = false;
 
         return getFeaturedPerfumes()
             .then(data => {
+
                 this.products = this.formatProducts(data);
             })
             .catch(error => {
+
                 this.products = [];
+
                 this.errorMessage =
                     'Unable to load fragrances. Please try again.';
 
-                console.error('Retry Error:', error);
+                console.error(
+                    'Retry Error:',
+                    error
+                );
             })
             .finally(() => {
                 this.isLoading = false;

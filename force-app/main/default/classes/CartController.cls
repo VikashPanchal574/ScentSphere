@@ -27,8 +27,8 @@ public with sharing class CartController {
     private static void logError(String source, Exception e) {
         System.debug(
             LoggingLevel.ERROR,
-            source + ' | ' + e.getTypeName() + ' | ' + e.getMessage()
-                + ' | ' + e.getStackTraceString()
+            source + ' | ' + e.getTypeName() + ' | ' +
+            e.getMessage() + ' | ' + e.getStackTraceString()
         );
     }
 
@@ -51,9 +51,10 @@ public with sharing class CartController {
             LIMIT 1
         ];
 
-        if (currentUsers.isEmpty() ||
-            currentUsers[0].ContactId == null) {
-
+        if (
+            currentUsers.isEmpty() ||
+            currentUsers[0].ContactId == null
+        ) {
             throw buildException(
                 'Your customer account is not properly configured.'
             );
@@ -97,7 +98,7 @@ public with sharing class CartController {
     }
 
     // ==========================================
-    // SHARED CART FETCH LOGIC
+    // FETCH CART DETAILS
     // ==========================================
 
     private static CartResponse fetchCartDetails(Id contactId) {
@@ -122,11 +123,14 @@ public with sharing class CartController {
 
         response.cart = carts[0];
 
+        // Fetch latest stock and product status
         response.items = [
             SELECT Id, Name,
                    Perfume__c,
                    Perfume__r.Product_Name__c,
                    Perfume__r.Product_Image_URL__c,
+                   Perfume__r.Stock_Quantity__c,
+                   Perfume__r.Active__c,
                    Quantity__c,
                    Unit_Price__c,
                    Subtotal__c
@@ -140,7 +144,7 @@ public with sharing class CartController {
     }
 
     // ==========================================
-    // GET CART DETAILS - CACHEABLE
+    // GET CART - CACHEABLE
     // ==========================================
 
     @AuraEnabled(cacheable=true)
@@ -164,7 +168,7 @@ public with sharing class CartController {
     }
 
     // ==========================================
-    // GET FRESH CART DETAILS - NO CACHE
+    // GET FRESH CART - NO CACHE
     // ==========================================
 
     @AuraEnabled
@@ -192,15 +196,20 @@ public with sharing class CartController {
     // ==========================================
 
     @AuraEnabled
-    public static void addToCart(Id perfumeId, Integer quantity) {
+    public static void addToCart(
+        Id perfumeId,
+        Integer quantity
+    ) {
 
         try {
 
             Id contactId = getCurrentContactId();
 
-            if (perfumeId == null || quantity == null ||
-                quantity <= 0) {
-
+            if (
+                perfumeId == null ||
+                quantity == null ||
+                quantity <= 0
+            ) {
                 throw buildException(
                     'Please provide a valid perfume and quantity.'
                 );
@@ -225,10 +234,11 @@ public with sharing class CartController {
 
             Perfume__c perfume = perfumes[0];
 
-            if (perfume.Price__c == null ||
+            if (
+                perfume.Price__c == null ||
                 perfume.Stock_Quantity__c == null ||
-                perfume.Stock_Quantity__c <= 0) {
-
+                perfume.Stock_Quantity__c <= 0
+            ) {
                 throw buildException(
                     'This perfume is out of stock.'
                 );
@@ -251,13 +261,18 @@ public with sharing class CartController {
                 Cart_Item__c existingItem = existingItems[0];
 
                 Decimal currentQuantity = 0;
+
                 if (existingItem.Quantity__c != null) {
                     currentQuantity = existingItem.Quantity__c;
                 }
 
-                Decimal updatedQuantity = currentQuantity + quantity;
+                Decimal updatedQuantity =
+                    currentQuantity + quantity;
 
-                if (updatedQuantity > perfume.Stock_Quantity__c) {
+                if (
+                    updatedQuantity >
+                    perfume.Stock_Quantity__c
+                ) {
                     throw buildException(
                         'Requested quantity exceeds available stock.'
                     );
@@ -275,7 +290,10 @@ public with sharing class CartController {
 
             } else {
 
-                if (quantity > perfume.Stock_Quantity__c) {
+                if (
+                    quantity >
+                    perfume.Stock_Quantity__c
+                ) {
                     throw buildException(
                         'Requested quantity exceeds available stock.'
                     );
@@ -304,38 +322,47 @@ public with sharing class CartController {
             );
         }
     }
+
     // ==========================================
-// GET CART COUNT - FOR HEADER BADGE
-// ==========================================
+    // GET CART COUNT FOR HEADER BADGE
+    // ==========================================
 
-@AuraEnabled
-public static Integer getCartCount() {
-    try {
-        Id contactId = getCurrentContactId();
+    @AuraEnabled
+    public static Integer getCartCount() {
 
-        List<AggregateResult> results = [
-            SELECT SUM(Quantity__c) totalQuantity
-            FROM Cart_Item__c
-            WHERE Shopping_Cart__r.Customer__c = :contactId
-            AND Shopping_Cart__r.Cart_Status__c = 'Active'
-            WITH USER_MODE
-        ];
+        try {
 
-        if (results.isEmpty() ||
-            results[0].get('totalQuantity') == null) {
-            return 0;
+            Id contactId = getCurrentContactId();
+
+            List<AggregateResult> results = [
+                SELECT SUM(Quantity__c) totalQuantity
+                FROM Cart_Item__c
+                WHERE Shopping_Cart__r.Customer__c = :contactId
+                AND Shopping_Cart__r.Cart_Status__c = 'Active'
+                WITH USER_MODE
+            ];
+
+            if (
+                results.isEmpty() ||
+                results[0].get('totalQuantity') == null
+            ) {
+                return 0;
+            }
+
+            return ((Decimal) results[0]
+                .get('totalQuantity')).intValue();
+
+        } catch (AuraHandledException e) {
+            throw e;
+
+        } catch (Exception e) {
+            logError('getCartCount', e);
+            throw buildException(
+                'Unable to load cart count.'
+            );
         }
-
-        return ((Decimal) results[0].get('totalQuantity')).intValue();
-
-    } catch (AuraHandledException e) {
-        throw e;
-
-    } catch (Exception e) {
-        logError('getCartCount', e);
-        throw buildException('Unable to load cart count.');
     }
-}
+
     // ==========================================
     // UPDATE CART ITEM QUANTITY
     // ==========================================
@@ -350,10 +377,11 @@ public static Integer getCartCount() {
 
             Id contactId = getCurrentContactId();
 
-            if (cartItemId == null ||
+            if (
+                cartItemId == null ||
                 quantity == null ||
-                quantity <= 0) {
-
+                quantity <= 0
+            ) {
                 throw buildException(
                     'Please provide a valid quantity.'
                 );
@@ -363,7 +391,8 @@ public static Integer getCartCount() {
                 SELECT Id,
                        Quantity__c,
                        Perfume__c,
-                       Perfume__r.Stock_Quantity__c
+                       Perfume__r.Stock_Quantity__c,
+                       Perfume__r.Active__c
                 FROM Cart_Item__c
                 WHERE Id = :cartItemId
                 AND Shopping_Cart__r.Customer__c = :contactId
@@ -380,13 +409,37 @@ public static Integer getCartCount() {
 
             Cart_Item__c item = items[0];
 
-            if (item.Perfume__r == null ||
-                item.Perfume__r.Stock_Quantity__c == null ||
-                quantity > item.Perfume__r.Stock_Quantity__c) {
+            // Allow customers to reduce quantity if
+            // inventory decreased after adding to cart
+            Decimal existingQuantity =
+                item.Quantity__c == null
+                    ? 0
+                    : item.Quantity__c;
 
-                throw buildException(
-                    'Requested quantity exceeds available stock.'
-                );
+            Boolean isReducing =
+                quantity < existingQuantity;
+
+            // Increasing quantity requires valid stock
+            if (!isReducing) {
+
+                if (
+                    item.Perfume__r == null ||
+                    item.Perfume__r.Active__c != true
+                ) {
+                    throw buildException(
+                        'This perfume is unavailable.'
+                    );
+                }
+
+                if (
+                    item.Perfume__r.Stock_Quantity__c == null ||
+                    quantity >
+                    item.Perfume__r.Stock_Quantity__c
+                ) {
+                    throw buildException(
+                        'Requested quantity exceeds available stock.'
+                    );
+                }
             }
 
             Cart_Item__c itemToUpdate = new Cart_Item__c(
@@ -394,7 +447,10 @@ public static Integer getCartCount() {
                 Quantity__c = quantity
             );
 
-            Database.update(itemToUpdate, AccessLevel.USER_MODE);
+            Database.update(
+                itemToUpdate,
+                AccessLevel.USER_MODE
+            );
 
         } catch (AuraHandledException e) {
             throw e;
@@ -412,7 +468,9 @@ public static Integer getCartCount() {
     // ==========================================
 
     @AuraEnabled
-    public static void removeCartItem(Id cartItemId) {
+    public static void removeCartItem(
+        Id cartItemId
+    ) {
 
         try {
 
@@ -440,7 +498,10 @@ public static Integer getCartCount() {
                 );
             }
 
-            Database.delete(items[0], AccessLevel.USER_MODE);
+            Database.delete(
+                items[0],
+                AccessLevel.USER_MODE
+            );
 
         } catch (AuraHandledException e) {
             throw e;

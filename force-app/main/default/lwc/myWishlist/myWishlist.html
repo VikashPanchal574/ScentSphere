@@ -1,4 +1,3 @@
-
 <template>
     <section class="wishlist-container">
 
@@ -20,48 +19,39 @@
         </div>
 
 
-        
-<!-- Guest Wishlist Message -->
-<template if:true={isGuestUser}>
-    <div class="wishlist-message guest-wishlist">
-        <div class="guest-heart">
-            <lightning-icon
-                icon-name="utility:heart"
-                size="large"
-                alternative-text="Wishlist">
-            </lightning-icon>
-        </div>
 
-        <h2>Your Wishlist Awaits</h2>
+        <!-- Guest Wishlist Message -->
+        <template if:true={isGuestUser}>
+            <div class="wishlist-message guest-wishlist">
+                <div class="guest-heart">
+                    <lightning-icon icon-name="utility:heart" size="large" alternative-text="Wishlist">
+                    </lightning-icon>
+                </div>
 
-        <p>
-            Please sign in to save your favourite
-            fragrances and access your personal wishlist.
-        </p>
+                <h2>Your Wishlist Awaits</h2>
 
-        <div class="guest-actions">
-            <button
-                class="guest-login-button"
-                onclick={handleGuestLogin}>
-                Sign In to Your Account
-            </button>
+                <p>
+                    Please sign in to save your favourite
+                    fragrances and access your personal wishlist.
+                </p>
 
-            <button
-                class="guest-shop-button"
-                onclick={handleGuestShop}>
-                Continue Shopping
-            </button>
-        </div>
-    </div>
-</template>
+                <div class="guest-actions">
+                    <button class="guest-login-button" onclick={handleGuestLogin}>
+                        Sign In to Your Account
+                    </button>
+
+                    <button class="guest-shop-button" onclick={handleGuestShop}>
+                        Continue Shopping
+                    </button>
+                </div>
+            </div>
+        </template>
 
 
         <!-- Loading -->
         <template if:true={isLoading}>
             <div class="wishlist-loading">
-                <lightning-spinner
-                    alternative-text="Loading wishlist"
-                    size="medium">
+                <lightning-spinner alternative-text="Loading wishlist" size="medium">
                 </lightning-spinner>
             </div>
         </template>
@@ -73,9 +63,7 @@
                 <h3>Something went wrong</h3>
                 <p>{errorMessage}</p>
 
-                <button
-                    class="retry-button"
-                    onclick={handleRetry}>
+                <button class="retry-button" onclick={handleRetry}>
                     Try Again
                 </button>
             </div>
@@ -88,22 +76,28 @@
 
                 <template for:each={wishlistItems} for:item="item">
 
-                    <article
-                        class="wishlist-card"
-                        key={item.Id}>
+                    <article class="wishlist-card" key={item.Id}>
+
 
                         <!-- Product Image -->
                         <div class="wishlist-image">
 
                             <template if:true={item.Perfume__r.Product_Image_URL__c}>
-                                <img
-                                    src={item.Perfume__r.Product_Image_URL__c}
-                                    alt={item.Perfume__r.Product_Name__c}>
+                                <img src={item.Perfume__r.Product_Image_URL__c} alt={item.Perfume__r.Product_Name__c}>
                             </template>
 
                             <template if:false={item.Perfume__r.Product_Image_URL__c}>
                                 <div class="image-placeholder">
                                     <span>SCENTSPHERE</span>
+                                </div>
+                            </template>
+
+                            <!-- Out Of Stock Overlay -->
+                            <template if:true={item.isOutOfStock}>
+                                <div class="out-of-stock-overlay">
+                                    <span class="out-of-stock-strip">
+                                        OUT OF STOCK
+                                    </span>
                                 </div>
                             </template>
 
@@ -126,14 +120,25 @@
                             </p>
 
 
-                            <!-- Availability -->
-                            <template if:true={item.Perfume__r.Active__c}>
+
+                            <!-- Availability Status -->
+
+                            <!-- Available -->
+                            <template if:true={item.isAvailable}>
                                 <span class="availability available">
                                     Available
                                 </span>
                             </template>
 
-                            <template if:false={item.Perfume__r.Active__c}>
+                            <!-- Out Of Stock -->
+                            <template if:true={item.isOutOfStock}>
+                                <span class="availability unavailable">
+                                    Out of Stock
+                                </span>
+                            </template>
+
+                            <!-- Inactive Perfume -->
+                            <template if:true={item.isCurrentlyUnavailable}>
                                 <span class="availability unavailable">
                                     Currently Unavailable
                                 </span>
@@ -144,17 +149,12 @@
                             <div class="wishlist-product-footer">
 
                                 <span class="product-price">
-                                    <lightning-formatted-number
-                                        value={item.Perfume__r.Price__c}
-                                        format-style="currency"
-                                        currency-code="INR"
-                                        currency-display-as="symbol">
+                                    <lightning-formatted-number value={item.Perfume__r.Price__c} format-style="currency"
+                                        currency-code="INR" currency-display-as="symbol">
                                     </lightning-formatted-number>
                                 </span>
 
-                                <button
-                                    class="view-details-button"
-                                    data-perfume-id={item.Perfume__c}
+                                <button class="view-details-button" data-perfume-id={item.Perfume__c}
                                     onclick={handleViewDetails}>
                                     View Details →
                                 </button>
@@ -163,16 +163,10 @@
 
 
                             <!-- Remove Button -->
-                            <button
-                                class="remove-button"
-                                data-perfume-id={item.Perfume__c}
-                                onclick={handleRemove}
+                            <button class="remove-button" data-perfume-id={item.Perfume__c} onclick={handleRemove}
                                 disabled={isRemoving}>
 
-                                <lightning-icon
-                                    icon-name="utility:delete"
-                                    size="x-small"
-                                    alternative-text="Remove">
+                                <lightning-icon icon-name="utility:delete" size="x-small" alternative-text="Remove">
                                 </lightning-icon>
 
                                 <span>Remove from Wishlist</span>
@@ -194,10 +188,7 @@
             <div class="empty-wishlist">
 
                 <div class="empty-heart">
-                    <lightning-icon
-                        icon-name="utility:heart"
-                        size="large"
-                        alternative-text="Empty Wishlist">
+                    <lightning-icon icon-name="utility:heart" size="large" alternative-text="Empty Wishlist">
                     </lightning-icon>
                 </div>
 

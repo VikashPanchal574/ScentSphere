@@ -6,20 +6,16 @@
         <div class="cart-header">
             <div>
                 <p class="eyebrow">YOUR SELECTION</p>
-
                 <h1>Shopping Cart</h1>
-
                 <p class="subtitle">
                     Your favourite fragrances, gathered in one place.
                 </p>
             </div>
         </div>
 
-        <!-- GUEST USER MESSAGE -->
+        <!-- Guest User -->
         <template if:true={showGuestMessage}>
-
             <div class="guest-cart">
-
                 <div class="guest-cart-icon">
                     <lightning-icon
                         icon-name="utility:lock"
@@ -44,9 +40,7 @@
                     class="guest-login-button"
                     onclick={handleLogin}
                     type="button">
-
                     Sign In to Continue →
-
                 </button>
 
                 <p class="guest-note">
@@ -57,52 +51,36 @@
                     class="guest-continue-button"
                     onclick={handleContinueShopping}
                     type="button">
-
                     ← Continue Shopping
-
                 </button>
-
             </div>
-
         </template>
 
         <!-- Loading -->
         <template if:true={isLoading}>
-
             <div class="status-message">
-
                 <lightning-spinner
                     alternative-text="Loading cart"
                     size="medium">
                 </lightning-spinner>
-
                 <p>Loading your cart...</p>
-
             </div>
-
         </template>
 
         <!-- Error -->
         <template if:true={errorMessage}>
-
             <div class="status-message error-message">
-
                 <lightning-icon
                     icon-name="utility:warning"
                     size="small">
                 </lightning-icon>
-
                 <p>{errorMessage}</p>
-
             </div>
-
         </template>
 
         <!-- Empty Cart -->
         <template if:true={isEmpty}>
-
             <div class="empty-cart">
-
                 <lightning-icon
                     icon-name="utility:cart"
                     size="large">
@@ -118,34 +96,23 @@
                     class="continue-button"
                     onclick={handleContinueShopping}
                     type="button">
-
                     Continue Shopping
-
                 </button>
-
             </div>
-
         </template>
 
         <!-- Cart Items -->
         <template if:true={hasItems}>
-
             <div class="cart-layout">
 
                 <div class="cart-items-section">
-
                     <div class="section-heading">
-
                         <h2>Your Items</h2>
-
-                        <span>
-                            {cart.Total_Items__c} items
-                        </span>
-
+                        <span>{cart.Total_Items__c} items</span>
                     </div>
 
                     <template
-                        for:each={cartItems}
+                        for:each={displayCartItems}
                         for:item="item">
 
                         <article
@@ -153,58 +120,53 @@
                             key={item.Id}>
 
                             <div class="product-image">
-
                                 <template if:true={item.imageUrl}>
-
                                     <img
                                         src={item.imageUrl}
                                         alt={item.productName}>
-
                                 </template>
 
                                 <template if:false={item.imageUrl}>
-
                                     <lightning-icon
                                         icon-name="utility:image"
                                         size="large">
                                     </lightning-icon>
-
                                 </template>
-
                             </div>
 
                             <div class="product-info">
-
                                 <h3>{item.productName}</h3>
 
                                 <p class="unit-price">
                                     {item.formattedPrice}
                                 </p>
 
+                                <!-- Stock Warning -->
+                                <template if:true={item.stockWarning}>
+                                    <p class="stock-warning" role="status">
+                                        {item.stockWarning}
+                                    </p>
+                                </template>
+
+                                <!-- Quantity Controls -->
                                 <div class="quantity-control">
 
                                     <button
                                         data-id={item.Id}
                                         onclick={handleDecrease}
-                                        disabled={isUpdating}
+                                        disabled={item.disableDecrease}
                                         title="Decrease quantity">
-
                                         −
-
                                     </button>
 
-                                    <span>
-                                        {item.Quantity__c}
-                                    </span>
+                                    <span>{item.Quantity__c}</span>
 
                                     <button
                                         data-id={item.Id}
                                         onclick={handleIncrease}
-                                        disabled={isUpdating}
+                                        disabled={item.disableIncrease}
                                         title="Increase quantity">
-
                                         +
-
                                     </button>
 
                                 </div>
@@ -214,11 +176,8 @@
                                     data-id={item.Id}
                                     onclick={handleRemove}
                                     disabled={isUpdating}>
-
                                     Remove
-
                                 </button>
-
                             </div>
 
                             <div class="item-subtotal">
@@ -226,9 +185,7 @@
                             </div>
 
                         </article>
-
                     </template>
-
                 </div>
 
                 <!-- Order Summary -->
@@ -237,32 +194,30 @@
                     <h2>Order Summary</h2>
 
                     <div class="summary-row">
-
                         <span>Total Items</span>
-
-                        <span>
-                            {cart.Total_Items__c}
-                        </span>
-
+                        <span>{cart.Total_Items__c}</span>
                     </div>
 
                     <div class="summary-row total-row">
-
                         <span>Total Amount</span>
-
-                        <strong>
-                            {formattedTotal}
-                        </strong>
-
+                        <strong>{formattedTotal}</strong>
                     </div>
 
+                    <!-- Stock Error -->
+                    <template if:true={hasStockIssue}>
+                        <p class="stock-alert" role="alert">
+                            Some perfumes are unavailable or exceed
+                            available stock. Please remove them or
+                            reduce their quantities to continue.
+                        </p>
+                    </template>
+
+                    <!-- Checkout -->
                     <button
                         class="checkout-button"
                         onclick={handleCheckout}
-                        disabled={isUpdating}>
-
+                        disabled={checkoutDisabled}>
                         Proceed to Checkout
-
                     </button>
 
                     <p class="checkout-note">
@@ -272,15 +227,11 @@
                     <button
                         class="continue-link"
                         onclick={handleContinueShopping}>
-
                         ← Continue Shopping
-
                     </button>
 
                 </aside>
-
             </div>
-
         </template>
 
     </section>
