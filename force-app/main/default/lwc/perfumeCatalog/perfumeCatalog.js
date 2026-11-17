@@ -1,4 +1,3 @@
-
 import { LightningElement, wire } from 'lwc';
 import {
     NavigationMixin,
@@ -19,6 +18,7 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
     errorMessage = '';
 
     searchTerm = '';
+    searchInput = '';
     selectedCategory = '';
     selectedBrand = '';
     selectedGender = '';
@@ -48,6 +48,9 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
 
         if (this.searchTerm !== newSearchTerm) {
             this.searchTerm = newSearchTerm;
+            this.searchInput = typeof headerSearch === 'string'
+                ? headerSearch.trim()
+                : '';
             this.applyFilters();
         }
     }
@@ -192,18 +195,27 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
     // ==========================================
 
     get categoryOptions() {
-        return this.getPicklistOptions('Category__c');
+        return this.getPicklistOptions(
+            'Category__c',
+            this.selectedCategory
+        );
     }
 
     get brandOptions() {
-        return this.getPicklistOptions('Brand__c');
+        return this.getPicklistOptions(
+            'Brand__c',
+            this.selectedBrand
+        );
     }
 
     get genderOptions() {
-        return this.getPicklistOptions('Gender__c');
+        return this.getPicklistOptions(
+            'Gender__c',
+            this.selectedGender
+        );
     }
 
-    getPicklistOptions(fieldName) {
+    getPicklistOptions(fieldName, selectedValue) {
 
         const values = [
             ...new Set(
@@ -214,11 +226,18 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
         ];
 
         return [
-            { label: 'All', value: '' },
+            {
+                label: 'All',
+                value: '',
+                key: 'all',
+                selected: !selectedValue
+            },
 
             ...values.map(value => ({
                 label: value,
-                value: value
+                value: value,
+                key: value,
+                selected: value === selectedValue
             }))
         ];
     }
@@ -229,39 +248,110 @@ export default class PerfumeCatalog extends NavigationMixin(LightningElement) {
             { label: 'Newest First', value: 'newest' },
             { label: 'Price: Low to High', value: 'lowToHigh' },
             { label: 'Price: High to Low', value: 'highToLow' }
-        ];
+        ].map(option => ({
+            ...option,
+            key: option.value,
+            selected: option.value === this.selectedSort
+        }));
+    }
+
+    // Gender is shown as pill buttons (few values)
+    get genderPills() {
+        return this.genderOptions.map(option => ({
+            key: option.key,
+            value: option.value,
+            label: option.label,
+            className: option.selected ? 'pill pill-active' : 'pill',
+            ariaPressed: option.selected ? 'true' : 'false'
+        }));
+    }
+
+    // ==========================================
+    // ACTIVE FILTER CHIPS
+    // ==========================================
+
+    get activeFilters() {
+
+        const chips = [];
+        const search = (this.searchInput || '').trim();
+
+        if (search) {
+            chips.push({ key: 'search', label: 'Search: ' + search });
+        }
+
+        if (this.selectedCategory) {
+            chips.push({ key: 'category', label: this.selectedCategory });
+        }
+
+        if (this.selectedBrand) {
+            chips.push({ key: 'brand', label: this.selectedBrand });
+        }
+
+        if (this.selectedGender) {
+            chips.push({ key: 'gender', label: this.selectedGender });
+        }
+
+        return chips.map(chip => ({
+            ...chip,
+            ariaLabel: 'Remove filter ' + chip.label
+        }));
+    }
+
+    get hasActiveFilters() {
+        return this.activeFilters.length > 0;
     }
 
     // ==========================================
     // FILTER HANDLERS
     // ==========================================
 
-    handleSearch(event) {
-
-        this.searchTerm = (
-            event.target.value || ''
-        ).trim().toLowerCase();
-
-        this.applyFilters();
-    }
-
     handleCategoryChange(event) {
-        this.selectedCategory = event.detail.value;
+        this.selectedCategory = event.target.value;
         this.applyFilters();
     }
 
     handleBrandChange(event) {
-        this.selectedBrand = event.detail.value;
+        this.selectedBrand = event.target.value;
         this.applyFilters();
     }
 
-    handleGenderChange(event) {
-        this.selectedGender = event.detail.value;
+    handleGenderPill(event) {
+        this.selectedGender = event.currentTarget.dataset.value || '';
         this.applyFilters();
     }
 
     handleSortChange(event) {
-        this.selectedSort = event.detail.value;
+        this.selectedSort = event.target.value;
+        this.applyFilters();
+    }
+
+    handleRemoveFilter(event) {
+
+        const type = event.currentTarget.dataset.type;
+
+        if (type === 'search') {
+            this.searchInput = '';
+            this.searchTerm = '';
+        } else if (type === 'category') {
+            this.selectedCategory = '';
+        } else if (type === 'brand') {
+            this.selectedBrand = '';
+        } else if (type === 'gender') {
+            this.selectedGender = '';
+        }
+
+        this.applyFilters();
+    }
+
+    // Clears search and filters. The sort order is kept.
+    handleClearFilters() {
+
+        this.searchInput = '';
+        this.searchTerm = '';
+        this.selectedCategory = '';
+        this.selectedBrand = '';
+        this.selectedGender = '';
+
         this.applyFilters();
     }
 

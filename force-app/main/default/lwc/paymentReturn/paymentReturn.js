@@ -14,6 +14,7 @@ const POLL_INTERVAL_MS = 5000;
 const MAX_POLL_MS = 10 * 60 * 1000;
 const MAX_CONSECUTIVE_POLL_ERRORS = 3;
 
+
 export default class PaymentReturn extends NavigationMixin(LightningElement) {
 
     razorpayPaymentId;
@@ -138,6 +139,7 @@ export default class PaymentReturn extends NavigationMixin(LightningElement) {
                 this.isWaiting = false;
                 this.isSuccess = true;
                 this.razorpayPaymentId = result.razorpayPaymentId;
+                this.markOrderConfirmedInTitle();
                 await this.loadOrder();
                 return;
             }
@@ -167,6 +169,17 @@ export default class PaymentReturn extends NavigationMixin(LightningElement) {
 
         // eslint-disable-next-line @lwc/lwc/no-async-operation
         this.pollTimer = setTimeout(() => this.pollPayment(), POLL_INTERVAL_MS);
+    }
+
+    // The customer is usually looking at the Razorpay tab. A page cannot pull
+    // its own tab to the front, so the tab title is the visible hint that the
+    // order is confirmed. Best effort only.
+    markOrderConfirmedInTitle() {
+        try {
+            document.title = '\u2714 Order confirmed - ScentSphere';
+        } catch (e) {
+            // Title is only a visual hint.
+        }
     }
 
     // ---------- Order details ----------

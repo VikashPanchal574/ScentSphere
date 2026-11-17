@@ -1,3 +1,4 @@
+
 import { LightningElement, wire } from 'lwc';
 
 import {
@@ -22,7 +23,6 @@ import getWishlist
 import removeFromWishlist
     from '@salesforce/apex/WishlistController.removeFromWishlist';
 
-
 export default class MyWishlist extends NavigationMixin(LightningElement) {
 
     // User information
@@ -46,8 +46,10 @@ export default class MyWishlist extends NavigationMixin(LightningElement) {
     @wire(CurrentPageReference)
     currentPageReference;
 
+    // ==========================================
+    // INITIAL LOAD
+    // ==========================================
 
-    // Load wishlist when page opens
     connectedCallback() {
 
         if (this.isGuestUser) {
@@ -58,79 +60,80 @@ export default class MyWishlist extends NavigationMixin(LightningElement) {
         this.loadWishlist();
     }
 
+    // ==========================================
+    // LOAD CUSTOMER WISHLIST
+    // ==========================================
 
-    // Fetch customer's wishlist
-   
-async loadWishlist() {
+    async loadWishlist() {
 
-    if (this.isGuestUser) {
-        this.isLoading = false;
-        return;
-    }
+        if (this.isGuestUser) {
+            this.isLoading = false;
+            return;
+        }
 
-    this.isLoading = true;
-    this.errorMessage = '';
+        this.isLoading = true;
+        this.errorMessage = '';
 
-    try {
+        try {
 
-        const result = await getWishlist();
+            const result = await getWishlist();
 
-        this.wishlistItems = (result || []).map(item => {
+            this.wishlistItems = (result || []).map(item => {
 
-            const perfume = item.Perfume__r;
+                const perfume = item.Perfume__r;
 
-            const stockQuantity = Number(
-                perfume?.Stock_Quantity__c ?? 0
+                const stockQuantity = Number(
+                    perfume?.Stock_Quantity__c ?? 0
+                );
+
+                const isActive = perfume?.Active__c === true;
+
+                const isOutOfStock = stockQuantity <= 0;
+
+                return {
+                    ...item,
+
+                    stockQuantity,
+                    isOutOfStock,
+
+                    isAvailable:
+                        isActive && !isOutOfStock,
+
+                    isCurrentlyUnavailable:
+                        !isActive && !isOutOfStock,
+
+                    detailsLabel:
+                        'View details for ' +
+                        (perfume?.Product_Name__c || 'perfume')
+                };
+            });
+
+        } catch (error) {
+
+            this.wishlistItems = [];
+
+            this.errorMessage = this.getErrorMessage(error);
+
+            this.showToast(
+                'Wishlist Error',
+                this.errorMessage,
+                'error'
             );
 
-            const isActive = perfume?.Active__c === true;
+        } finally {
 
-            const isOutOfStock = stockQuantity <= 0;
-
-            return {
-                ...item,
-
-                stockQuantity,
-
-                // Stock is zero
-                isOutOfStock,
-
-                // Active perfume with stock
-                isAvailable:
-                    isActive && !isOutOfStock,
-
-                // Inactive perfume with remaining stock
-                isCurrentlyUnavailable:
-                    !isActive && !isOutOfStock
-            };
-        });
-
-    } catch (error) {
-
-        this.wishlistItems = [];
-
-        this.errorMessage = this.getErrorMessage(error);
-
-        this.showToast(
-            'Wishlist Error',
-            this.errorMessage,
-            'error'
-        );
-
-    } finally {
-
-        this.isLoading = false;
+            this.isLoading = false;
+        }
     }
-}
 
+    // ==========================================
+    // WISHLIST STATES
+    // ==========================================
 
-    // Check whether wishlist contains products
     get hasItems() {
         return this.wishlistItems.length > 0;
     }
 
-
-    // Show empty wishlist message
     get showEmpty() {
         return (
             !this.isLoading &&
@@ -140,14 +143,14 @@ async loadWishlist() {
         );
     }
 
-
-    // Display total wishlist items
     get wishlistCount() {
         return this.wishlistItems.length;
     }
 
+    // ==========================================
+    // PRODUCT DETAILS NAVIGATION
+    // ==========================================
 
-    // Navigate to Product Details with Wishlist context
     handleViewDetails(event) {
 
         event.stopPropagation();
@@ -174,36 +177,44 @@ async loadWishlist() {
                     this.currentPageReference?.attributes?.name ||
                     'Wishlist__c'
             }
-
         });
     }
 
-handleGuestLogin() {
-    this[NavigationMixin.Navigate]({
-        type: 'comm__loginPage',
-        attributes: {
-            actionName: 'login'
-        }
-    });
-}
+    // ==========================================
+    // GUEST NAVIGATION
+    // ==========================================
 
-handleGuestShop() {
-    this[NavigationMixin.Navigate]({
-        type: 'comm__namedPage',
-        attributes: {
-            name: 'Shop__c'
-        }
-    });
-}
+    handleGuestLogin() {
 
+        this[NavigationMixin.Navigate]({
+            type: 'comm__loginPage',
+            attributes: {
+                actionName: 'login'
+            }
+        });
+    }
 
+    handleGuestShop() {
 
-    // Remove perfume from wishlist
+        this[NavigationMixin.Navigate]({
+            type: 'comm__namedPage',
+            attributes: {
+                name: 'Shop__c'
+            }
+        });
+    }
+
+    // ==========================================
+    // REMOVE FROM WISHLIST
+    // ==========================================
+
     async handleRemove(event) {
 
+        // Prevent card's product navigation.
         event.stopPropagation();
 
-        const perfumeId = event.currentTarget.dataset.perfumeId;
+        const perfumeId =
+            event.currentTarget.dataset.perfumeId;
 
         if (!perfumeId || this.isRemoving) {
             return;
@@ -222,13 +233,13 @@ handleGuestShop() {
                 item => item.Perfume__c !== perfumeId
             );
 
-            // Notify Header through LMS
+            // Notify header through LMS
             publish(this.messageContext, WISHLIST_UPDATE, {
                 perfumeId: perfumeId,
                 isWishlisted: false
             });
 
-            // Success notification
+            // Success toast
             this.showToast(
                 'Removed from Wishlist',
                 'Perfume has been removed successfully.',
@@ -249,14 +260,18 @@ handleGuestShop() {
         }
     }
 
+    // ==========================================
+    // RETRY LOADING
+    // ==========================================
 
-    // Retry loading wishlist
     handleRetry() {
         this.loadWishlist();
     }
 
+    // ==========================================
+    // TOAST
+    // ==========================================
 
-    // Toast notification
     showToast(title, message, variant) {
 
         Toast.show({
@@ -267,8 +282,10 @@ handleGuestShop() {
         }, this);
     }
 
+    // ==========================================
+    // ERROR MESSAGE HELPER
+    // ==========================================
 
-    // Extract error message
     getErrorMessage(error) {
 
         return error?.body?.message ||

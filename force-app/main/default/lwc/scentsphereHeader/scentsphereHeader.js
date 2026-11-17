@@ -1,3 +1,4 @@
+
 import { LightningElement, wire } from 'lwc';
 
 import {
@@ -21,12 +22,14 @@ import getWishlistPerfumeIds
 import getCartCount
     from '@salesforce/apex/CartController.getCartCount';
 
+import getSuggestions
+    from '@salesforce/apex/PerfumeSearchController.getSuggestions';
+
 import WISHLIST_UPDATE
     from '@salesforce/messageChannel/WishlistUpdate__c';
 
 import CART_UPDATE
     from '@salesforce/messageChannel/CartUpdate__c';
-
 
 export default class ScentsphereHeader extends NavigationMixin(LightningElement) {
 
@@ -42,7 +45,18 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     cartCount = 0;
     cartSubscription = null;
 
-    // Current Salesforce page reference
+    // Search Suggestions
+    suggestions = [];
+    showSuggestions = false;
+    isSearchLoading = false;
+    searchError = false;
+
+    searchTimer = null;
+    searchCloseTimer = null;
+    searchRequestId = 0;
+    resizeObserver = null;
+
+    // Current Page
     @wire(CurrentPageReference)
     pageReference;
 
@@ -51,7 +65,6 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     wiredMessageContext(context) {
 
         if (context && !this.subscription) {
-
             this.subscription = subscribe(
                 context,
                 WISHLIST_UPDATE,
@@ -61,7 +74,6 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
 
         if (context && !this.cartSubscription) {
-
             this.cartSubscription = subscribe(
                 context,
                 CART_UPDATE,
@@ -71,7 +83,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
-    // Initial counts
+    // Initial Counts
     connectedCallback() {
 
         if (!this.isGuest) {
@@ -80,7 +92,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
-    // Keep spacer height equal to the fixed header height
+    // Sync spacer with fixed header
     renderedCallback() {
 
         if (this.resizeObserver) {
@@ -106,8 +118,11 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
-    // Unsubscribe when component is removed
     disconnectedCallback() {
+
+        clearTimeout(this.searchTimer);
+        clearTimeout(this.searchCloseTimer);
+        this.searchRequestId += 1;
 
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
@@ -125,7 +140,10 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
-    // Fetch latest wishlist count
+    // ==========================================
+    // WISHLIST COUNT
+    // ==========================================
+
     async loadWishlistCount() {
 
         if (this.isGuest) {
@@ -134,18 +152,18 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
 
         try {
-
             const perfumeIds = await getWishlistPerfumeIds();
             this.wishlistCount = perfumeIds.length;
-
         } catch (error) {
-
             console.error('Wishlist count error:', error);
             this.wishlistCount = 0;
         }
     }
 
-    // Fetch latest cart count
+    // ==========================================
+    // CART COUNT
+    // ==========================================
+
     async loadCartCount() {
 
         if (this.isGuest) {
@@ -161,31 +179,28 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
-    // Receive wishlist updates from other components
     handleWishlistUpdate(message) {
-
         if (message) {
             this.loadWishlistCount();
         }
     }
 
-    // Wishlist badge label
     get wishlistCountLabel() {
-
         return this.wishlistCount > 99
             ? '99+'
             : String(this.wishlistCount);
     }
 
-    // Cart badge label
     get cartCountLabel() {
-
         return this.cartCount > 99
             ? '99+'
             : String(this.cartCount);
     }
 
-    // Hide Header on Authentication Pages
+    // ==========================================
+    // HEADER VISIBILITY
+    // ==========================================
+
     get showHeader() {
 
         const path = window.location.pathname.toLowerCase();
@@ -199,14 +214,15 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         return !authPages.some(page => path.endsWith(page));
     }
 
-    // Detect Current Salesforce Page
+    // ==========================================
+    // CURRENT PAGE
+    // ==========================================
+
     get currentPage() {
 
         const pageName = this.pageReference?.attributes?.name;
 
-        // About and Contact share the same page
         if (pageName === 'About_Contact__c') {
-
             return this.pageReference?.state?.c__section === 'contact'
                 ? 'contact'
                 : 'about';
@@ -224,7 +240,6 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         return pageMap[pageName] || '';
     }
 
-    // Active Navigation Classes
     get homeClass() {
         return this.getNavClass('home');
     }
@@ -250,13 +265,15 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     getNavClass(page) {
-
         return this.currentPage === page
             ? 'nav-link active'
             : 'nav-link';
     }
 
-    // Mobile Menu
+    // ==========================================
+    // MOBILE MENU
+    // ==========================================
+
     toggleMenu() {
         this.isMenuOpen = !this.isMenuOpen;
     }
@@ -279,13 +296,16 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         return this.isMenuOpen ? 'true' : 'false';
     }
 
-    // Common Navigation
+    // ==========================================
+    // COMMON NAVIGATION
+    // ==========================================
+
     navigateToPage(pageName) {
 
+        this.closeSearchSuggestions();
+
         this[NavigationMixin.Navigate]({
-
             type: 'comm__namedPage',
-
             attributes: {
                 name: pageName
             }
@@ -294,130 +314,287 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         this.closeMenu();
     }
 
-// Navigate directly to About or Contact section
-navigateToSection(sectionName) {
+    navigateToSection(sectionName) {
 
-    this[NavigationMixin.Navigate]({
+        this.closeSearchSuggestions();
 
-        type: 'comm__namedPage',
+        this[NavigationMixin.Navigate]({
+            type: 'comm__namedPage',
+            attributes: {
+                name: 'About_Contact__c'
+            },
+            state: {
+                c__section: sectionName,
+                c__navRequest: String(Date.now())
+            }
+        });
 
-        attributes: {
-            name: 'About_Contact__c'
-        },
-
-        state: {
-            c__section: sectionName,
-
-            // Unique navigation request ensures
-            // repeated clicks trigger a new page reference
-            c__navRequest: String(Date.now())
-        }
-    });
-
-    this.closeMenu();
-}
-
-
-    // Search
-    // Search Input Handler
-handleSearch(event) {
-
-    this.searchTerm = event.target.value;
-}
-
-// Search Navigation Handler
-handleSearchKeydown(event) {
-
-    // Search only when Enter is pressed
-    if (event.key !== 'Enter') {
-        return;
+        this.closeMenu();
     }
 
-    event.preventDefault();
+    // ==========================================
+    // SEARCH SUGGESTIONS
+    // ==========================================
 
-    const searchValue = this.searchTerm.trim();
-
-    // Do nothing when search is empty
-    if (!searchValue) {
-        return;
+    get hasSuggestions() {
+        return this.suggestions.length > 0;
     }
 
-    // Navigate to Shop page with search keyword
-    this[NavigationMixin.Navigate]({
+    get suggestionHeading() {
+        return this.searchTerm.trim()
+            ? 'MATCHING PERFUMES'
+            : 'FEATURED PERFUMES';
+    }
 
-        type: 'comm__namedPage',
+    get suggestionEmptyMessage() {
 
-        attributes: {
-            name: 'Shop__c'
-        },
-
-        state: {
-            c__search: searchValue
+        if (this.searchError) {
+            return 'Unable to load suggestions. Please try again.';
         }
-    });
 
-    this.closeMenu();
-}
+        return this.searchTerm.trim()
+            ? 'No matching perfumes found.'
+            : 'No featured perfumes available.';
+    }
 
-    // Home
+    get showViewAll() {
+        return this.searchTerm.trim().length > 0
+            && !this.isSearchLoading;
+    }
+
+    handleSearchFocus() {
+
+        clearTimeout(this.searchCloseTimer);
+
+        this.showSuggestions = true;
+        this.scheduleSearch(true);
+    }
+
+    handleSearch(event) {
+
+        this.searchTerm = event.target.value;
+        this.showSuggestions = true;
+
+        this.scheduleSearch(false);
+    }
+
+    scheduleSearch(immediate = false) {
+
+        clearTimeout(this.searchTimer);
+
+        const requestId = ++this.searchRequestId;
+
+        this.isSearchLoading = true;
+        this.searchError = false;
+        this.suggestions = [];
+
+        if (immediate) {
+            this.loadSuggestions(requestId);
+            return;
+        }
+
+        this.searchTimer = setTimeout(() => {
+            this.loadSuggestions(requestId);
+        }, 250);
+    }
+
+    async loadSuggestions(requestId) {
+
+        const term = this.searchTerm.trim();
+
+        try {
+            const result = await getSuggestions({
+                searchTerm: term
+            });
+
+            if (
+                requestId !== this.searchRequestId ||
+                !this.showSuggestions
+            ) {
+                return;
+            }
+
+            const formatter = new Intl.NumberFormat(
+                'en-IN',
+                {
+                    style: 'currency',
+                    currency: 'INR',
+                    maximumFractionDigits: 0
+                }
+            );
+
+            this.suggestions = (result || []).map(item => ({
+                ...item,
+                formattedPrice: item.price == null
+                    ? 'Price unavailable'
+                    : formatter.format(item.price)
+            }));
+
+            this.searchError = false;
+
+        } catch (error) {
+
+            if (requestId !== this.searchRequestId) {
+                return;
+            }
+
+            console.error('Perfume suggestions error:', error);
+
+            this.suggestions = [];
+            this.searchError = true;
+
+        } finally {
+
+            if (requestId === this.searchRequestId) {
+                this.isSearchLoading = false;
+            }
+        }
+    }
+
+    handleSearchFocusOut(event) {
+
+        const nextTarget = event.relatedTarget;
+
+        if (
+            nextTarget &&
+            this.template.querySelector('.search-area')
+                ?.contains(nextTarget)
+        ) {
+            return;
+        }
+
+        clearTimeout(this.searchCloseTimer);
+
+        this.searchCloseTimer = setTimeout(() => {
+            this.closeSearchSuggestions();
+        }, 180);
+    }
+
+    closeSearchSuggestions() {
+
+        clearTimeout(this.searchTimer);
+        clearTimeout(this.searchCloseTimer);
+
+        this.searchRequestId += 1;
+
+        this.showSuggestions = false;
+        this.isSearchLoading = false;
+        this.suggestions = [];
+    }
+
+    handleSearchKeydown(event) {
+
+        if (event.key === 'Escape') {
+            this.closeSearchSuggestions();
+            return;
+        }
+
+        if (event.key !== 'Enter') {
+            return;
+        }
+
+        event.preventDefault();
+
+        const searchValue = this.searchTerm.trim();
+
+        if (!searchValue) {
+            return;
+        }
+
+        this.navigateToSearchResults(searchValue);
+    }
+
+    navigateToSearchResults(searchValue) {
+
+        this.searchTerm = searchValue;
+        this.closeSearchSuggestions();
+
+        this[NavigationMixin.Navigate]({
+            type: 'comm__namedPage',
+            attributes: {
+                name: 'Shop__c'
+            },
+            state: {
+                c__search: searchValue,
+                c__searchRequest: String(Date.now())
+            }
+        });
+
+        this.closeMenu();
+    }
+
+    handleSuggestionClick(event) {
+
+        const perfumeId = event.currentTarget.dataset.id;
+
+        const selected = this.suggestions.find(
+            item => item.id === perfumeId
+        );
+
+        if (!selected) {
+            return;
+        }
+
+        this.navigateToSearchResults(selected.productName);
+    }
+
+    handleViewAllResults() {
+
+        const searchValue = this.searchTerm.trim();
+
+        if (searchValue) {
+            this.navigateToSearchResults(searchValue);
+        }
+    }
+
+    // ==========================================
+    // ORIGINAL NAVIGATION HANDLERS
+    // ==========================================
+
     handleHome(event) {
-
         event.preventDefault();
         this.navigateToPage('Home');
     }
 
-    // Shop
     handleShop(event) {
-
         event.preventDefault();
         this.navigateToPage('Shop__c');
     }
 
-    // Collections
     handleCollections(event) {
-
         event.preventDefault();
         this.navigateToPage('Collections__c');
     }
 
-    // Gifts
     handleGifts(event) {
-
         event.preventDefault();
         this.navigateToPage('Gifts__c');
     }
 
-    // About - Navigate to top section
     handleAbout(event) {
-
         event.preventDefault();
         this.navigateToSection('about');
     }
 
-    // Contact - Navigate to Contact form section
     handleContact(event) {
-
         event.preventDefault();
         this.navigateToSection('contact');
     }
 
-    // Wishlist
     handleWishlist() {
-    this.navigateToPage('My_Wishlist__c');
-}
+        this.navigateToPage('My_Wishlist__c');
+    }
 
-    // Shopping Cart
     handleCart() {
         this.navigateToPage('Shopping_Cart__c');
     }
 
-    // Salesforce Experience Cloud Login
     handleLogin() {
 
+        this.closeSearchSuggestions();
+
         this[NavigationMixin.Navigate]({
-
             type: 'comm__loginPage',
-
             attributes: {
                 actionName: 'login'
             }
@@ -426,7 +603,6 @@ handleSearchKeydown(event) {
         this.closeMenu();
     }
 
-    // My Account
     handleMyAccount() {
         this.navigateToPage('My_Account__c');
     }

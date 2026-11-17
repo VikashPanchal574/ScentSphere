@@ -522,13 +522,25 @@
     overflow-wrap: anywhere;
 }
 
+
+/* Product Description - Maximum 3 Lines */
 .product-description {
-    min-height: 60px;
     color: #81747a;
     font-size: 12px;
     line-height: 1.7;
+
+    height: 61.2px;
+    min-height: 61.2px;
+    max-height: 61.2px;
+
     margin: 0 0 15px;
+    overflow: hidden;
     overflow-wrap: anywhere;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
 }
 
 .product-meta {
@@ -822,5 +834,107 @@
     .gift-closing-section {
         min-height: 250px;
         padding: 65px 22px;
+    }
+}
+
+/* ==========================================
+   GIFT PRODUCT CARD ALIGNMENT
+========================================== */
+
+/* Product name - maximum 2 lines */
+.product-info h3 {
+    height: 51.3px;
+    min-height: 51.3px;
+    max-height: 51.3px;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+
+    overflow: hidden;
+}
+
+/* Keep size/category tags aligned */
+.product-meta {
+    min-height: 28px;
+    align-content: flex-start;
+}
+
+/* Keep prices and buttons at card bottom */
+.product-bottom {
+    margin-top: auto;
+}
+
+/* ==========================================
+   GIFT WISHLIST HEART
+   SAME AS FEATURED / COLLECTIONS
+========================================== */
+
+.wishlist-heart {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 5;
+
+    width: 23px;
+    height: 23px;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Transparent background */
+    background: transparent !important;
+
+    /* Thin grey rectangular border */
+    border: 1px solid #777777;
+    border-radius: 4px;
+
+    /* Grey heart */
+    --slds-c-icon-color-foreground-default: #777777;
+
+    box-shadow: none;
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.wishlist-heart:hover:not(:disabled) {
+    background: transparent !important;
+    border-color: #481d2d;
+    transform: scale(1.05);
+}
+
+/* Already added to Wishlist */
+.wishlist-heart.is-active {
+    background: transparent !important;
+    border-color: #c43c54;
+
+    --slds-c-icon-color-foreground-default: #c43c54;
+}
+
+.wishlist-heart lightning-icon {
+    transform: scale(0.65);
+}
+
+.wishlist-heart:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.wishlist-heart:focus-visible {
+    outline: 2px solid #b38b54;
+    outline-offset: 2px;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .wishlist-heart {
+        top: 10px;
+        right: 10px;
     }
 }

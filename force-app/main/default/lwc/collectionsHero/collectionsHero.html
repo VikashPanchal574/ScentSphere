@@ -5,7 +5,9 @@
         <!-- HERO SECTION -->
         <section class="hero-section">
             <div class="hero-content">
-                <p class="eyebrow">SCENTSPHERE EXCLUSIVE COLLECTION</p>
+                <p class="eyebrow">
+                    SCENTSPHERE EXCLUSIVE COLLECTION
+                </p>
 
                 <h1>
                     Find the fragrance
@@ -18,7 +20,10 @@
                     crafted for every personality, every mood and every occasion.
                 </p>
 
-                <button class="explore-button" onclick={handleExplore} type="button">
+                <button
+                    class="explore-button"
+                    onclick={handleExplore}
+                    type="button">
                     Explore Collections
                     <span class="arrow">↘</span>
                 </button>
@@ -40,7 +45,9 @@
                         <div class="bottle-brand">SCENT</div>
                         <div class="bottle-name">SPHERE</div>
                         <div class="bottle-line"></div>
-                        <div class="bottle-label">EAU DE PARFUM</div>
+                        <div class="bottle-label">
+                            EAU DE PARFUM
+                        </div>
                     </div>
                 </div>
 
@@ -57,10 +64,14 @@
         </section>
 
         <!-- COLLECTION CATEGORIES -->
-        <section class="collection-section" data-target="collection-grid">
+        <section
+            class="collection-section"
+            data-target="collection-grid">
 
             <div class="section-heading">
-                <p class="eyebrow">EXPLORE SCENTSPHERE</p>
+                <p class="eyebrow">
+                    EXPLORE SCENTSPHERE
+                </p>
 
                 <h2>
                     Discover Your
@@ -68,12 +79,16 @@
                 </h2>
 
                 <p>
-                    Every fragrance tells a story. Find the one that tells yours.
+                    Every fragrance tells a story.
+                    Find the one that tells yours.
                 </p>
             </div>
 
             <div class="collection-grid">
-                <template for:each={collectionTypes} for:item="item">
+                <template
+                    for:each={collectionTypes}
+                    for:item="item">
+
                     <button
                         class="collection-card"
                         key={item.id}
@@ -81,22 +96,34 @@
                         onclick={handleCategoryClick}
                         type="button">
 
-                        <span class="card-number">{item.number}</span>
-                        <h3>{item.title}</h3>
-                        <p>{item.description}</p>
-                        <span class="card-decoration">✦</span>
+                        <span class="card-number">
+                            {item.number}
+                        </span>
 
+                        <h3>{item.title}</h3>
+
+                        <p>{item.description}</p>
+
+                        <span class="card-decoration">
+                            ✦
+                        </span>
                     </button>
+
                 </template>
             </div>
         </section>
 
         <!-- PERFUME RESULTS -->
-        <section class="products-section" data-target="perfume-results">
+        <section
+            class="products-section"
+            data-target="perfume-results">
 
             <div class="products-heading">
                 <div>
-                    <p class="eyebrow">CURATED FOR YOU</p>
+                    <p class="eyebrow">
+                        CURATED FOR YOU
+                    </p>
+
                     <h2>{selectedCategoryLabel}</h2>
 
                     <p>
@@ -112,9 +139,7 @@
                     class="view-all-button"
                     onclick={handleShowAll}
                     type="button">
-
                     View All Fragrances
-
                 </button>
             </div>
 
@@ -140,7 +165,8 @@
                 <div class="message-container">
                     <h3>No Fragrances Found</h3>
                     <p>
-                        There are currently no active perfumes in this category.
+                        There are currently no active
+                        perfumes in this category.
                     </p>
                 </div>
             </template>
@@ -149,7 +175,9 @@
             <template if:true={hasPerfumes}>
                 <div class="perfume-grid">
 
-                    <template for:each={visiblePerfumes} for:item="perfume">
+                    <template
+                        for:each={visiblePerfumes}
+                        for:item="perfume">
 
                         <article
                             class="perfume-card"
@@ -159,7 +187,7 @@
                             onkeydown={handleCardKeydown}
                             tabindex="0"
                             role="link"
-                            aria-label="View perfume details">
+                            aria-label={perfume.detailsLabel}>
 
                             <!-- PRODUCT IMAGE -->
                             <div class="product-image">
@@ -176,6 +204,25 @@
                                         SCENTSPHERE
                                     </div>
                                 </template>
+
+                                <!-- NEW WISHLIST HEART -->
+                                <button
+                                    class={perfume.wishlistButtonClass}
+                                    data-id={perfume.Id}
+                                    onclick={handleWishlistClick}
+                                    type="button"
+                                    disabled={perfume.isWishlistUpdating}
+                                    title={perfume.wishlistTitle}
+                                    aria-label={perfume.wishlistTitle}
+                                    aria-pressed={perfume.isWishlisted}>
+
+                                    <lightning-icon
+                                        icon-name={perfume.wishlistIcon}
+                                        size="small"
+                                        alternative-text="Wishlist">
+                                    </lightning-icon>
+
+                                </button>
 
                                 <!-- OUT OF STOCK -->
                                 <template if:true={perfume.isOutOfStock}>
@@ -199,11 +246,14 @@
                                     {perfume.Product_Name__c}
                                 </h3>
 
+                                <!-- THREE-LINE DESCRIPTION -->
                                 <p class="product-description">
                                     {perfume.Description__c}
                                 </p>
 
+                                <!-- PRODUCT META -->
                                 <div class="product-meta">
+
                                     <template if:true={perfume.Size__c}>
                                         <span>{perfume.Size__c}</span>
                                     </template>
@@ -211,9 +261,10 @@
                                     <template if:true={perfume.Category__c}>
                                         <span>{perfume.Category__c}</span>
                                     </template>
+
                                 </div>
 
-                                <!-- PRICE AND VIEW DETAILS -->
+                                <!-- PRICE + VIEW DETAILS -->
                                 <div class="product-bottom">
 
                                     <div class="product-price">
@@ -230,9 +281,7 @@
                                         data-id={perfume.Id}
                                         onclick={handleViewDetails}
                                         type="button">
-
                                         View Details →
-
                                     </button>
 
                                 </div>
@@ -242,24 +291,20 @@
                     </template>
                 </div>
 
-                <!-- LOAD MORE BUTTON -->
+                <!-- LOAD MORE -->
                 <template if:true={showLoadMore}>
                     <div class="load-more-section">
                         <button
                             class="load-more-button"
                             onclick={handleLoadMore}
                             type="button">
-
                             Load More Fragrances
                             <span>↓</span>
-
                         </button>
                     </div>
                 </template>
-
             </template>
 
         </section>
-
     </div>
 </template>

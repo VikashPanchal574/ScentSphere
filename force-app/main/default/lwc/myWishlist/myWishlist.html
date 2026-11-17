@@ -1,3 +1,4 @@
+
 <template>
     <section class="wishlist-container">
 
@@ -18,13 +19,14 @@
             </template>
         </div>
 
-
-
         <!-- Guest Wishlist Message -->
         <template if:true={isGuestUser}>
             <div class="wishlist-message guest-wishlist">
                 <div class="guest-heart">
-                    <lightning-icon icon-name="utility:heart" size="large" alternative-text="Wishlist">
+                    <lightning-icon
+                        icon-name="utility:heart"
+                        size="large"
+                        alternative-text="Wishlist">
                     </lightning-icon>
                 </div>
 
@@ -36,26 +38,32 @@
                 </p>
 
                 <div class="guest-actions">
-                    <button class="guest-login-button" onclick={handleGuestLogin}>
+                    <button
+                        class="guest-login-button"
+                        onclick={handleGuestLogin}
+                        type="button">
                         Sign In to Your Account
                     </button>
 
-                    <button class="guest-shop-button" onclick={handleGuestShop}>
+                    <button
+                        class="guest-shop-button"
+                        onclick={handleGuestShop}
+                        type="button">
                         Continue Shopping
                     </button>
                 </div>
             </div>
         </template>
 
-
         <!-- Loading -->
         <template if:true={isLoading}>
             <div class="wishlist-loading">
-                <lightning-spinner alternative-text="Loading wishlist" size="medium">
+                <lightning-spinner
+                    alternative-text="Loading wishlist"
+                    size="medium">
                 </lightning-spinner>
             </div>
         </template>
-
 
         <!-- Error -->
         <template if:true={errorMessage}>
@@ -63,12 +71,14 @@
                 <h3>Something went wrong</h3>
                 <p>{errorMessage}</p>
 
-                <button class="retry-button" onclick={handleRetry}>
+                <button
+                    class="retry-button"
+                    onclick={handleRetry}
+                    type="button">
                     Try Again
                 </button>
             </div>
         </template>
-
 
         <!-- Wishlist Products -->
         <template if:true={hasItems}>
@@ -78,12 +88,43 @@
 
                     <article class="wishlist-card" key={item.Id}>
 
+                        <!--
+                            Full-card navigation layer.
+                            Separate real button keeps keyboard access
+                            and avoids nested buttons.
+                        -->
+                        <button
+                            class="card-click-target"
+                            type="button"
+                            data-perfume-id={item.Perfume__c}
+                            onclick={handleViewDetails}
+                            aria-label={item.detailsLabel}>
+                        </button>
+
+                        <!-- Remove Icon -->
+                        <button
+                            class="remove-icon-button"
+                            type="button"
+                            title="Remove from Wishlist"
+                            aria-label="Remove from Wishlist"
+                            data-perfume-id={item.Perfume__c}
+                            onclick={handleRemove}
+                            disabled={isRemoving}>
+
+                            <lightning-icon
+                                icon-name="utility:delete"
+                                size="x-small"
+                                alternative-text="Remove">
+                            </lightning-icon>
+                        </button>
 
                         <!-- Product Image -->
                         <div class="wishlist-image">
 
                             <template if:true={item.Perfume__r.Product_Image_URL__c}>
-                                <img src={item.Perfume__r.Product_Image_URL__c} alt={item.Perfume__r.Product_Name__c}>
+                                <img
+                                    src={item.Perfume__r.Product_Image_URL__c}
+                                    alt={item.Perfume__r.Product_Name__c}>
                             </template>
 
                             <template if:false={item.Perfume__r.Product_Image_URL__c}>
@@ -92,7 +133,7 @@
                                 </div>
                             </template>
 
-                            <!-- Out Of Stock Overlay -->
+                            <!-- Out of Stock Overlay -->
                             <template if:true={item.isOutOfStock}>
                                 <div class="out-of-stock-overlay">
                                     <span class="out-of-stock-strip">
@@ -103,7 +144,6 @@
 
                         </div>
 
-
                         <!-- Product Information -->
                         <div class="wishlist-info">
 
@@ -111,17 +151,13 @@
                                 {item.Perfume__r.Brand__c}
                             </p>
 
-                            <h3>
+                            <h3 class="product-name">
                                 {item.Perfume__r.Product_Name__c}
                             </h3>
 
                             <p class="product-category">
                                 {item.Perfume__r.Category__c}
                             </p>
-
-
-
-                            <!-- Availability Status -->
 
                             <!-- Available -->
                             <template if:true={item.isAvailable}>
@@ -130,51 +166,43 @@
                                 </span>
                             </template>
 
-                            <!-- Out Of Stock -->
+                            <!-- Out of Stock -->
                             <template if:true={item.isOutOfStock}>
                                 <span class="availability unavailable">
                                     Out of Stock
                                 </span>
                             </template>
 
-                            <!-- Inactive Perfume -->
+                            <!-- Inactive -->
                             <template if:true={item.isCurrentlyUnavailable}>
                                 <span class="availability unavailable">
                                     Currently Unavailable
                                 </span>
                             </template>
 
-
-                            <!-- Price and View Details -->
+                            <!-- Footer: Price + Shop-style Button -->
                             <div class="wishlist-product-footer">
 
                                 <span class="product-price">
-                                    <lightning-formatted-number value={item.Perfume__r.Price__c} format-style="currency"
-                                        currency-code="INR" currency-display-as="symbol">
+                                    <lightning-formatted-number
+                                        value={item.Perfume__r.Price__c}
+                                        format-style="currency"
+                                        currency-code="INR"
+                                        currency-display-as="symbol">
                                     </lightning-formatted-number>
                                 </span>
 
-                                <button class="view-details-button" data-perfume-id={item.Perfume__c}
+                                <button
+                                    class="view-details-button"
+                                    type="button"
+                                    data-perfume-id={item.Perfume__c}
                                     onclick={handleViewDetails}>
                                     View Details →
                                 </button>
 
                             </div>
 
-
-                            <!-- Remove Button -->
-                            <button class="remove-button" data-perfume-id={item.Perfume__c} onclick={handleRemove}
-                                disabled={isRemoving}>
-
-                                <lightning-icon icon-name="utility:delete" size="x-small" alternative-text="Remove">
-                                </lightning-icon>
-
-                                <span>Remove from Wishlist</span>
-
-                            </button>
-
                         </div>
-
                     </article>
 
                 </template>
@@ -182,13 +210,15 @@
             </div>
         </template>
 
-
         <!-- Empty Wishlist -->
         <template if:true={showEmpty}>
             <div class="empty-wishlist">
 
                 <div class="empty-heart">
-                    <lightning-icon icon-name="utility:heart" size="large" alternative-text="Empty Wishlist">
+                    <lightning-icon
+                        icon-name="utility:heart"
+                        size="large"
+                        alternative-text="Empty Wishlist">
                     </lightning-icon>
                 </div>
 

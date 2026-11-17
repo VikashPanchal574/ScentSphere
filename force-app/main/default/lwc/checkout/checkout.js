@@ -1,4 +1,3 @@
-
 import { LightningElement, wire } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
@@ -10,6 +9,10 @@ import createRazorpayPaymentLink
     from '@salesforce/apex/RazorpayPaymentController.createRazorpayPaymentLink';
 
 const PAYMENT_RETURN_PATH = '/scentsphere/payment-return';
+
+// Fixed name for the Razorpay tab. The payment-return page uses the same name
+// to find that tab again and send it to the confirmation page.
+const PAYMENT_WINDOW_NAME = 'scentsphere_razorpay_payment';
 
 export default class Checkout extends NavigationMixin(LightningElement) {
 
@@ -165,7 +168,7 @@ export default class Checkout extends NavigationMixin(LightningElement) {
         let paymentWindow = null;
 
         try {
-            paymentWindow = window.open('', '_blank');
+            paymentWindow = window.open('', PAYMENT_WINDOW_NAME);
         } catch (e) {
             paymentWindow = null;
         }
@@ -228,7 +231,8 @@ export default class Checkout extends NavigationMixin(LightningElement) {
                 window.location.assign(
                     PAYMENT_RETURN_PATH +
                     '?razorpay_payment_link_id=' +
-                    encodeURIComponent(paymentLink.paymentLinkId)
+                    encodeURIComponent(paymentLink.paymentLinkId) +
+                    '&ss_newtab=1'
                 );
 
             } else {
