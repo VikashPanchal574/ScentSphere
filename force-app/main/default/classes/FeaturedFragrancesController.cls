@@ -12,8 +12,6 @@ public with sharing class FeaturedFragrancesController {
         @AuraEnabled public String size { get; set; }
         @AuraEnabled public String description { get; set; }
         @AuraEnabled public String imageUrl { get; set; }
-
-        // Stock Information
         @AuraEnabled public Decimal stockQuantity { get; set; }
 
         public FeaturedPerfume(Perfume__c perfume) {
@@ -27,8 +25,6 @@ public with sharing class FeaturedFragrancesController {
             size = perfume.Size__c;
             description = perfume.Description__c;
             imageUrl = perfume.Product_Image_URL__c;
-
-            // Current Salesforce Stock
             stockQuantity = perfume.Stock_Quantity__c;
         }
     }

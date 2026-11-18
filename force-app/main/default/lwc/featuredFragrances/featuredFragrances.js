@@ -1,6 +1,10 @@
 
 import { LightningElement, wire } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+
+import {
+    NavigationMixin,
+    CurrentPageReference
+} from 'lightning/navigation';
 
 import getFeaturedPerfumes
     from '@salesforce/apex/FeaturedFragrancesController.getFeaturedPerfumes';
@@ -12,6 +16,62 @@ export default class FeaturedFragrances extends NavigationMixin(LightningElement
     errorMessage = '';
 
     showAllProducts = false;
+
+    // NEW: Return from Product Details to Featured section
+    shouldScrollToFeatured = false;
+    hasScrolledToFeatured = false;
+
+    // ==========================================
+    // HOME PAGE RETURN CONTEXT
+    // ==========================================
+
+    @wire(CurrentPageReference)
+    handleHomePageReference(pageReference) {
+
+        if (!pageReference) {
+            return;
+        }
+
+        const scrollRequested =
+            pageReference.state?.c__scrollTo === 'featured';
+
+        this.shouldScrollToFeatured = scrollRequested;
+
+        if (scrollRequested) {
+            this.scrollToFeaturedSection();
+        } else {
+            this.hasScrolledToFeatured = false;
+        }
+    }
+
+    renderedCallback() {
+        this.scrollToFeaturedSection();
+    }
+
+    scrollToFeaturedSection() {
+
+        if (
+            !this.shouldScrollToFeatured ||
+            this.hasScrolledToFeatured
+        ) {
+            return;
+        }
+
+        const featuredSection = this.template.querySelector(
+            '.featured-section'
+        );
+
+        if (!featuredSection) {
+            return;
+        }
+
+        this.hasScrolledToFeatured = true;
+
+        featuredSection.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
 
     // ==========================================
     // FORMAT PRODUCTS WITH STOCK STATUS
@@ -137,11 +197,19 @@ export default class FeaturedFragrances extends NavigationMixin(LightningElement
 
         this[NavigationMixin.Navigate]({
             type: 'comm__namedPage',
+
             attributes: {
                 name: 'Product_Details__c'
             },
+
             state: {
-                c__recordId: perfumeId
+                c__recordId: perfumeId,
+
+                // NEW: Identify Featured as source
+                c__source: 'featured',
+
+                // Home page is the return destination
+                c__returnPage: 'Home'
             }
         });
     }
@@ -151,6 +219,12 @@ export default class FeaturedFragrances extends NavigationMixin(LightningElement
     // ==========================================
 
     handleCardKeydown(event) {
+
+        // Do not intercept keyboard input on
+        // nested buttons like Wishlist or View Details.
+        if (event.target !== event.currentTarget) {
+            return;
+        }
 
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();

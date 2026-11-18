@@ -175,8 +175,14 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
     get backButtonLabel() {
 
+        // Priority: return through related perfume history
         if (this.previousPerfumeId) {
             return 'Back to Previous Perfume';
+        }
+
+        // NEW: Featured Fragrances
+        if (this.navigationSource === 'featured') {
+            return 'Back to Featured';
         }
 
         if (this.navigationSource === 'collections') {
@@ -221,7 +227,11 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
         if (!destinationName) {
 
-            if (this.navigationSource === 'collections') {
+            // NEW: Featured products belong to Home
+            if (this.navigationSource === 'featured') {
+                destinationName = 'Home';
+
+            } else if (this.navigationSource === 'collections') {
                 destinationName = 'Collections__c';
 
             } else if (this.navigationSource === 'wishlist') {
@@ -235,14 +245,31 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             }
         }
 
+        // Preserve category/section when returning
+        let returnState = {};
+
+        if (this.navigationSource === 'collections') {
+
+            returnState = {
+                c__category: this.returnCategory
+            };
+
+        } else if (this.navigationSource === 'featured') {
+
+            // NEW: Tell the Home page to show Featured section
+            returnState = {
+                c__scrollTo: 'featured'
+            };
+        }
+
         this[NavigationMixin.Navigate]({
             type: 'comm__namedPage',
+
             attributes: {
                 name: destinationName
             },
-            state: this.navigationSource === 'collections'
-                ? { c__category: this.returnCategory }
-                : {}
+
+            state: returnState
         });
     }
 

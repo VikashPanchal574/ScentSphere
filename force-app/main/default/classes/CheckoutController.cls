@@ -232,4 +232,41 @@ String formattedShippingAddress =
     );
 }
     }
+
+    // Read the logged-in customer's most recent shipping address.
+    // This method does not create or update any records.
+    @AuraEnabled
+    public static String getLastShippingAddress() {
+
+        List<User> users = [
+            SELECT ContactId
+            FROM User
+            WHERE Id = :UserInfo.getUserId()
+            LIMIT 1
+        ];
+
+        if (users.isEmpty() || users[0].ContactId == null) {
+            return null;
+        }
+
+        Id contactId = users[0].ContactId;
+
+        List<Customer_Order__c> previousOrders = [
+            SELECT Shipping_Address__c
+            FROM Customer_Order__c
+            WHERE Customer__c = :contactId
+            WITH USER_MODE
+            ORDER BY CreatedDate DESC
+            LIMIT 10
+        ];
+
+        for (Customer_Order__c orderRecord : previousOrders) {
+            if (!String.isBlank(orderRecord.Shipping_Address__c)) {
+                return orderRecord.Shipping_Address__c;
+            }
+        }
+
+        return null;
+    }
+
 }

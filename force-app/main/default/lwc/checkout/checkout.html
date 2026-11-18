@@ -2,169 +2,316 @@
 <template>
     <div class="checkout-container">
 
-        <div class="checkout-header">
-            <p class="eyebrow">SCENTSPHERE</p>
-            <h1>Complete Your Order</h1>
-            <p>One final step before your fragrance arrives.</p>
-        </div>
+        <!-- EXISTING CHECKOUT FORM -->
+        <template if:false={isWaitingForPayment}>
 
-        <div class="checkout-layout">
+            <div class="checkout-header">
+                <p class="eyebrow">SCENTSPHERE</p>
+                <h1>Complete Your Order</h1>
+                <p>
+                    One final step before your fragrance arrives.
+                </p>
+            </div>
 
-            <!-- Shipping Address -->
-            <section class="shipping-section">
-                <h2>Shipping Address</h2>
-                <p class="section-description">
-                    Where should we deliver your fragrance?
+            <div class="checkout-layout">
+
+                <!-- Shipping Address -->
+                <section class="shipping-section">
+
+                    <h2>Shipping Address</h2>
+
+                    <p class="section-description">
+                        Where should we deliver your fragrance?
+                    </p>
+
+                    <!-- ===================================
+                         NEW: SAVED SHIPPING ADDRESS
+                    ==================================== -->
+                    <template if:true={hasSavedAddress}>
+
+                        <div class="saved-address-panel">
+
+                            <div class="saved-address-heading">
+
+                                <span class="saved-address-icon">
+                                    ✓
+                                </span>
+
+                                <div>
+                                    <strong>
+                                        Previous Address Available
+                                    </strong>
+
+                                    <p>
+                                        Your last shipping address is available.
+                                        Reuse it or enter a different address.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div class="saved-address-actions">
+
+                                <button
+                                    type="button"
+                                    class="use-saved-address-button"
+                                    onclick={handleUseSavedAddress}>
+
+                                    Use Saved Address
+
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="new-address-button"
+                                    onclick={handleEnterNewAddress}>
+
+                                    Enter New Address
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </template>
+                    <!-- END SAVED SHIPPING ADDRESS -->
+
+                    <!-- EXISTING ADDRESS INPUTS -->
+                    <div class="address-grid">
+
+                        <lightning-input
+                            type="text"
+                            label="Full Name"
+                            placeholder="Enter your full name"
+                            value={fullName}
+                            data-field="fullName"
+                            onchange={handleInputChange}
+                            maxlength="80"
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            type="tel"
+                            label="Mobile Number"
+                            placeholder="10-digit mobile number"
+                            value={mobileNumber}
+                            data-field="mobileNumber"
+                            onchange={handleInputChange}
+                            pattern="[6-9][0-9]{9}"
+                            message-when-pattern-mismatch="Enter a valid 10-digit Indian mobile number."
+                            maxlength="10"
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            class="full-width"
+                            type="text"
+                            label="House / Flat / Building"
+                            placeholder="House number, flat or building name"
+                            value={houseNumber}
+                            data-field="houseNumber"
+                            onchange={handleInputChange}
+                            maxlength="150"
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            class="full-width"
+                            type="text"
+                            label="Street / Area / Locality"
+                            placeholder="Enter street, area or locality"
+                            value={streetArea}
+                            data-field="streetArea"
+                            onchange={handleInputChange}
+                            maxlength="150"
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            class="full-width"
+                            type="text"
+                            label="Landmark"
+                            placeholder="Nearby landmark (optional)"
+                            value={landmark}
+                            data-field="landmark"
+                            onchange={handleInputChange}
+                            maxlength="100">
+                        </lightning-input>
+
+                        <lightning-input
+                            type="text"
+                            label="City"
+                            placeholder="Enter city"
+                            value={city}
+                            data-field="city"
+                            onchange={handleInputChange}
+                            maxlength="80"
+                            required>
+                        </lightning-input>
+
+                        <lightning-combobox
+                            label="State"
+                            placeholder="Select state"
+                            options={stateOptions}
+                            value={shippingState}
+                            data-field="shippingState"
+                            onchange={handleInputChange}
+                            required>
+                        </lightning-combobox>
+
+                        <lightning-input
+                            type="text"
+                            label="PIN Code"
+                            placeholder="6-digit PIN code"
+                            value={pinCode}
+                            data-field="pinCode"
+                            onchange={handleInputChange}
+                            pattern="[1-9][0-9]{5}"
+                            message-when-pattern-mismatch="Enter a valid 6-digit PIN code."
+                            maxlength="6"
+                            required>
+                        </lightning-input>
+
+                        <lightning-input
+                            type="text"
+                            label="Country"
+                            value={country}
+                            disabled>
+                        </lightning-input>
+
+                    </div>
+
+                    <p class="delivery-note">
+                        Please make sure your mobile number
+                        and delivery address are correct.
+                    </p>
+
+                </section>
+
+                <!-- Order Summary -->
+                <section class="summary-section">
+
+                    <h2>Order Summary</h2>
+
+                    <div class="summary-row">
+                        <span>Items</span>
+                        <span>{totalItems}</span>
+                    </div>
+
+                    <div class="summary-row total-row">
+                        <span>Total Amount</span>
+                        <span>{formattedTotal}</span>
+                    </div>
+
+                    <button
+                        class="place-order-button"
+                        onclick={handlePlaceOrder}
+                        disabled={isPlacingOrder}
+                        type="button">
+
+                        <template if:true={isPlacingOrder}>
+                            Placing Order...
+                        </template>
+
+                        <template if:false={isPlacingOrder}>
+                            Place Order
+                        </template>
+
+                    </button>
+
+                    <template if:true={errorMessage}>
+                        <p class="error-message">
+                            {errorMessage}
+                        </p>
+                    </template>
+
+                    <p class="secure-note">
+                        Your order will be created
+                        with payment pending.
+                    </p>
+
+                </section>
+
+            </div>
+
+        </template>
+
+        <!-- ===================================
+             EXISTING PAYMENT WAITING SCREEN
+             NO PAYMENT LOGIC CHANGED
+        ==================================== -->
+        <template if:true={isWaitingForPayment}>
+
+            <div class="checkout-header">
+
+                <p class="eyebrow">SCENTSPHERE</p>
+
+                <h1>Waiting for Your Payment</h1>
+
+                <p>{paymentWaitMessage}</p>
+
+            </div>
+
+            <section class="payment-wait-panel">
+
+                <template if:true={isCheckingPayment}>
+
+                    <div class="payment-spinner-wrap">
+
+                        <lightning-spinner
+                            alternative-text="Checking payment status"
+                            size="medium">
+                        </lightning-spinner>
+
+                    </div>
+
+                </template>
+
+                <h2>Secure Razorpay Payment</h2>
+
+                <p>
+                    Complete the payment in your Razorpay tab.
+                    We are checking its status automatically.
                 </p>
 
-                <div class="address-grid">
-
-                    <lightning-input
-                        type="text"
-                        label="Full Name"
-                        placeholder="Enter your full name"
-                        value={fullName}
-                        data-field="fullName"
-                        onchange={handleInputChange}
-                        maxlength="80"
-                        required>
-                    </lightning-input>
-
-                    <lightning-input
-                        type="tel"
-                        label="Mobile Number"
-                        placeholder="10-digit mobile number"
-                        value={mobileNumber}
-                        data-field="mobileNumber"
-                        onchange={handleInputChange}
-                        pattern="[6-9][0-9]{9}"
-                        message-when-pattern-mismatch="Enter a valid 10-digit Indian mobile number."
-                        maxlength="10"
-                        required>
-                    </lightning-input>
-
-                    <lightning-input
-                        class="full-width"
-                        type="text"
-                        label="House / Flat / Building"
-                        placeholder="House number, flat or building name"
-                        value={houseNumber}
-                        data-field="houseNumber"
-                        onchange={handleInputChange}
-                        maxlength="150"
-                        required>
-                    </lightning-input>
-
-                    <lightning-input
-                        class="full-width"
-                        type="text"
-                        label="Street / Area / Locality"
-                        placeholder="Enter street, area or locality"
-                        value={streetArea}
-                        data-field="streetArea"
-                        onchange={handleInputChange}
-                        maxlength="150"
-                        required>
-                    </lightning-input>
-
-                    <lightning-input
-                        class="full-width"
-                        type="text"
-                        label="Landmark"
-                        placeholder="Nearby landmark (optional)"
-                        value={landmark}
-                        data-field="landmark"
-                        onchange={handleInputChange}
-                        maxlength="100">
-                    </lightning-input>
-
-                    <lightning-input
-                        type="text"
-                        label="City"
-                        placeholder="Enter city"
-                        value={city}
-                        data-field="city"
-                        onchange={handleInputChange}
-                        maxlength="80"
-                        required>
-                    </lightning-input>
-
-                    <lightning-combobox
-                        label="State"
-                        placeholder="Select state"
-                        options={stateOptions}
-                        value={shippingState}
-                        data-field="shippingState"
-                        onchange={handleInputChange}
-                        required>
-                    </lightning-combobox>
-
-                    <lightning-input
-                        type="text"
-                        label="PIN Code"
-                        placeholder="6-digit PIN code"
-                        value={pinCode}
-                        data-field="pinCode"
-                        onchange={handleInputChange}
-                        pattern="[1-9][0-9]{5}"
-                        message-when-pattern-mismatch="Enter a valid 6-digit PIN code."
-                        maxlength="6"
-                        required>
-                    </lightning-input>
-
-                    <lightning-input
-                        type="text"
-                        label="Country"
-                        value={country}
-                        disabled>
-                    </lightning-input>
-
-                </div>
-
-                <p class="delivery-note">
-                    Please make sure your mobile number and delivery
-                    address are correct.
+                <p>
+                    Once payment is confirmed, we will try
+                    to close the Razorpay tab and show
+                    your order confirmation.
                 </p>
-            </section>
-
-            <!-- Order Summary -->
-            <section class="summary-section">
-                <h2>Order Summary</h2>
-
-                <div class="summary-row">
-                    <span>Items</span>
-                    <span>{totalItems}</span>
-                </div>
-
-                <div class="summary-row total-row">
-                    <span>Total Amount</span>
-                    <span>{formattedTotal}</span>
-                </div>
 
                 <button
-                    class="place-order-button"
-                    onclick={handlePlaceOrder}
-                    disabled={isPlacingOrder}>
+                    class="payment-tab-button"
+                    onclick={handleFocusPaymentTab}
+                    type="button">
 
-                    <template if:true={isPlacingOrder}>
-                        Placing Order...
-                    </template>
-
-                    <template if:false={isPlacingOrder}>
-                        Place Order
-                    </template>
+                    Return to Razorpay Tab
 
                 </button>
 
-                <template if:true={errorMessage}>
-                    <p class="error-message">{errorMessage}</p>
+                <!-- RETRY SAME PAYMENT LINK STATUS -->
+                <template if:true={canRetryPaymentCheck}>
+
+                    <button
+                        class="retry-payment-button"
+                        onclick={handleRetryPaymentCheck}
+                        type="button">
+
+                        Check Payment Status Again
+
+                    </button>
+
                 </template>
 
                 <p class="secure-note">
-                    Your order will be created with payment pending.
+                    Checking payment status does not
+                    create another order or payment link.
                 </p>
+
             </section>
 
-        </div>
+        </template>
+
     </div>
 </template>
