@@ -231,6 +231,7 @@
                             </div>
 
                             <!-- Wishlist -->
+                             <template if:false={isGuest}>
                             <button
                                 class="action-button wishlist-btn"
                                 title="Wishlist"
@@ -247,8 +248,10 @@
                                     {wishlistCountLabel}
                                 </span>
                             </button>
+                            </template>
 
                             <!-- Shopping Cart -->
+                             <template if:false={isGuest}>
                             <button
                                 class="action-button cart-btn"
                                 title="Shopping Cart"
@@ -265,6 +268,7 @@
                                     {cartCountLabel}
                                 </span>
                             </button>
+                            </template>
 
                             <span class="action-divider"></span>
 
@@ -290,7 +294,7 @@
                                 <button
                                     class="account-chip"
                                     onclick={handleMyAccount}
-                                    title="My Account"
+                                    title={headerUsername}
                                     type="button">
 
                                     <span class="account-avatar">
@@ -302,7 +306,7 @@
                                     </span>
 
                                     <span class="account-label">
-                                        My Account
+                                         {headerUsername}
                                     </span>
                                 </button>
                             </template>

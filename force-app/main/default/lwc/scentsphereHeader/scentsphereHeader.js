@@ -13,6 +13,11 @@ import {
     APPLICATION_SCOPE
 } from 'lightning/messageService';
 
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+
+import USER_ID from '@salesforce/user/Id';
+import USERNAME_FIELD from '@salesforce/schema/User.Username';
+
 import isGuestUser from '@salesforce/user/isGuest';
 import logoResource from '@salesforce/resourceUrl/ScentSphereLogo';
 
@@ -56,15 +61,56 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     searchRequestId = 0;
     resizeObserver = null;
 
-    // Current Page
+    // ==========================================
+    // LOGGED-IN USERNAME
+    // ==========================================
+
+    // Do not fetch a user record for guest visitors
+    userId = isGuestUser ? undefined : USER_ID;
+
+    // Fetch current Salesforce user
+    @wire(getRecord, {
+        recordId: '$userId',
+        fields: [USERNAME_FIELD]
+    })
+    userRecord;
+
+    // Example:
+    // vikash.panchal@gruslabs.com -> Vikash
+    get headerUsername() {
+
+        const username = getFieldValue(
+            this.userRecord?.data,
+            USERNAME_FIELD
+        );
+
+        if (!username) {
+            return 'My Account';
+        }
+
+        const firstName = username
+            .split('@')[0]
+            .split('.')[0];
+
+        return firstName.charAt(0).toUpperCase() + firstName.slice(1);
+    }
+
+    // ==========================================
+    // CURRENT PAGE
+    // ==========================================
+
     @wire(CurrentPageReference)
     pageReference;
 
-    // Subscribe to Wishlist and Cart Updates
+    // ==========================================
+    // MESSAGE CHANNEL SUBSCRIPTIONS
+    // ==========================================
+
     @wire(MessageContext)
     wiredMessageContext(context) {
 
         if (context && !this.subscription) {
+
             this.subscription = subscribe(
                 context,
                 WISHLIST_UPDATE,
@@ -74,6 +120,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
 
         if (context && !this.cartSubscription) {
+
             this.cartSubscription = subscribe(
                 context,
                 CART_UPDATE,
@@ -83,7 +130,10 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
-    // Initial Counts
+    // ==========================================
+    // INITIAL COUNTS
+    // ==========================================
+
     connectedCallback() {
 
         if (!this.isGuest) {
@@ -92,7 +142,10 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
-    // Sync spacer with fixed header
+    // ==========================================
+    // SYNC FIXED HEADER HEIGHT
+    // ==========================================
+
     renderedCallback() {
 
         if (this.resizeObserver) {
@@ -118,10 +171,15 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
+    // ==========================================
+    // CLEANUP
+    // ==========================================
+
     disconnectedCallback() {
 
         clearTimeout(this.searchTimer);
         clearTimeout(this.searchCloseTimer);
+
         this.searchRequestId += 1;
 
         if (this.resizeObserver) {
@@ -152,9 +210,13 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
 
         try {
+
             const perfumeIds = await getWishlistPerfumeIds();
+
             this.wishlistCount = perfumeIds.length;
+
         } catch (error) {
+
             console.error('Wishlist count error:', error);
             this.wishlistCount = 0;
         }
@@ -172,26 +234,32 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
 
         try {
+
             this.cartCount = await getCartCount();
+
         } catch (error) {
+
             console.error('Cart count error:', error);
             this.cartCount = 0;
         }
     }
 
     handleWishlistUpdate(message) {
+
         if (message) {
             this.loadWishlistCount();
         }
     }
 
     get wishlistCountLabel() {
+
         return this.wishlistCount > 99
             ? '99+'
             : String(this.wishlistCount);
     }
 
     get cartCountLabel() {
+
         return this.cartCount > 99
             ? '99+'
             : String(this.cartCount);
@@ -215,7 +283,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     // ==========================================
-    // CURRENT PAGE
+    // CURRENT PAGE HIGHLIGHT
     // ==========================================
 
     get currentPage() {
@@ -223,6 +291,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         const pageName = this.pageReference?.attributes?.name;
 
         if (pageName === 'About_Contact__c') {
+
             return this.pageReference?.state?.c__section === 'contact'
                 ? 'contact'
                 : 'about';
@@ -265,6 +334,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     getNavClass(page) {
+
         return this.currentPage === page
             ? 'nav-link active'
             : 'nav-link';
@@ -283,6 +353,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     get navClass() {
+
         return this.isMenuOpen
             ? 'navigation open'
             : 'navigation';
@@ -341,6 +412,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     get suggestionHeading() {
+
         return this.searchTerm.trim()
             ? 'MATCHING PERFUMES'
             : 'FEATURED PERFUMES';
@@ -358,6 +430,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     get showViewAll() {
+
         return this.searchTerm.trim().length > 0
             && !this.isSearchLoading;
     }
@@ -403,6 +476,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         const term = this.searchTerm.trim();
 
         try {
+
             const result = await getSuggestions({
                 searchTerm: term
             });

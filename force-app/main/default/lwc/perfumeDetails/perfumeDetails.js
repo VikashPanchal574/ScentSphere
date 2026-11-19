@@ -169,6 +169,21 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
         }
     }
 
+
+    // Display fragrance notes as separate tags
+    get fragranceNoteItems() {
+
+        const notes = this.perfume?.Fragrance_Notes__c || '';
+
+        return notes.split(',')
+            .map((name, index) => ({
+                key: String(index),
+                name: name.trim()
+            }))
+            .filter(note => note.name);
+    }
+
+
     // ==========================================
     // BACK BUTTON LABEL
     // ==========================================

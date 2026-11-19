@@ -1,13 +1,9 @@
-
 <template>
     <section class="details-container">
 
         <!-- Back Navigation -->
         <div class="back-navigation">
-            <button
-                class="back-button"
-                onclick={handleBackNavigation}
-                type="button">
+            <button class="back-button" onclick={handleBackNavigation} type="button">
                 <span>←</span>
                 {backButtonLabel}
             </button>
@@ -16,9 +12,7 @@
         <!-- Loading -->
         <template if:true={isLoading}>
             <div class="message">
-                <lightning-spinner
-                    alternative-text="Loading perfume details"
-                    size="medium">
+                <lightning-spinner alternative-text="Loading perfume details" size="medium">
                 </lightning-spinner>
             </div>
         </template>
@@ -39,10 +33,7 @@
                 <div class="image-section">
 
                     <template if:true={perfume.imageUrl}>
-                        <img
-                            src={perfume.imageUrl}
-                            alt={perfume.Product_Name__c}
-                            class="product-image" />
+                        <img src={perfume.imageUrl} alt={perfume.Product_Name__c} class="product-image" />
                     </template>
 
                     <template if:false={perfume.imageUrl}>
@@ -56,9 +47,19 @@
                 <!-- Product Information -->
                 <div class="info-section">
 
-                    <p class="eyebrow">{perfume.Brand__c}</p>
+                    <p class="eyebrow">
+                        {perfume.Brand__c}
+                    </p>
 
-                    <h1>{perfume.Product_Name__c}</h1>
+                    <!-- Product Name + Wishlist -->
+                    <div class="product-title-row">
+
+                        <h1>{perfume.Product_Name__c}</h1>
+
+                        <c-wishlist-button perfume-id={recordId}>
+                        </c-wishlist-button>
+
+                    </div>
 
                     <p class="category">
                         {perfume.Category__c} Fragrance
@@ -71,6 +72,7 @@
                     <p class="description">
                         {perfume.Description__c}
                     </p>
+
 
                     <!-- Product Specifications -->
                     <div class="specifications">
@@ -90,20 +92,33 @@
                             <strong>{perfume.Category__c}</strong>
                         </div>
 
-                        <div class="spec-item">
-                            <span>Available Stock</span>
-                            <strong>{perfume.Stock_Quantity__c}</strong>
-                        </div>
-
                     </div>
+
+
 
                     <!-- Fragrance Notes -->
                     <template if:true={perfume.Fragrance_Notes__c}>
+
                         <div class="fragrance-notes">
+
                             <h3>Fragrance Notes</h3>
-                            <p>{perfume.Fragrance_Notes__c}</p>
+
+                            <div class="fragrance-notes-list">
+
+                                <template for:each={fragranceNoteItems} for:item="note">
+
+                                    <span key={note.key} class="fragrance-note-tag">
+                                        {note.name}
+                                    </span>
+
+                                </template>
+
+                            </div>
+
                         </div>
+
                     </template>
+
 
                     <!-- Out of Stock Message -->
                     <template if:true={isOutOfStock}>
@@ -122,19 +137,13 @@
 
                         <div class="quantity-control">
 
-                            <button
-                                onclick={handleDecrease}
-                                disabled={isOutOfStock}
-                                type="button">
+                            <button onclick={handleDecrease} disabled={isOutOfStock} type="button">
                                 −
                             </button>
 
                             <span>{quantity}</span>
 
-                            <button
-                                onclick={handleIncrease}
-                                disabled={isIncreaseDisabled}
-                                type="button">
+                            <button onclick={handleIncrease} disabled={isIncreaseDisabled} type="button">
                                 +
                             </button>
 
@@ -152,10 +161,7 @@
 
                         <template if:false={isOutOfStock}>
 
-                            <button
-                                class="add-to-cart-button"
-                                onclick={handleLogin}
-                                type="button">
+                            <button class="add-to-cart-button" onclick={handleLogin} type="button">
 
                                 <span>Sign In to Add to Cart</span>
                                 <span class="cart-arrow">→</span>
@@ -169,17 +175,12 @@
                     <!-- Logged-In User: Add to Cart -->
                     <template if:false={isGuest}>
 
-                        <button
-                            class="add-to-cart-button"
-                            onclick={handleAddToCart}
-                            disabled={isAddToCartDisabled}
+                        <button class="add-to-cart-button" onclick={handleAddToCart} disabled={isAddToCartDisabled}
                             type="button">
 
                             <template if:true={isAddingToCart}>
 
-                                <lightning-spinner
-                                    alternative-text="Adding to cart"
-                                    size="small">
+                                <lightning-spinner alternative-text="Adding to cart" size="small">
                                 </lightning-spinner>
 
                                 <span>Adding to Cart...</span>
@@ -218,7 +219,10 @@
                     </template>
 
                 </div>
+                <!-- End info-section -->
+
             </div>
+            <!-- End product-layout -->
 
             <!-- ======================================
                  RELATED FRAGRANCES SECTION
@@ -244,9 +248,7 @@
 
                     <div class="related-message">
 
-                        <lightning-spinner
-                            alternative-text="Loading related fragrances"
-                            size="medium">
+                        <lightning-spinner alternative-text="Loading related fragrances" size="medium">
                         </lightning-spinner>
 
                     </div>
@@ -262,10 +264,7 @@
                             {relatedError}
                         </p>
 
-                        <button
-                            class="related-retry-button"
-                            onclick={handleRelatedRetry}
-                            type="button">
+                        <button class="related-retry-button" onclick={handleRelatedRetry} type="button">
                             Try Again
                         </button>
 
@@ -278,33 +277,20 @@
 
                     <div class="related-grid">
 
-                        <template
-                            for:each={relatedProducts}
-                            for:item="item">
+                        <template for:each={relatedProducts} for:item="item">
 
                             <!-- FULL CLICKABLE CARD -->
-                            <article
-                                class="related-card"
-                                key={item.Id}
-                                data-id={item.Id}
-                                onclick={handleRelatedProductClick}
-                                onkeydown={handleRelatedCardKeydown}
-                                tabindex="0"
-                                role="link"
-                                aria-label={item.Product_Name__c}>
+                            <article class="related-card" key={item.Id} data-id={item.Id}
+                                onclick={handleRelatedProductClick} onkeydown={handleRelatedCardKeydown} tabindex="0"
+                                role="link" aria-label={item.Product_Name__c}>
 
                                 <!-- Product Image -->
                                 <div class="related-image-wrapper">
 
                                     <template if:true={item.imageUrl}>
 
-                                        <img
-                                            src={item.imageUrl}
-                                            alt={item.Product_Name__c}
-                                            class="related-image"
-                                            data-id={item.Id}
-                                            onerror={handleRelatedImageError}
-                                            loading="lazy" />
+                                        <img src={item.imageUrl} alt={item.Product_Name__c} class="related-image"
+                                            data-id={item.Id} onerror={handleRelatedImageError} loading="lazy" />
 
                                     </template>
 
@@ -369,7 +355,7 @@
                                             {item.formattedPrice}
                                         </strong>
 
-                                        <!-- Span avoids nested clickable controls -->
+                                        <!-- Avoid nested clickable controls -->
                                         <span class="related-view-button">
                                             View Details →
                                         </span>
@@ -396,10 +382,7 @@
                             Explore our full collection instead.
                         </p>
 
-                        <button
-                            class="related-retry-button"
-                            onclick={handleBackToShop}
-                            type="button">
+                        <button class="related-retry-button" onclick={handleBackToShop} type="button">
                             Explore Shop →
                         </button>
 
@@ -412,11 +395,8 @@
 
                     <div class="related-pagination">
 
-                        <button
-                            class="pagination-button"
-                            onclick={handleRelatedPrevious}
-                            disabled={relatedPreviousDisabled}
-                            type="button">
+                        <button class="pagination-button" onclick={handleRelatedPrevious}
+                            disabled={relatedPreviousDisabled} type="button">
                             ← Previous
                         </button>
 
@@ -425,10 +405,7 @@
                             of {relatedTotalPages}
                         </span>
 
-                        <button
-                            class="pagination-button"
-                            onclick={handleRelatedNext}
-                            disabled={relatedNextDisabled}
+                        <button class="pagination-button" onclick={handleRelatedNext} disabled={relatedNextDisabled}
                             type="button">
                             Next →
                         </button>
