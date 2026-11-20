@@ -27,16 +27,15 @@ export default class WishlistButton extends LightningElement {
 
     isWishlisted = false;
     isLoading = false;
-
     isGuestUser = isGuest;
 
-    // LMS Message Context
     @wire(MessageContext)
     messageContext;
 
 
-    // Load existing wishlist status
+    // Load Wishlist status
     connectedCallback() {
+
         if (!this.isGuestUser && this.perfumeId) {
             this.loadWishlistState();
         }
@@ -44,56 +43,65 @@ export default class WishlistButton extends LightningElement {
 
 
     async loadWishlistState() {
+
+        this.isLoading = true;
+
         try {
+
             const perfumeIds = await getWishlistPerfumeIds();
 
-            this.isWishlisted = perfumeIds.includes(this.perfumeId);
+            this.isWishlisted = (perfumeIds || [])
+                .includes(this.perfumeId);
 
         } catch (error) {
-            this.showToast(
-                'Wishlist Error',
-                this.getErrorMessage(error),
-                'error'
-            );
+
+            console.error('Wishlist Load Error:', error);
+
+        } finally {
+
+            this.isLoading = false;
         }
     }
 
 
-    // Button label
     get buttonLabel() {
+
         return this.isWishlisted
             ? 'Remove from Wishlist'
             : 'Add to Wishlist';
     }
 
 
-    // Highlight saved heart
     get buttonVariant() {
+
         return this.isWishlisted ? 'brand' : 'border';
     }
 
 
     get isButtonDisabled() {
+
         return this.isLoading || !this.perfumeId;
     }
 
 
-    // Add or Remove perfume
+    // Add / Remove Wishlist
     async handleToggle(event) {
 
-        // Prevent parent product card navigation
         event.stopPropagation();
 
-        if (this.isGuestUser) {
-            this.showToast(
-                'Login Required',
-                'Please login to add perfumes to your wishlist.',
-                'info'
-            );
+        // Prevent duplicate requests
+        if (this.isLoading || !this.perfumeId) {
             return;
         }
 
-        if (!this.perfumeId) {
+        if (this.isGuestUser) {
+
+            this.showToast(
+                'Login Required',
+                'Please login to use your wishlist.',
+                'info'
+            );
+
             return;
         }
 
@@ -109,12 +117,6 @@ export default class WishlistButton extends LightningElement {
 
                 this.isWishlisted = false;
 
-                this.showToast(
-                    'Removed from Wishlist',
-                    'Perfume has been removed from your wishlist.',
-                    'success'
-                );
-
             } else {
 
                 await addToWishlist({
@@ -122,20 +124,15 @@ export default class WishlistButton extends LightningElement {
                 });
 
                 this.isWishlisted = true;
-
-                this.showToast(
-                    'Added to Wishlist ❤️',
-                    'Perfume has been added to your wishlist successfully!',
-                    'success'
-                );
             }
 
-            // Notify Header using Lightning Message Service
+            // Notify Header:
+            // 1. Refresh Wishlist count
+            // 2. Display latest green/yellow notification
             publish(this.messageContext, WISHLIST_UPDATE, {
                 perfumeId: this.perfumeId,
                 isWishlisted: this.isWishlisted
             });
-
 
             // Notify parent component
             this.dispatchEvent(
@@ -156,24 +153,26 @@ export default class WishlistButton extends LightningElement {
             );
 
         } finally {
+
             this.isLoading = false;
         }
     }
 
 
-    // Toast notification
+    // Salesforce toast for errors and guest login
     showToast(title, message, variant) {
+
         Toast.show({
             label: title,
-            message: message,
-            variant: variant,
+            message,
+            variant,
             mode: 'dismissible'
         }, this);
     }
 
 
-    // Extract Apex error
     getErrorMessage(error) {
+
         return error?.body?.message ||
             error?.message ||
             'Something went wrong. Please try again.';

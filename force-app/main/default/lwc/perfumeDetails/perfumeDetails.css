@@ -1,3 +1,9 @@
+/* ==========================================
+   SCENTSPHERE - PRODUCT DETAILS
+   CLEAN RESPONSIVE STYLES
+========================================== */
+
+/* MAIN CONTAINER */
 
 .details-container {
     padding: 55px 7%;
@@ -6,42 +12,72 @@
     color: #351d27;
 }
 
+/* PRODUCT LAYOUT */
+
 .product-layout {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 65px;
     max-width: 1200px;
     margin: auto;
     align-items: center;
 }
 
-/* Product Image */
+/* ==========================================
+   MAIN PRODUCT IMAGE
+   FULL IMAGE - NO CROPPING
+========================================== */
+
 .image-section {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+
     background: #f0eae3;
     border-radius: 16px;
     overflow: hidden;
-    min-height: 480px;
+
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 .product-image {
-    width: 100%;
-    height: 480px;
-    object-fit: cover;
     display: block;
+
+    width: 100%;
+    max-width: 100%;
+
+    /* Natural image height */
+    height: auto;
+    max-height: none;
+
+    /* Entire perfume image remains visible */
+    object-fit: contain;
+    object-position: center;
 }
 
 .image-placeholder {
+    width: 100%;
+    min-height: 360px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     font-family: Georgia, serif;
     color: #98764e;
     letter-spacing: 5px;
     font-size: 20px;
+    text-align: center;
 }
 
-/* Product Information */
+/* ==========================================
+   PRODUCT INFORMATION
+========================================== */
+
 .info-section {
+    min-width: 0;
     padding: 20px 0;
 }
 
@@ -82,13 +118,18 @@
     margin-bottom: 28px;
 }
 
-/* Specifications */
+/* ==========================================
+   PRODUCT SPECIFICATIONS
+========================================== */
+
 .specifications {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 15px;
+
     border-top: 1px solid #e9dfd5;
     border-bottom: 1px solid #e9dfd5;
+
     padding: 22px 0;
     margin-bottom: 25px;
 }
@@ -97,6 +138,7 @@
     display: flex;
     flex-direction: column;
     gap: 7px;
+    min-width: 0;
 }
 
 .spec-item span {
@@ -109,7 +151,10 @@
     font-size: 14px;
 }
 
-/* Fragrance Notes */
+/* ==========================================
+   FRAGRANCE NOTES
+========================================== */
+
 .fragrance-notes {
     margin-bottom: 25px;
 }
@@ -126,11 +171,15 @@
     font-size: 14px;
 }
 
-/* Quantity */
+/* ==========================================
+   QUANTITY CONTROLS
+========================================== */
+
 .quantity-section {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
     margin-bottom: 22px;
     color: #49302f;
 }
@@ -138,16 +187,19 @@
 .quantity-control {
     display: flex;
     align-items: center;
+
     border: 1px solid #ded2c5;
     border-radius: 6px;
     overflow: hidden;
 }
 
 .quantity-control button {
-    background: #f0eae3;
-    border: none;
     width: 38px;
     height: 36px;
+
+    background: #f0eae3;
+    border: none;
+
     font-size: 19px;
     color: #351d27;
     cursor: pointer;
@@ -164,11 +216,15 @@
     font-weight: 600;
 }
 
-/* Total Price */
+/* ==========================================
+   TOTAL PRICE
+========================================== */
+
 .total-price {
     display: flex;
     justify-content: space-between;
     align-items: center;
+
     border-top: 1px solid #e9dfd5;
     padding-top: 20px;
     margin-bottom: 22px;
@@ -183,34 +239,57 @@
     font-size: 23px;
 }
 
-/* Add to Cart Button */
+/* ==========================================
+   ADD TO CART BUTTON
+========================================== */
+
 .add-to-cart-button {
     width: 100%;
     min-height: 56px;
+
     margin-top: 8px;
     padding: 14px 24px;
+
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: linear-gradient(135deg, #351d27, #593347);
+
+    background: linear-gradient(
+        135deg,
+        #351d27,
+        #593347
+    );
+
     color: #fffdf9;
     border: 1px solid #351d27;
     border-radius: 6px;
+
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 1.5px;
     text-transform: uppercase;
+
     cursor: pointer;
+
     transition: all 0.3s ease;
-    box-shadow: 0 5px 14px rgba(53, 29, 39, 0.15);
+
+    box-shadow:
+        0 5px 14px rgba(53, 29, 39, 0.15);
 }
 
 .add-to-cart-button:hover:not(:disabled) {
-    background: linear-gradient(135deg, #76513f, #987044);
+    background: linear-gradient(
+        135deg,
+        #76513f,
+        #987044
+    );
+
     border-color: #987044;
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(53, 29, 39, 0.2);
+
+    box-shadow:
+        0 8px 20px rgba(53, 29, 39, 0.2);
 }
 
 .add-to-cart-button:active:not(:disabled) {
@@ -221,6 +300,7 @@
     background: #a69a94;
     border-color: #a69a94;
     color: #ffffff;
+
     opacity: 0.8;
     cursor: not-allowed;
     box-shadow: none;
@@ -235,12 +315,17 @@
     transform: translateX(5px);
 }
 
-/* Out of Stock */
+/* ==========================================
+   OUT OF STOCK
+========================================== */
+
 .out-of-stock-message {
     margin: 20px 0;
     padding: 14px;
+
     text-align: center;
     background: #f1eeeb;
+
     border: 1px solid #ded6d0;
     border-radius: 6px;
 }
@@ -258,7 +343,10 @@
     font-size: 12px;
 }
 
-/* Messages */
+/* ==========================================
+   SUCCESS / ERROR MESSAGES
+========================================== */
+
 .message {
     text-align: center;
     padding: 60px 20px;
@@ -278,7 +366,10 @@
     font-weight: 600;
 }
 
-/* Back Navigation */
+/* ==========================================
+   BACK NAVIGATION
+========================================== */
+
 .back-navigation {
     max-width: 1200px;
     margin: 0 auto 25px;
@@ -288,13 +379,17 @@
     display: inline-flex;
     align-items: center;
     gap: 9px;
+
     background: transparent;
     border: 1px solid #c58b45;
     color: #987044;
+
     padding: 10px 18px;
+
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+
     transition: all 0.3s ease;
 }
 
@@ -311,12 +406,13 @@
 }
 
 /* ==========================================
-   RELATED FRAGRANCES SECTION
+   RELATED FRAGRANCES
 ========================================== */
 
 .related-section {
     max-width: 1200px;
     margin: 85px auto 0;
+
     padding-top: 60px;
     border-top: 1px solid #e9dfd5;
 }
@@ -328,6 +424,7 @@
 
 .related-heading h2 {
     margin: 12px 0;
+
     font-family: Georgia, serif;
     font-size: clamp(28px, 4vw, 39px);
     font-weight: 400;
@@ -340,20 +437,28 @@
     line-height: 1.8;
 }
 
-/* Four Product Cards */
+/* ==========================================
+   RELATED PRODUCT GRID
+========================================== */
+
 .related-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 23px;
 }
 
-/* Product Card */
+/* RELATED CARD */
+
 .related-card {
     min-width: 0;
+
     background: #ffffff;
     border: 1px solid #e9dfd5;
     border-radius: 6px;
     overflow: hidden;
+
+    cursor: pointer;
+
     transition:
         transform 0.3s ease,
         box-shadow 0.3s ease;
@@ -361,14 +466,23 @@
 
 .related-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 30px rgba(53, 29, 39, 0.10);
+    box-shadow:
+        0 12px 30px rgba(53, 29, 39, 0.10);
 }
 
-/* Related Product Image */
+.related-card:focus-visible {
+    outline: 2px solid #c58b45;
+    outline-offset: 4px;
+}
+
+/* RELATED PRODUCT IMAGE */
+
 .related-image-wrapper {
     position: relative;
     width: 100%;
+
     aspect-ratio: 4 / 4.5;
+
     background: #f0eae3;
     overflow: hidden;
 }
@@ -377,7 +491,10 @@
     display: block;
     width: 100%;
     height: 100%;
+
     object-fit: cover;
+    object-position: center;
+
     transition: transform 0.4s ease;
 }
 
@@ -385,14 +502,18 @@
     transform: scale(1.04);
 }
 
+/* IMAGE PLACEHOLDER */
+
 .related-image-placeholder {
     width: 100%;
     height: 100%;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 10px;
+
     color: #987044;
     background: #f0eae3;
 }
@@ -407,51 +528,66 @@
     letter-spacing: 2px;
 }
 
-/* Out of Stock Image Overlay */
+/* ==========================================
+   RELATED OUT OF STOCK
+========================================== */
+
 .related-stock-overlay {
     position: absolute;
     inset: 0;
     z-index: 2;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     background: rgba(45, 39, 42, 0.18);
     pointer-events: none;
 }
 
 .related-stock-overlay span {
     display: block;
+
     width: 100%;
     padding: 13px 8px;
+
     background: rgba(53, 29, 39, 0.94);
     color: #ffffff;
+
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 2px;
     text-align: center;
 }
 
-/* Card Information */
+/* ==========================================
+   RELATED PRODUCT INFORMATION
+========================================== */
+
 .related-product-info {
     padding: 19px 15px;
 }
 
 .related-brand {
     margin: 0 0 8px;
+
     color: #a17b4a;
     font-size: 10px;
     font-weight: 700;
+
     letter-spacing: 1.3px;
     text-transform: uppercase;
 }
 
 .related-product-info h3 {
     margin: 0 0 9px;
+
     font-family: Georgia, serif;
     font-size: 18px;
     font-weight: 500;
-    color: #351d27;
     line-height: 1.5;
+
+    color: #351d27;
     overflow-wrap: anywhere;
 }
 
@@ -463,17 +599,20 @@
 
 .related-unavailable {
     margin: 0 0 12px;
+
     color: #b42318;
     font-size: 12px;
     font-weight: 700;
 }
 
-/* Product Price and Button */
+/* RELATED PRICE + BUTTON */
+
 .related-bottom {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 10px;
+
     flex-wrap: wrap;
     margin-top: 15px;
 }
@@ -485,39 +624,53 @@
 }
 
 .related-view-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
     padding: 10px 12px;
+
     border: 1px solid #c58b45;
     border-radius: 3px;
+
     background: transparent;
     color: #987044;
+
     font-size: 11px;
     cursor: pointer;
+
     transition: all 0.3s ease;
 }
 
-.related-view-button:hover {
+.related-view-button:hover,
+.related-card:hover .related-view-button,
+.related-card:focus-visible .related-view-button {
     background: #351d27;
     border-color: #351d27;
     color: #ffffff;
 }
 
 .related-view-button:focus-visible,
-.pagination-button:focus-visible,
 .related-retry-button:focus-visible {
     outline: 2px solid #c58b45;
     outline-offset: 3px;
 }
 
-/* Loading, Error, Empty */
+/* ==========================================
+   RELATED LOADING / ERROR / EMPTY
+========================================== */
+
 .related-message {
     position: relative;
     min-height: 170px;
     padding: 45px 20px;
+
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 20px;
+
     text-align: center;
     color: #81747a;
     font-size: 14px;
@@ -525,16 +678,22 @@
 
 .related-retry-button {
     padding: 11px 20px;
+
     border: 1px solid #351d27;
     background: #351d27;
     color: #ffffff;
+
     font-size: 12px;
     cursor: pointer;
 }
 
-/* Pagination */
+/* ==========================================
+   RELATED PAGINATION
+========================================== */
+
 .related-pagination {
     margin-top: 40px;
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -545,12 +704,16 @@
 .pagination-button {
     min-width: 115px;
     padding: 12px 16px;
+
     background: #351d27;
     color: #ffffff;
+
     border: 1px solid #351d27;
     border-radius: 4px;
+
     font-size: 12px;
     font-weight: 600;
+
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -565,6 +728,11 @@
     cursor: not-allowed;
 }
 
+.pagination-button:focus-visible {
+    outline: 2px solid #c58b45;
+    outline-offset: 3px;
+}
+
 .page-indicator {
     color: #49302f;
     font-size: 13px;
@@ -573,19 +741,19 @@
 }
 
 /* ==========================================
-   TABLET
+   TABLET - BELOW 900PX
 ========================================== */
 
 @media (max-width: 900px) {
+
     .product-layout {
         gap: 30px;
     }
 
-    .image-section,
-    .product-image {
-        min-height: 380px;
-        height: 380px;
-    }
+    /*
+       No fixed image height.
+       The image follows its natural ratio.
+    */
 
     .related-section {
         margin-top: 65px;
@@ -593,29 +761,61 @@
     }
 
     .related-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
         gap: 18px;
     }
 }
 
 /* ==========================================
-   MOBILE
+   MOBILE - BELOW 600PX
 ========================================== */
 
 @media (max-width: 600px) {
+
+    /* MAIN CONTAINER */
+
     .details-container {
         padding: 25px 16px;
     }
 
+    /* SINGLE COLUMN LAYOUT */
+
     .product-layout {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
         gap: 20px;
     }
 
-    .image-section,
+    /* MAIN IMAGE - FULL WIDTH, NO CROP */
+
+    .image-section {
+        width: 100%;
+        min-height: 0;
+        height: auto;
+        border-radius: 12px;
+    }
+
     .product-image {
-        min-height: 300px;
-        height: 300px;
+        width: 100%;
+        height: auto;
+        max-height: none;
+
+        object-fit: contain;
+        object-position: center;
+
+        display: block;
+    }
+
+    .image-placeholder {
+        min-height: 260px;
+        font-size: 16px;
+    }
+
+    /* PRODUCT DETAILS */
+
+    .info-section {
+        padding: 12px 0;
     }
 
     .info-section h1 {
@@ -625,6 +825,8 @@
     .specifications {
         gap: 18px;
     }
+
+    /* RELATED SECTION */
 
     .related-section {
         margin-top: 48px;
@@ -643,8 +845,12 @@
         font-size: 12px;
     }
 
+    /* 2 RELATED CARDS PER ROW */
+
     .related-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
         gap: 12px;
     }
 
@@ -674,6 +880,8 @@
         letter-spacing: 1px;
     }
 
+    /* PAGINATION */
+
     .related-pagination {
         gap: 10px;
     }
@@ -688,94 +896,27 @@
     }
 }
 
-/* Very Small Mobile */
+/* ==========================================
+   VERY SMALL MOBILE
+========================================== */
+
 @media (max-width: 350px) {
+
     .related-grid {
         grid-template-columns: 1fr;
     }
 }
 
-/* Make entire related product card clickable */
+/* ==========================================
+   PRODUCT NAME + WISHLIST
+========================================== */
 
-.related-card {
-    cursor: pointer;
-}
-
-.related-card:focus-visible {
-    outline: 2px solid #c58b45;
-    outline-offset: 4px;
-}
-
-.related-view-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.related-card:hover .related-view-button,
-.related-card:focus-visible .related-view-button {
-    background: #351d27;
-    border-color: #351d27;
-    color: #ffffff;
-}
-
-/* Product name and wishlist heart */
 .product-title-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-}
-
-.product-title-row h1 {
-    flex: 1;
-    min-width: 0;
-}
-
-.product-title-row c-wishlist-button {
-    flex-shrink: 0;
-}
-
-/* ==========================================
-   PREMIUM PRODUCT DETAILS IMPROVEMENTS
-========================================== */
-
-/* Align image and product info at the top */
-.product-layout {
-    align-items: start;
-}
-
-/* Remove unnecessary top spacing */
-.info-section {
-    padding: 0;
-}
-
-/* Product Image Improvements */
-.image-section {
-    position: relative;
-    background: #f0eae3;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow: 0 12px 30px rgba(53, 29, 39, 0.06);
-}
-
-.product-image {
-    transition: transform 0.45s ease;
-}
-
-/* Subtle image zoom on desktop */
-@media (hover: hover) {
-    .image-section:hover .product-image {
-        transform: scale(1.035);
-    }
-}
-
-/* Product name and Wishlist */
-.product-title-row {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 20px;
+    width: 100%;
     margin-bottom: 12px;
 }
 
@@ -783,108 +924,169 @@
     flex: 1;
     min-width: 0;
     margin: 0;
-    line-height: 1.2;
+    overflow-wrap: anywhere;
 }
 
 .product-title-row c-wishlist-button {
-    display: inline-flex;
-    flex-shrink: 0;
-    margin-top: 7px;
-}
-
-/* Better spacing */
-.info-section .category {
-    margin-bottom: 18px;
-}
-
-.info-section .price {
-    margin-bottom: 18px;
-}
-
-.info-section .description {
-    margin-bottom: 26px;
+    flex: 0 0 auto;
 }
 
 /* ==========================================
-   FRAGRANCE NOTES TAGS
+   FRAGRANCE NOTES CHIPS
 ========================================== */
 
-.fragrance-notes {
-    margin-bottom: 28px;
-}
-
-.fragrance-notes h3 {
-    font-family: Georgia, serif;
-    font-size: 20px;
-    font-weight: 500;
-    color: #351d27;
-    margin-bottom: 15px;
-}
-
-.fragrance-notes-list {
+.fragrance-note-items {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 9px;
+    margin-top: 14px;
 }
 
-.fragrance-note-tag {
+.fragrance-note-chip {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+
+    max-width: 100%;
     padding: 9px 14px;
-    border: 1px solid #e8d9c6;
-    border-radius: 30px;
-    background: #f5eee6;
-    color: #76583c;
+
+    background: #f5f0ea;
+    border: 1px solid #e7d9c8;
+    border-radius: 20px;
+
+    color: #765d4a;
     font-size: 12px;
+    font-weight: 500;
     line-height: 1.4;
+
+    text-align: center;
+    overflow-wrap: anywhere;
 }
 
 /* ==========================================
-   MOBILE IMPROVEMENTS
+   MOBILE RESPONSIVENESS
+========================================== */
+
+@media (max-width: 600px) {
+
+    .product-title-row {
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .product-title-row h1 {
+        font-size: 30px;
+        line-height: 1.25;
+    }
+
+    .fragrance-note-items {
+        gap: 7px;
+        margin-top: 12px;
+    }
+
+    .fragrance-note-chip {
+        padding: 7px 11px;
+        font-size: 11px;
+    }
+}
+
+/* ==========================================
+   PRODUCT DETAILS - TOP ALIGNMENT
+========================================== */
+
+/* Image aur details same top level se start */
+@media (min-width: 601px) {
+
+    .product-layout {
+        align-items: start;
+    }
+
+    .info-section {
+        padding-top: 0;
+    }
+}
+
+/* ==========================================
+   PERFUME IMAGE - SMOOTH ZOOM EFFECT
+========================================== */
+
+.image-section {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    display: block;
+
+    /* Full image without cropping normally */
+    object-fit: contain;
+    object-position: center;
+
+    /* Smooth zoom animation */
+    transform: scale(1);
+    transform-origin: center center;
+
+    transition: transform 0.5s ease;
+}
+
+/* Zoom only on devices with mouse hover */
+@media (hover: hover) and (pointer: fine) {
+
+    .image-section:hover .product-image {
+        transform: scale(1.08);
+    }
+}
+
+/* ==========================================
+   MOBILE - PRESERVE EXISTING LAYOUT
 ========================================== */
 
 @media (max-width: 600px) {
 
     .product-layout {
-        gap: 24px;
+        grid-template-columns: minmax(0, 1fr);
     }
 
-    .info-section {
-        padding: 4px 0 0;
+    .image-section {
+        border-radius: 12px;
     }
 
-    .product-title-row {
-        gap: 12px;
-    }
-
-    .product-title-row h1 {
-        font-size: 30px;
-    }
-
-    .product-title-row c-wishlist-button {
-        margin-top: 4px;
-    }
-
-    .fragrance-notes-list {
-        gap: 7px;
-    }
-
-    .fragrance-note-tag {
-        padding: 8px 11px;
-        font-size: 11px;
-    }
-
-    .add-to-cart-button {
-        min-height: 54px;
+    .product-image {
+        transform: none;
     }
 }
 
+/* Accessibility: respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .product-image {
         transition: none;
     }
+}
 
-    .image-section:hover .product-image {
-        transform: none;
-    }
+
+/* Cart Quantity Information */
+
+.cart-quantity-hint {
+    margin: -10px 0 20px;
+    color: #6b7668;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.cart-quantity-hint strong {
+    color: #237a45;
+    font-weight: 700;
+}
+
+.cart-limit-message {
+    margin: -10px 0 20px;
+    color: #a66b32;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.6;
 }

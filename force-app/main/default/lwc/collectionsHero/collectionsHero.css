@@ -1,17 +1,37 @@
+/* ==========================================
+   SCENTSPHERE COLLECTIONS - CLEAN CSS
+   Shop-style perfume cards + 2-column mobile categories
+========================================== */
 
+/* PAGE */
 :host {
     display: block;
+    width: 100vw;
+    max-width: 100vw;
+    margin-left: calc(50% - 50vw);
     font-family: Arial, sans-serif;
+    box-sizing: border-box;
+    overflow-x: clip;
 }
 
 .collections-page {
+    width: 100%;
+    margin: 0;
     background: #f8f4ed;
     color: #351b24;
-    overflow: hidden;
+    overflow-x: clip;
+    box-sizing: border-box;
 }
 
-/* HERO SECTION */
+.collections-page *,
+.collections-page *::before,
+.collections-page *::after {
+    box-sizing: border-box;
+}
 
+/* ==========================================
+   HERO SECTION
+========================================== */
 .hero-section {
     min-height: 570px;
     max-width: 1250px;
@@ -26,6 +46,7 @@
 .hero-content {
     flex: 1;
     max-width: 560px;
+    min-width: 0;
 }
 
 .eyebrow {
@@ -37,12 +58,12 @@
 }
 
 .hero-content h1 {
+    margin: 0 0 22px;
+    color: #421b2a;
     font-family: Georgia, serif;
     font-size: clamp(42px, 5vw, 66px);
-    line-height: 1.12;
     font-weight: 400;
-    color: #421b2a;
-    margin: 0 0 22px;
+    line-height: 1.12;
 }
 
 .hero-content h1 span {
@@ -51,18 +72,18 @@
 }
 
 .hero-description {
+    max-width: 440px;
+    margin-bottom: 30px;
     color: #71646a;
     font-size: 15px;
     line-height: 1.9;
-    max-width: 440px;
-    margin-bottom: 30px;
 }
 
 .explore-button {
-    border: none;
+    padding: 16px 27px;
+    border: 0;
     background: #481d2d;
     color: #fff;
-    padding: 16px 27px;
     font-size: 13px;
     letter-spacing: 0.5px;
     cursor: pointer;
@@ -90,15 +111,15 @@
     letter-spacing: 0.5px;
 }
 
-/* HERO PERFUME VISUAL */
-
+/* CSS perfume bottle */
 .hero-visual {
-    flex: 1;
-    min-height: 420px;
     position: relative;
+    flex: 1;
+    min-width: 0;
+    min-height: 420px;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 }
 
 .visual-circle {
@@ -111,8 +132,8 @@
 }
 
 .perfume-bottle {
-    z-index: 1;
     position: relative;
+    z-index: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -136,17 +157,14 @@
 .bottle-body {
     width: 190px;
     height: 250px;
-    border-radius: 35px 35px 25px 25px;
     border: 2px solid rgba(255, 255, 255, 0.7);
-    background: linear-gradient(
-        110deg,
+    border-radius: 35px 35px 25px 25px;
+    background: linear-gradient(110deg,
         rgba(255, 255, 255, 0.45),
         rgba(185, 126, 91, 0.55),
-        rgba(255, 255, 255, 0.25)
-    );
+        rgba(255, 255, 255, 0.25));
     backdrop-filter: blur(5px);
-    box-shadow:
-        inset 10px 0 20px rgba(255, 255, 255, 0.55),
+    box-shadow: inset 10px 0 20px rgba(255, 255, 255, 0.55),
         15px 25px 35px rgba(65, 31, 38, 0.2);
     display: flex;
     flex-direction: column;
@@ -162,16 +180,16 @@
 }
 
 .bottle-name {
+    margin-top: 4px;
     font-size: 12px;
     letter-spacing: 5px;
-    margin-top: 4px;
 }
 
 .bottle-line {
-    height: 1px;
     width: 80px;
-    background: #a77d4a;
+    height: 1px;
     margin: 18px 0;
+    background: #a77d4a;
 }
 
 .bottle-label {
@@ -185,8 +203,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255, 255, 255, 0.85);
     padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.85);
     box-shadow: 0 10px 30px rgba(60, 30, 40, 0.08);
 }
 
@@ -197,24 +215,18 @@
 }
 
 .floating-note p {
+    margin: 0;
     color: #593d43;
     font-size: 10px;
     line-height: 1.5;
-    margin: 0;
 }
 
-.note-top {
-    top: 55px;
-    right: 0;
-}
+.note-top { top: 55px; right: 0; }
+.note-bottom { bottom: 55px; left: 0; }
 
-.note-bottom {
-    bottom: 55px;
-    left: 0;
-}
-
-/* COLLECTION CATEGORIES */
-
+/* ==========================================
+   COLLECTION CATEGORIES
+========================================== */
 .collection-section {
     padding: 75px 7% 90px;
     background: #fffdf9;
@@ -222,18 +234,18 @@
 }
 
 .section-heading {
-    text-align: center;
     max-width: 650px;
     margin: 0 auto 45px;
+    text-align: center;
 }
 
 .section-heading h2 {
-    font-family: Georgia, serif;
-    font-weight: 400;
-    font-size: clamp(28px, 4vw, 42px);
-    color: #421b2a;
-    line-height: 1.3;
     margin: 10px 0;
+    color: #421b2a;
+    font-family: Georgia, serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 400;
+    line-height: 1.3;
 }
 
 .section-heading h2 span {
@@ -251,14 +263,15 @@
     max-width: 1150px;
     margin: auto;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
 }
 
 .collection-card {
-    width: 100%;
-    display: block;
     position: relative;
+    display: block;
+    width: 100%;
+    min-width: 0;
     min-height: 220px;
     padding: 28px 22px;
     border: 1px solid #eee5d9;
@@ -268,8 +281,7 @@
     font-family: inherit;
     text-align: left;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease,
-        border-color 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .collection-card:hover {
@@ -290,51 +302,52 @@
 }
 
 .collection-card h3 {
+    margin: 27px 0 12px;
     color: #482331;
     font-family: Georgia, serif;
     font-size: 21px;
     font-weight: 400;
-    margin: 27px 0 12px;
 }
 
 .collection-card p {
+    margin: 0;
     color: #81747a;
     font-size: 12px;
     line-height: 1.8;
-    margin: 0;
 }
 
 .card-decoration {
     position: absolute;
-    bottom: 17px;
     right: 18px;
+    bottom: 17px;
     color: #c3a477;
     font-size: 17px;
 }
 
-/* PERFUME RESULTS */
-
+/* ==========================================
+   PERFUME RESULTS
+========================================== */
 .products-section {
+    padding: 75px 5% 90px;
     background: #f8f4ed;
-    padding: 75px 7% 90px;
     scroll-margin-top: 30px;
 }
 
 .products-heading {
-    max-width: 1150px;
+    width: 100%;
     margin: 0 auto 35px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     gap: 20px;
 }
 
 .products-heading h2 {
+    margin: 8px 0;
+    color: #421b2a;
     font-family: Georgia, serif;
     font-size: 36px;
     font-weight: 400;
-    color: #421b2a;
-    margin: 8px 0;
 }
 
 .products-heading > div > p:last-child {
@@ -343,19 +356,20 @@
 }
 
 .products-count {
+    margin-top: 8px;
     color: #81747a;
     font-size: 12px;
-    margin-top: 8px;
 }
 
 .view-all-button {
+    flex-shrink: 0;
+    padding: 13px 20px;
+    border: 1px solid #481d2d;
     background: transparent;
     color: #481d2d;
-    border: 1px solid #481d2d;
-    padding: 13px 20px;
-    cursor: pointer;
     font-size: 12px;
-    transition: all 0.3s ease;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 .view-all-button:hover {
@@ -363,69 +377,76 @@
     color: #fff;
 }
 
-/* PERFUME GRID */
-
+/* Shop-style 4-column perfume grid */
 .perfume-grid {
-    max-width: 1150px;
+    width: 100%;
     margin: auto;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 22px;
+    gap: 20px;
     align-items: stretch;
 }
 
 .perfume-card {
-    min-width: 0;
-    height: 100%;
     display: flex;
     flex-direction: column;
-    background: #fffdf9;
-    border: 1px solid #eee5d9;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid #eee5dc;
+    border-radius: 12px;
+    background: #fff;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .perfume-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 14px 30px rgba(65, 31, 42, 0.1);
+    box-shadow: 0 12px 28px rgba(53, 29, 39, 0.12);
 }
 
 .perfume-card:focus-visible {
-    outline: 2px solid #b38b54;
+    outline: 2px solid #c58b45;
     outline-offset: 3px;
 }
 
-/* PRODUCT IMAGE */
-
+/* Image: same dimensions as Shop */
 .product-image {
     position: relative;
-    width: 100%;
-    height: 230px;
-    flex-shrink: 0;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f0e9df;
+    width: 100%;
+    height: 280px;
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #f0eae3;
 }
 
 .product-image img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: center;
-    display: block;
 }
 
 .image-placeholder {
-    color: #b38b54;
+    color: #98764e;
     font-family: Georgia, serif;
-    font-size: 17px;
+    font-size: 14px;
     letter-spacing: 3px;
 }
 
-/* OUT OF STOCK */
+/* Wishlist: same reusable c-wishlist-button used in Shop */
+.wishlist-action {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+}
 
+/* Out-of-stock overlay */
 .out-of-stock-overlay {
     position: absolute;
     inset: 0;
@@ -433,169 +454,156 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(30, 18, 23, 0.22);
+    background: rgba(45, 39, 42, 0.18);
     pointer-events: none;
 }
 
 .out-of-stock-strip {
     display: block;
     width: 100%;
-    padding: 12px 8px;
-    text-align: center;
-    background: rgba(61, 29, 42, 0.94);
+    padding: 13px 8px;
+    background: rgba(53, 29, 39, 0.94);
     color: #fff;
     font-size: 12px;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
+    text-align: center;
+    text-transform: uppercase;
 }
 
-/* PRODUCT INFORMATION */
-
+/* Product text */
 .product-info {
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: 20px;
+    min-width: 0;
+    padding: 15px;
 }
 
 .product-brand {
-    color: #ad8956;
+    margin: 0 0 7px;
+    color: #a17b4a;
     font-size: 10px;
+    font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin: 0 0 8px;
 }
 
 .product-info h3 {
+    margin: 0 0 9px;
+    color: #351d27;
     font-family: Georgia, serif;
-    font-weight: 400;
-    font-size: 19px;
-    line-height: 1.35;
-    color: #421b2a;
-    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: normal;
     overflow-wrap: anywhere;
 }
 
-
-/* Description: exactly 3 lines of space */
 .product-description {
-    color: #81747a;
-    font-size: 12px;
-    line-height: 1.7;
-
-    height: 61.2px;
-    min-height: 61.2px;
-    max-height: 61.2px;
-
-    margin: 0 0 15px;
-    overflow: hidden;
-    overflow-wrap: anywhere;
-
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+    -webkit-line-clamp: 2;
+    height: 39px;
+    min-height: 39px;
+    max-height: 39px;
+    margin: 0 0 12px;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    color: #806f6a;
+    font-size: 12px;
+    line-height: 1.6;
 }
 
 .product-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    color: #71646a;
-    font-size: 11px;
-    margin-bottom: 15px;
+    gap: 7px;
+    margin: 10px 0 12px;
+    color: #765d4a;
 }
 
 .product-meta span {
-    background: #f2ece3;
     padding: 5px 9px;
+    border-radius: 20px;
+    background: #f5f0ea;
+    color: #765d4a;
+    font-size: 10px;
 }
-
-/* PRICE AND DETAILS */
 
 .product-bottom {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    border-top: 1px solid #eee5d9;
-    padding-top: 14px;
+    justify-content: space-between;
+    gap: 8px;
     margin-top: auto;
+    padding-top: 12px;
 }
 
 .product-price {
-    color: #481d2d;
+    color: #8b663d;
     font-size: 16px;
     font-weight: 700;
     white-space: nowrap;
 }
 
 .view-button {
-    background: #481d2d;
-    color: #fff;
-    border: 1px solid #481d2d;
-    padding: 10px 13px;
+    position: relative;
+    z-index: 1;
+    padding: 8px 10px;
+    border: 1px solid #c58b45;
+    background: #fff;
+    color: #a66b32;
     font-size: 11px;
-    letter-spacing: 0.3px;
-    cursor: pointer;
+    font-weight: 600;
     white-space: nowrap;
-    transition: background 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease,
+        border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .view-button:hover {
-    background: #704052;
-    border-color: #704052;
+    transform: translateY(-2px);
+    border-color: #351d27;
+    background: #351d27;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(53, 29, 39, 0.18);
 }
 
-.view-button:focus-visible {
-    outline: 2px solid #b38b54;
-    outline-offset: 3px;
-}
+.view-button:active { transform: translateY(0); }
+.view-button:focus-visible { outline: 2px solid #c58b45; outline-offset: 3px; }
 
-/* LOAD MORE */
-
+/* ==========================================
+   LOAD MORE + STATES
+========================================== */
 .load-more-section {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     margin: 45px auto 10px;
 }
 
 .load-more-button {
     padding: 15px 30px;
-    background: #481d2d;
     border: 1px solid #481d2d;
+    background: #481d2d;
     color: #fff;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.5px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
 .load-more-button:hover {
-    background: #704052;
-    border-color: #704052;
     transform: translateY(-2px);
+    border-color: #704052;
+    background: #704052;
 }
 
-.load-more-button span {
-    margin-left: 12px;
-    font-size: 15px;
-}
+.load-more-button span { margin-left: 12px; font-size: 15px; }
+.load-more-button:focus-visible { outline: 2px solid #b38b54; outline-offset: 4px; }
 
-.load-more-button:focus-visible {
-    outline: 2px solid #b38b54;
-    outline-offset: 4px;
-}
-
-/* LOADING AND ERROR */
-
-.loading-container {
-    position: relative;
-    min-height: 150px;
-}
+.loading-container { position: relative; min-height: 150px; }
 
 .message-container {
     max-width: 1150px;
@@ -607,275 +615,99 @@
 }
 
 .message-container h3 {
+    margin-bottom: 10px;
+    color: #421b2a;
     font-family: Georgia, serif;
     font-size: 23px;
-    color: #421b2a;
     font-weight: 400;
-    margin-bottom: 10px;
 }
 
-.error-message {
-    color: #a12828;
+.error-message { color: #a12828; }
+
+/* ==========================================
+   RESPONSIVE: TABLET
+========================================== */
+@media (max-width: 1100px) {
+    .perfume-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+    }
 }
 
-/* TABLET */
+@media (max-width: 900px) {
+    .perfume-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .product-image { height: 260px; }
+}
 
 @media (max-width: 850px) {
+    .hero-section { padding: 55px 5%; gap: 20px; }
+    .hero-content h1 { font-size: 45px; }
+    .visual-circle { width: 270px; height: 270px; }
+    .bottle-body { width: 155px; height: 215px; }
+    .collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
+/* ==========================================
+   RESPONSIVE: MOBILE
+   2 CATEGORY CARDS + 2 PERFUME CARDS PER ROW
+========================================== */
+@media (max-width: 600px) {
+    /* Hero remains unchanged visually */
     .hero-section {
-        padding: 55px 5%;
-        gap: 20px;
+        flex-direction: column;
+        padding: 55px 22px 35px;
+        text-align: center;
     }
+    .hero-content { width: 100%; }
+    .hero-content h1 { font-size: 42px; }
+    .hero-description { margin-left: auto; margin-right: auto; }
+    .hero-features { justify-content: center; }
+    .hero-visual { width: 100%; min-height: 360px; }
+    .visual-circle { width: 260px; height: 260px; }
+    .note-top { top: 20px; right: 0; }
+    .note-bottom { bottom: 20px; left: 0; }
 
-    .hero-content h1 {
-        font-size: 45px;
+    /* Categories: compact 2-column layout */
+    .collection-section { padding: 55px 16px; }
+    .collection-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
     }
-
-    .visual-circle {
-        width: 270px;
-        height: 270px;
+    .collection-card {
+        min-height: 170px;
+        padding: 18px 13px 30px;
     }
+    .card-number { font-size: 10px; letter-spacing: 1.5px; }
+    .collection-card h3 { margin: 15px 0 9px; font-size: 18px; }
+    .collection-card p { font-size: 11px; line-height: 1.5; }
+    .card-decoration { right: 12px; bottom: 10px; font-size: 15px; }
 
-    .bottle-body {
-        width: 155px;
-        height: 215px;
-    }
-
-    .collection-grid,
+    /* Perfumes: same as Shop mobile */
+    .products-section { padding: 55px 16px; }
+    .products-heading { flex-direction: column; align-items: flex-start; }
+    .products-heading h2 { font-size: 29px; }
     .perfume-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
     }
+    .product-image { height: 190px; }
+    .product-info { padding: 11px; }
+    .product-info h3 { font-size: 16px; }
+    .product-description { font-size: 11px; }
+    .product-bottom { flex-wrap: wrap; }
+    .product-price { font-size: 14px; }
+    .view-button { padding: 7px 8px; font-size: 10px; }
+
+    .load-more-section { margin-top: 30px; }
+    .load-more-button { width: 100%; max-width: 280px; }
 }
 
-/* MOBILE */
-
-@media (max-width: 600px) {
-
-    .hero-section {
-        flex-direction: column;
-        text-align: center;
-        padding: 55px 22px 35px;
-    }
-
-    .hero-content {
-        width: 100%;
-    }
-
-    .hero-content h1 {
-        font-size: 42px;
-    }
-
-    .hero-description {
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .hero-features {
-        justify-content: center;
-    }
-
-    .hero-visual {
-        width: 100%;
-        min-height: 360px;
-    }
-
-    .visual-circle {
-        width: 260px;
-        height: 260px;
-    }
-
-    .note-top {
-        right: 0;
-        top: 20px;
-    }
-
-    .note-bottom {
-        left: 0;
-        bottom: 20px;
-    }
-
-    .collection-section {
-        padding: 55px 20px;
-    }
-
-    .collection-grid,
-    .perfume-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .collection-card {
-        min-height: 180px;
-    }
-
-    .products-section {
-        padding: 55px 20px;
-    }
-
-    .products-heading {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .products-heading h2 {
-        font-size: 29px;
-    }
-
-    .product-image {
-        height: 250px;
-    }
-
-    .product-info {
-        padding: 16px;
-    }
-
-    .load-more-section {
-        margin-top: 30px;
-    }
-
-    .load-more-button {
-        width: 100%;
-        max-width: 280px;
-    }
-}
-/* FULL BROWSER WIDTH */
-:host {
-    display: block;
-    width: 100vw;
-    max-width: 100vw;
-    margin-left: calc(50% - 50vw);
-    font-family: Arial, sans-serif;
-    box-sizing: border-box;
-    overflow-x: clip;
-}
-
-.collections-page {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-    background: #f8f4ed;
-    color: #351b24;
-    overflow-x: clip;
-    box-sizing: border-box;
-}
-
-.collections-page *,
-.collections-page *::before,
-.collections-page *::after {
-    box-sizing: border-box;
-}
-
-/* ==========================================
-   COLLECTION CARD ALIGNMENT
-========================================== */
-
-/* Reserve two lines for product title */
-.product-info h3 {
-    min-height: 51.3px;
-    max-height: 51.3px;
-
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-
-    overflow: hidden;
-}
-
-/* Keep product tags aligned */
-.product-meta {
-    min-height: 28px;
-    align-content: flex-start;
-}
-
-/* Keep footer at the bottom */
-.product-bottom {
-    margin-top: auto;
-}
-
-/* ==========================================
-   WISHLIST HEART
-========================================== */
-
-
-/* =====================================
-   WISHLIST HEART - FEATURED STYLE
-===================================== */
-
-
-/* WISHLIST HEART - TRANSPARENT BACKGROUND */
-
-
-/* =====================================
-   WISHLIST HEART - FEATURED STYLE
-===================================== */
-
-.wishlist-heart {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 5;
-
-    width: 23px;
-    height: 23px;
-    padding: 0;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    /* Fully transparent background */
-    background: transparent !important;
-
-    /* Thin grey rectangular border */
-    border: 1px solid #777777;
-    border-radius: 4px;
-
-    /* Grey heart */
-    --slds-c-icon-color-foreground-default: #777777;
-
-    box-shadow: none;
-    cursor: pointer;
-
-    transition:
-        border-color 0.2s ease,
-        transform 0.2s ease;
-}
-
-.wishlist-heart:hover:not(:disabled) {
-    background: transparent !important;
-    border-color: #481d2d;
-    transform: scale(1.05);
-}
-
-.wishlist-heart.is-active {
-    background: transparent !important;
-    border-color: #c43c54;
-
-    --slds-c-icon-color-foreground-default: #c43c54;
-}
-
-.wishlist-heart lightning-icon {
-    transform: scale(0.65);
-}
-
-.wishlist-heart:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.wishlist-heart:focus-visible {
-    outline: 2px solid #b38b54;
-    outline-offset: 2px;
-}
-
-
-
-/* Smaller heart on mobile */
-@media (max-width: 600px) {
-    .wishlist-heart {
-        top: 10px;
-        right: 10px;
-        width: 35px;
-        height: 35px;
-    }
+/* Small phones: still 2 category cards; Shop-style 1 perfume card */
+@media (max-width: 360px) {
+    .collection-grid { gap: 9px; }
+    .collection-card { padding: 14px 10px 28px; }
+    .collection-card h3 { font-size: 16px; }
+    .collection-card p { font-size: 10px; }
+    .perfume-grid { grid-template-columns: 1fr; }
+    .product-image { height: 240px; }
 }

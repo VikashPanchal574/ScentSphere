@@ -11,8 +11,6 @@ import {
     publish
 } from 'lightning/messageService';
 
-import Toast from 'lightning/toast';
-
 import isGuestUser from '@salesforce/user/isGuest';
 
 import CART_UPDATE
@@ -20,6 +18,10 @@ import CART_UPDATE
 
 import addToCart
     from '@salesforce/apex/CartController.addToCart';
+
+// NEW: Get fresh active Cart details
+import getCartFresh
+    from '@salesforce/apex/CartController.getCartFresh';
 
 import getPerfumeDetails
     from '@salesforce/apex/PerfumeDetailsController.getPerfumeDetails';
@@ -34,6 +36,7 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     perfume;
     isLoading = true;
     errorMessage = '';
+
     quantity = 1;
 
     isAddingToCart = false;
@@ -43,7 +46,26 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     // Guest user detection
     isGuest = isGuestUser;
 
-    // Original navigation context
+    // ==========================================
+    // NEW: CART QUANTITY TRACKING
+    // ==========================================
+
+    // Quantity of current perfume already in Cart
+    cartPerfumeQuantity = 0;
+
+    // True only when Cart quantity loaded successfully
+    cartQuantityLoaded = false;
+
+    // Loading indicator for Cart quantity request
+    isCartQuantityLoading = false;
+
+    // Prevent outdated Cart responses
+    cartQuantityRequestId = 0;
+
+    // ==========================================
+    // ORIGINAL NAVIGATION CONTEXT
+    // ==========================================
+
     navigationSource = 'shop';
     returnPageName;
     returnCategory = 'All';
@@ -101,6 +123,15 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             this.cartMessage = '';
             this.cartError = '';
 
+            // ==================================
+            // NEW: RESET OLD PERFUME CART DATA
+            // ==================================
+
+            this.cartQuantityRequestId++;
+            this.cartPerfumeQuantity = 0;
+            this.cartQuantityLoaded = false;
+            this.isCartQuantityLoading = false;
+
             // Reset related pagination
             this.relatedProducts = [];
             this.relatedPageNumber = 1;
@@ -114,12 +145,17 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             this.relatedRequestToken++;
         }
 
+
         // Read related-product navigation history
         const historyParam = state.c__perfumeHistory;
 
         if (historyParam) {
+
             try {
-                const parsedHistory = JSON.parse(historyParam);
+
+                const parsedHistory = JSON.parse(
+                    historyParam
+                );
 
                 this.perfumeHistory = Array.isArray(parsedHistory)
                     ? parsedHistory.filter(
@@ -130,8 +166,10 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             } catch (error) {
                 this.perfumeHistory = [];
             }
+
         } else {
-            // Support earlier links using previousPerfumeId
+
+            // Support earlier links
             this.perfumeHistory = state.c__previousPerfumeId
                 ? [state.c__previousPerfumeId]
                 : [];
@@ -140,7 +178,7 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
         this.previousPerfumeId =
             this.perfumeHistory.length > 0
                 ? this.perfumeHistory[
-                    this.perfumeHistory.length - 1
+                this.perfumeHistory.length - 1
                 ]
                 : undefined;
 
@@ -168,19 +206,21 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
                 state.c__category || 'All';
         }
     }
+    get remainingQuantityMessage() {
+        return `You can add up to ${this.remainingAddableQuantity} more to your cart.`;
+    }
 
+    get showLowStockHint() {
 
-    // Display fragrance notes as separate tags
-    get fragranceNoteItems() {
+        const stock = Number(
+            this.perfume?.Stock_Quantity__c ?? 0
+        );
 
-        const notes = this.perfume?.Fragrance_Notes__c || '';
-
-        return notes.split(',')
-            .map((name, index) => ({
-                key: String(index),
-                name: name.trim()
-            }))
-            .filter(note => note.name);
+        return !this.isGuest &&
+            this.cartQuantityLoaded &&
+            stock > 0 &&
+            stock < 5 &&
+            this.remainingAddableQuantity > 0;
     }
 
 
@@ -190,12 +230,10 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
     get backButtonLabel() {
 
-        // Priority: return through related perfume history
         if (this.previousPerfumeId) {
             return 'Back to Previous Perfume';
         }
 
-        // NEW: Featured Fragrances
         if (this.navigationSource === 'featured') {
             return 'Back to Featured';
         }
@@ -242,25 +280,28 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
         if (!destinationName) {
 
-            // NEW: Featured products belong to Home
             if (this.navigationSource === 'featured') {
+
                 destinationName = 'Home';
 
             } else if (this.navigationSource === 'collections') {
+
                 destinationName = 'Collections__c';
 
             } else if (this.navigationSource === 'wishlist') {
+
                 destinationName = 'My_Wishlist__c';
 
             } else if (this.navigationSource === 'gifts') {
+
                 destinationName = 'Gifts__c';
 
             } else {
+
                 destinationName = 'Shop__c';
             }
         }
 
-        // Preserve category/section when returning
         let returnState = {};
 
         if (this.navigationSource === 'collections') {
@@ -271,13 +312,13 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
         } else if (this.navigationSource === 'featured') {
 
-            // NEW: Tell the Home page to show Featured section
             returnState = {
                 c__scrollTo: 'featured'
             };
         }
 
         this[NavigationMixin.Navigate]({
+
             type: 'comm__namedPage',
 
             attributes: {
@@ -313,10 +354,13 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
         }
 
         this[NavigationMixin.Navigate]({
+
             type: 'comm__namedPage',
+
             attributes: {
                 name: 'Product_Details__c'
             },
+
             state
         });
 
@@ -341,6 +385,7 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
                 this.perfume?.Id !== data.Id;
 
             this.perfume = {
+
                 ...data,
 
                 imageUrl: data.Product_Image_URL__c || '',
@@ -356,7 +401,22 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
                 this.cartMessage = '';
                 this.cartError = '';
 
+                // ==================================
+                // NEW: RESET CURRENT CART QUANTITY
+                // ==================================
+
+                this.cartQuantityRequestId++;
+                this.cartPerfumeQuantity = 0;
+                this.cartQuantityLoaded = false;
+                this.isCartQuantityLoading = false;
+
+                // Existing related perfumes functionality
                 this.loadRelatedPerfumes(1, data.Id);
+
+                // NEW: Check quantity already in Cart
+                if (!this.isGuest) {
+                    this.loadCartQuantity(data.Id);
+                }
             }
 
             this.errorMessage = '';
@@ -365,6 +425,13 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
         } else if (error) {
 
             this.perfume = undefined;
+
+            // Invalidate Cart quantity requests
+            this.cartQuantityRequestId++;
+            this.cartPerfumeQuantity = 0;
+            this.cartQuantityLoaded = false;
+            this.isCartQuantityLoading = false;
+
             this.relatedProducts = [];
             this.relatedError = '';
             this.relatedLoading = false;
@@ -396,7 +463,144 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     }
 
     // ==========================================
+    // FRAGRANCE NOTES - INDIVIDUAL CHIPS
+    // EXISTING FUNCTIONALITY PRESERVED
+    // ==========================================
+
+    get fragranceNoteItems() {
+
+        const notes = this.perfume?.Fragrance_Notes__c;
+
+        if (!notes) {
+            return [];
+        }
+
+        return String(notes)
+            .split(/[,;\n\r]+/)
+            .map((note, index) => ({
+                key: `fragrance-note-${index}`,
+                label: note.trim()
+            }))
+            .filter(note => note.label.length > 0);
+    }
+
+    // ==========================================
+    // NEW: LOAD PERFUME QUANTITY FROM CART
+    // ==========================================
+
+    async loadCartQuantity(
+        perfumeId = this.perfume?.Id
+    ) {
+
+        // Guests cannot access customer Cart
+        if (this.isGuest || !perfumeId) {
+            return;
+        }
+
+        const requestId = ++this.cartQuantityRequestId;
+
+        this.isCartQuantityLoading = true;
+        this.cartQuantityLoaded = false;
+
+        try {
+
+            // Existing non-cacheable Apex method
+            const response = await getCartFresh();
+
+            // Ignore response from older product/request
+            if (
+                requestId !== this.cartQuantityRequestId ||
+                this.perfume?.Id !== perfumeId
+            ) {
+                return;
+            }
+
+            const cartItems = response?.items || [];
+
+            // Sum quantity for current perfume only
+            const alreadyInCart = cartItems
+                .filter(
+                    item => item.Perfume__c === perfumeId
+                )
+                .reduce(
+                    (total, item) =>
+                        total + Number(
+                            item.Quantity__c || 0
+                        ),
+                    0
+                );
+
+            this.cartPerfumeQuantity = alreadyInCart;
+
+            // Cart quantity successfully loaded
+            this.cartQuantityLoaded = true;
+
+            // Calculate how many more can be added
+            const remaining =
+                this.remainingAddableQuantity;
+
+            // Never leave selected quantity above limit
+            if (
+                remaining > 0 &&
+                this.quantity > remaining
+            ) {
+                this.quantity = remaining;
+            }
+
+            // If remaining = 0, quantity can stay 1
+            // but Add to Cart will be disabled.
+
+        } catch (error) {
+
+            if (
+                requestId !== this.cartQuantityRequestId ||
+                this.perfume?.Id !== perfumeId
+            ) {
+                return;
+            }
+
+            console.error(
+                'Cart Quantity Load Error:',
+                error
+            );
+
+            this.cartQuantityLoaded = false;
+
+            this.cartError =
+                'Unable to check your cart quantity. Please refresh the page.';
+
+        } finally {
+
+            if (requestId === this.cartQuantityRequestId) {
+                this.isCartQuantityLoading = false;
+            }
+        }
+    }
+
+    // ==========================================
+    // NEW: REMAINING QUANTITY USER CAN ADD
+    // ==========================================
+
+    get remainingAddableQuantity() {
+
+        const totalStock = Number(
+            this.perfume?.Stock_Quantity__c || 0
+        );
+
+        // Guests do not have a customer Cart
+        const alreadyInCart = this.isGuest
+            ? 0
+            : this.cartPerfumeQuantity;
+
+        return Math.max(
+            0,
+            Math.floor(totalStock - alreadyInCart)
+        );
+    }
+
+    // ==========================================
     // FETCH RELATED PERFUMES
+    // EXISTING FUNCTIONALITY PRESERVED
     // ==========================================
 
     async loadRelatedPerfumes(
@@ -437,6 +641,7 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
                     );
 
                     return {
+
                         ...item,
 
                         imageUrl:
@@ -570,7 +775,6 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             return;
         }
 
-        // Add current perfume to history
         const updatedHistory = [
             ...this.perfumeHistory,
             this.perfume.Id
@@ -589,6 +793,7 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             event.key === 'Enter' ||
             event.key === ' '
         ) {
+
             event.preventDefault();
             this.handleRelatedProductClick(event);
         }
@@ -600,12 +805,14 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
     handleRelatedImageError(event) {
 
-        const perfumeId = event.currentTarget.dataset.id;
+        const perfumeId =
+            event.currentTarget.dataset.id;
 
         this.relatedProducts = this.relatedProducts.map(
             item => {
 
                 if (item.Id === perfumeId) {
+
                     return {
                         ...item,
                         imageUrl: ''
@@ -624,7 +831,9 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     handleBackToShop() {
 
         this[NavigationMixin.Navigate]({
+
             type: 'comm__namedPage',
+
             attributes: {
                 name: 'Shop__c'
             }
@@ -638,7 +847,9 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     handleLogin() {
 
         this[NavigationMixin.Navigate]({
+
             type: 'comm__loginPage',
+
             attributes: {
                 actionName: 'login'
             }
@@ -646,7 +857,7 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
     }
 
     // ==========================================
-    // ADD TO CART
+    // UPDATED: ADD TO CART WITH QUANTITY LIMIT
     // ==========================================
 
     async handleAddToCart() {
@@ -656,13 +867,21 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
             return;
         }
 
+        // Disable operation when Cart quantity is
+        // not ready or selected quantity exceeds limit
         if (
             !this.perfume ||
-            this.isOutOfStock ||
-            this.isAddingToCart
+            this.isAddToCartDisabled
         ) {
             return;
         }
+
+        // Capture values before async request
+        const perfumeId = this.perfume.Id;
+        const perfumeName =
+            this.perfume.Product_Name__c;
+
+        const requestedQuantity = this.quantity;
 
         this.isAddingToCart = true;
         this.cartMessage = '';
@@ -670,28 +889,32 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
         try {
 
+            // Existing backend Add to Cart method
             await addToCart({
-                perfumeId: this.perfume.Id,
-                quantity: this.quantity
+                perfumeId: perfumeId,
+                quantity: requestedQuantity
             });
 
             this.cartMessage = '';
 
-            Toast.show({
-                label: 'Added to Cart',
-                message:
-                    `${this.perfume.Product_Name__c} has been added to your cart.`,
-                variant: 'success',
-                mode: 'dismissible'
-            }, this);
-
+            // Existing Header count + notification
             publish(this.messageContext, CART_UPDATE, {
-                action: 'refresh'
+                action: 'added',
+                perfumeName: perfumeName
             });
+
+            // NEW: Refresh quantity after success
+            if (this.perfume?.Id === perfumeId) {
+
+                this.quantity = 1;
+
+                // Get latest quantity already in Cart
+                await this.loadCartQuantity(perfumeId);
+            }
 
         } catch (error) {
 
-            this.cartError =
+            const message =
                 error?.body?.message ||
                 'Unable to add perfume to cart.';
 
@@ -700,26 +923,42 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
                 error
             );
 
+            // Refresh Cart quantity after stock errors
+            if (
+                this.perfume?.Id === perfumeId &&
+                /stock|quantity/i.test(message)
+            ) {
+                await this.loadCartQuantity(perfumeId);
+            }
+
+            if (this.perfume?.Id === perfumeId) {
+                this.cartError = message;
+            }
+
         } finally {
+
             this.isAddingToCart = false;
         }
     }
 
     // ==========================================
-    // QUANTITY CONTROLS
+    // UPDATED: INCREASE QUANTITY
     // ==========================================
 
     handleIncrease() {
 
-        if (
-            this.perfume &&
-            !this.isOutOfStock &&
-            this.quantity <
-                Number(this.perfume.Stock_Quantity__c)
-        ) {
-            this.quantity++;
+        // Stop at available stock minus Cart quantity
+        if (this.isIncreaseDisabled) {
+            return;
         }
+
+        this.quantity++;
     }
+
+    // ==========================================
+    // DECREASE QUANTITY
+    // EXISTING FUNCTIONALITY PRESERVED
+    // ==========================================
 
     handleDecrease() {
 
@@ -730,29 +969,60 @@ export default class PerfumeDetails extends NavigationMixin(LightningElement) {
 
     // ==========================================
     // OUT OF STOCK CHECK
+    // EXISTING FUNCTIONALITY PRESERVED
     // ==========================================
 
     get isOutOfStock() {
 
         return !this.perfume ||
-            Number(this.perfume.Stock_Quantity__c ?? 0) <= 0;
+            Number(
+                this.perfume.Stock_Quantity__c ?? 0
+            ) <= 0;
     }
+
+    // ==========================================
+    // UPDATED: DISABLE PLUS BUTTON
+    // ==========================================
 
     get isIncreaseDisabled() {
 
-        return this.isOutOfStock ||
-            this.quantity >=
-                Number(this.perfume?.Stock_Quantity__c || 0);
+        if (this.isOutOfStock) {
+            return true;
+        }
+
+        // Logged-in users must wait for Cart data
+        if (
+            !this.isGuest &&
+            (
+                this.isCartQuantityLoading ||
+                !this.cartQuantityLoaded
+            )
+        ) {
+            return true;
+        }
+
+        // Stop at maximum additional quantity
+        return this.quantity >=
+            this.remainingAddableQuantity;
     }
+
+    // ==========================================
+    // UPDATED: DISABLE ADD TO CART
+    // ==========================================
 
     get isAddToCartDisabled() {
 
         return this.isOutOfStock ||
-            this.isAddingToCart;
+            this.isAddingToCart ||
+            this.isCartQuantityLoading ||
+            !this.cartQuantityLoaded ||
+            this.remainingAddableQuantity <= 0 ||
+            this.quantity > this.remainingAddableQuantity;
     }
 
     // ==========================================
     // TOTAL PRICE
+    // EXISTING FUNCTIONALITY PRESERVED
     // ==========================================
 
     get totalPrice() {

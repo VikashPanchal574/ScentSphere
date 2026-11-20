@@ -1,6 +1,7 @@
 
 <template>
     <template if:true={showHeader}>
+
         <div class="header-spacer">
             <div class="header-fixed">
 
@@ -8,7 +9,7 @@
                 <header class="main-header">
                     <div class="header-container">
 
-                        <!-- Mobile Menu -->
+                        <!-- MOBILE MENU -->
                         <button
                             class="menu-toggle"
                             onclick={toggleMenu}
@@ -18,7 +19,7 @@
                             {menuIcon}
                         </button>
 
-                        <!-- Logo -->
+                        <!-- LOGO -->
                         <a
                             href="#"
                             class="brand"
@@ -66,51 +67,71 @@
                                 <span class="brand-name">
                                     SCENTSPHERE
                                 </span>
+
                                 <span class="brand-tag">
                                     THE ART OF FRAGRANCE
                                 </span>
                             </span>
                         </a>
 
-                        <!-- Navigation -->
+                        <!-- MAIN NAVIGATION -->
                         <nav
                             class={navClass}
                             aria-label="Main navigation">
 
-                            <a href="#" class={homeClass} onclick={handleHome}>
+                            <a
+                                href="#"
+                                class={homeClass}
+                                onclick={handleHome}>
                                 Home
                             </a>
 
-                            <a href="#" class={shopClass} onclick={handleShop}>
+                            <a
+                                href="#"
+                                class={shopClass}
+                                onclick={handleShop}>
                                 Shop
                             </a>
 
-                            <a href="#" class={collectionsClass} onclick={handleCollections}>
+                            <a
+                                href="#"
+                                class={collectionsClass}
+                                onclick={handleCollections}>
                                 Collections
                             </a>
 
-                            <a href="#" class={giftsClass} onclick={handleGifts}>
+                            <a
+                                href="#"
+                                class={giftsClass}
+                                onclick={handleGifts}>
                                 Gifts
                             </a>
 
-                            <a href="#" class={aboutClass} onclick={handleAbout}>
+                            <a
+                                href="#"
+                                class={aboutClass}
+                                onclick={handleAbout}>
                                 About
                             </a>
 
-                            <a href="#" class={contactClass} onclick={handleContact}>
+                            <a
+                                href="#"
+                                class={contactClass}
+                                onclick={handleContact}>
                                 Contact
                             </a>
                         </nav>
 
-                        <!-- Header Actions -->
+                        <!-- HEADER ACTIONS -->
                         <div class="header-actions">
 
-                            <!-- Search with Suggestions -->
+                            <!-- SEARCH -->
                             <div
                                 class="search-area"
                                 onfocusout={handleSearchFocusOut}>
 
                                 <div class="search-box">
+
                                     <lightning-icon
                                         icon-name="utility:search"
                                         size="x-small"
@@ -131,8 +152,9 @@
                                         autocomplete="off"/>
                                 </div>
 
-                                <!-- Suggestions Dropdown -->
+                                <!-- SEARCH SUGGESTIONS -->
                                 <template if:true={showSuggestions}>
+
                                     <div
                                         class="search-dropdown"
                                         id="perfume-suggestions"
@@ -143,17 +165,18 @@
                                             {suggestionHeading}
                                         </div>
 
-                                        <!-- Loading -->
+                                        <!-- LOADING -->
                                         <template if:true={isSearchLoading}>
                                             <div class="suggestion-status">
                                                 Searching perfumes...
                                             </div>
                                         </template>
 
-                                        <!-- Loaded Results -->
+                                        <!-- RESULTS -->
                                         <template if:false={isSearchLoading}>
 
                                             <template if:true={hasSuggestions}>
+
                                                 <template
                                                     for:each={suggestions}
                                                     for:item="item">
@@ -166,8 +189,8 @@
                                                         data-id={item.id}
                                                         onclick={handleSuggestionClick}>
 
-                                                        <!-- Perfume Image -->
                                                         <span class="suggestion-image-box">
+
                                                             <template if:true={item.imageUrl}>
                                                                 <img
                                                                     src={item.imageUrl}
@@ -182,32 +205,36 @@
                                                                     alternative-text="No image">
                                                                 </lightning-icon>
                                                             </template>
+
                                                         </span>
 
-                                                        <!-- Perfume Details -->
                                                         <span class="suggestion-info">
+
                                                             <span class="suggestion-name">
                                                                 {item.productName}
                                                             </span>
 
                                                             <span class="suggestion-brand">
                                                                 {item.brand}
+
                                                                 <template if:true={item.size}>
                                                                     · {item.size}
                                                                 </template>
                                                             </span>
+
                                                         </span>
 
-                                                        <!-- Price -->
                                                         <span class="suggestion-price">
                                                             {item.formattedPrice}
                                                         </span>
+
                                                     </button>
 
                                                 </template>
+
                                             </template>
 
-                                            <!-- Empty Result -->
+                                            <!-- NO RESULTS -->
                                             <template if:false={hasSuggestions}>
                                                 <div class="suggestion-status">
                                                     {suggestionEmptyMessage}
@@ -216,67 +243,87 @@
 
                                         </template>
 
-                                        <!-- View All -->
+                                        <!-- VIEW ALL RESULTS -->
                                         <template if:true={showViewAll}>
+
                                             <button
                                                 type="button"
                                                 class="suggestion-view-all"
                                                 onclick={handleViewAllResults}>
+
                                                 View all results for "{searchTerm}"
+
                                             </button>
+
                                         </template>
 
                                     </div>
+
                                 </template>
+
                             </div>
 
-                            <!-- Wishlist -->
-                             <template if:false={isGuest}>
-                            <button
-                                class="action-button wishlist-btn"
-                                title="Wishlist"
-                                onclick={handleWishlist}
-                                type="button">
+                            <!-- ==================================
+                                 LOGGED-IN USERS ONLY
+                                 WISHLIST + CART
+                            =================================== -->
 
-                                <lightning-icon
-                                    icon-name="utility:heart"
-                                    size="medium"
-                                    alternative-text="Wishlist">
-                                </lightning-icon>
+                            <template if:false={isGuest}>
 
-                                <span class="count-badge">
-                                    {wishlistCountLabel}
-                                </span>
-                            </button>
+                                <!-- WISHLIST -->
+                                <button
+                                    class="action-button wishlist-btn"
+                                    title="Wishlist"
+                                    aria-label="Open Wishlist"
+                                    onclick={handleWishlist}
+                                    type="button">
+
+                                    <lightning-icon
+                                        icon-name="utility:heart"
+                                        size="medium"
+                                        alternative-text="Wishlist">
+                                    </lightning-icon>
+
+                                    <span class="count-badge">
+                                        {wishlistCountLabel}
+                                    </span>
+                                </button>
+
+                                <!-- SHOPPING CART -->
+                                <button
+                                    class="action-button cart-btn"
+                                    title="Shopping Cart"
+                                    aria-label="Open Shopping Cart"
+                                    onclick={handleCart}
+                                    type="button">
+
+                                    <lightning-icon
+                                        icon-name="utility:cart"
+                                        size="medium"
+                                        alternative-text="Cart">
+                                    </lightning-icon>
+
+                                    <span class="count-badge">
+                                        {cartCountLabel}
+                                    </span>
+                                </button>
+
+                                <!-- DIVIDER -->
+                                <span class="action-divider"></span>
+
                             </template>
 
-                            <!-- Shopping Cart -->
-                             <template if:false={isGuest}>
-                            <button
-                                class="action-button cart-btn"
-                                title="Shopping Cart"
-                                onclick={handleCart}
-                                type="button">
+                            <!-- ==================================
+                                 GUEST USER
+                                 SIGN IN ONLY
+                            =================================== -->
 
-                                <lightning-icon
-                                    icon-name="utility:cart"
-                                    size="medium"
-                                    alternative-text="Cart">
-                                </lightning-icon>
-
-                                <span class="count-badge">
-                                    {cartCountLabel}
-                                </span>
-                            </button>
-                            </template>
-
-                            <span class="action-divider"></span>
-
-                            <!-- Guest User -->
                             <template if:true={isGuest}>
+
                                 <button
                                     class="account-button"
                                     onclick={handleLogin}
+                                    title="Sign In"
                                     type="button">
 
                                     <lightning-icon
@@ -286,36 +333,88 @@
                                     </lightning-icon>
 
                                     <span>Sign In</span>
+
                                 </button>
+
                             </template>
 
-                            <!-- Logged-In User -->
+                            <!-- ==================================
+                                 LOGGED-IN USER
+                                 FIRST NAME
+                            =================================== -->
+
                             <template if:false={isGuest}>
+
                                 <button
                                     class="account-chip"
                                     onclick={handleMyAccount}
-                                    title={headerUsername}
+                                    title="My Account"
                                     type="button">
 
                                     <span class="account-avatar">
+
                                         <lightning-icon
                                             icon-name="utility:user"
                                             size="x-small"
                                             alternative-text="Account">
                                         </lightning-icon>
+
                                     </span>
 
                                     <span class="account-label">
-                                         {headerUsername}
+                                        {headerUsername}
                                     </span>
+
                                 </button>
+
                             </template>
 
                         </div>
                     </div>
                 </header>
 
+                <!-- ==================================
+                     SINGLE HEADER NOTIFICATION
+                     WISHLIST + CART
+                =================================== -->
+
+                <template if:true={wishlistToastVisible}>
+
+                    <div
+                        class={wishlistToastClass}
+                        role="status"
+                        aria-live="polite">
+
+                        <span class="wishlist-notice-icon">
+                            ✓
+                        </span>
+
+                        <div class="wishlist-notice-content">
+
+                            <strong>
+                                {wishlistToastTitle}
+                            </strong>
+
+                            <span>
+                                {wishlistToastMessage}
+                            </span>
+
+                        </div>
+
+                        <button
+                            class="wishlist-notice-close"
+                            onclick={handleCloseWishlistToast}
+                            type="button"
+                            aria-label="Close notification">
+                            ✕
+                        </button>
+
+                    </div>
+
+                </template>
+
             </div>
         </div>
+
     </template>
 </template>

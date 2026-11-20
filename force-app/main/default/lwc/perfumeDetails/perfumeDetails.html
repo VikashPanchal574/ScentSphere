@@ -1,7 +1,7 @@
 <template>
     <section class="details-container">
 
-        <!-- Back Navigation -->
+        <!-- BACK NAVIGATION -->
         <div class="back-navigation">
             <button class="back-button" onclick={handleBackNavigation} type="button">
                 <span>←</span>
@@ -9,7 +9,7 @@
             </button>
         </div>
 
-        <!-- Loading -->
+        <!-- LOADING -->
         <template if:true={isLoading}>
             <div class="message">
                 <lightning-spinner alternative-text="Loading perfume details" size="medium">
@@ -17,19 +17,19 @@
             </div>
         </template>
 
-        <!-- Error -->
+        <!-- ERROR -->
         <template if:true={errorMessage}>
             <div class="message error-message">
                 {errorMessage}
             </div>
         </template>
 
-        <!-- Product Details -->
+        <!-- PRODUCT DETAILS -->
         <template if:true={perfume}>
 
             <div class="product-layout">
 
-                <!-- Product Image -->
+                <!-- PRODUCT IMAGE -->
                 <div class="image-section">
 
                     <template if:true={perfume.imageUrl}>
@@ -44,14 +44,15 @@
 
                 </div>
 
-                <!-- Product Information -->
+                <!-- PRODUCT INFORMATION -->
                 <div class="info-section">
 
+                    <!-- BRAND -->
                     <p class="eyebrow">
                         {perfume.Brand__c}
                     </p>
 
-                    <!-- Product Name + Wishlist -->
+                    <!-- NAME + WISHLIST -->
                     <div class="product-title-row">
 
                         <h1>{perfume.Product_Name__c}</h1>
@@ -61,20 +62,22 @@
 
                     </div>
 
+                    <!-- CATEGORY -->
                     <p class="category">
                         {perfume.Category__c} Fragrance
                     </p>
 
+                    <!-- PRICE -->
                     <div class="price">
                         {perfume.formattedPrice}
                     </div>
 
+                    <!-- DESCRIPTION -->
                     <p class="description">
                         {perfume.Description__c}
                     </p>
 
-
-                    <!-- Product Specifications -->
+                    <!-- SPECIFICATIONS -->
                     <div class="specifications">
 
                         <div class="spec-item">
@@ -92,23 +95,24 @@
                             <strong>{perfume.Category__c}</strong>
                         </div>
 
+                        <!-- Available Stock number hidden.
+                             Stock validation remains in JS/Apex. -->
+
                     </div>
 
-
-
-                    <!-- Fragrance Notes -->
+                    <!-- FRAGRANCE NOTES -->
                     <template if:true={perfume.Fragrance_Notes__c}>
 
                         <div class="fragrance-notes">
 
                             <h3>Fragrance Notes</h3>
 
-                            <div class="fragrance-notes-list">
+                            <div class="fragrance-note-items">
 
                                 <template for:each={fragranceNoteItems} for:item="note">
 
-                                    <span key={note.key} class="fragrance-note-tag">
-                                        {note.name}
+                                    <span key={note.key} class="fragrance-note-chip">
+                                        {note.label}
                                     </span>
 
                                 </template>
@@ -119,51 +123,96 @@
 
                     </template>
 
-
-                    <!-- Out of Stock Message -->
+                    <!-- OUT OF STOCK -->
                     <template if:true={isOutOfStock}>
+
                         <div class="out-of-stock-message">
+
                             <span>OUT OF STOCK</span>
+
                             <p>
                                 This fragrance is currently unavailable.
                             </p>
+
                         </div>
+
                     </template>
 
-                    <!-- Quantity -->
+                    <!-- QUANTITY -->
                     <div class="quantity-section">
 
                         <span>Quantity</span>
 
                         <div class="quantity-control">
 
-                            <button onclick={handleDecrease} disabled={isOutOfStock} type="button">
+                            <!-- DECREASE -->
+                            <button onclick={handleDecrease} disabled={isOutOfStock} type="button"
+                                aria-label="Decrease quantity">
                                 −
                             </button>
 
                             <span>{quantity}</span>
 
-                            <button onclick={handleIncrease} disabled={isIncreaseDisabled} type="button">
+                            <!-- INCREASE -->
+                            <button onclick={handleIncrease} disabled={isIncreaseDisabled} type="button"
+                                aria-label="Increase quantity">
                                 +
                             </button>
 
                         </div>
+
                     </div>
 
-                    <!-- Total Price -->
+                    <!-- ===================================
+                         NEW: REMAINING CART QUANTITY
+                    ==================================== -->
+
+                    <template if:false={isGuest}>
+
+                        <!-- CHECKING CART
+                        <template if:true={isCartQuantityLoading}>
+
+                            <p class="cart-quantity-hint">
+                                Checking your cart quantity...
+                            </p>
+
+                        </template> -->
+
+                        <!-- CART QUANTITY LOADED -->
+                        <template if:true={cartQuantityLoaded}>
+
+                            <!-- MORE QUANTITY AVAILABLE -->
+
+                            <template if:true={showLowStockHint}>
+                                <p class="cart-quantity-hint">
+                                    {remainingQuantityMessage}
+                                </p>
+                            </template>
+
+                        </template>
+
+                    </template>
+
+                    <!-- TOTAL PRICE -->
                     <div class="total-price">
+
                         <span>Total Price</span>
+
                         <strong>{totalPrice}</strong>
+
                     </div>
 
-                    <!-- Guest User: Sign In -->
+                    <!-- GUEST USER -->
                     <template if:true={isGuest}>
 
                         <template if:false={isOutOfStock}>
 
                             <button class="add-to-cart-button" onclick={handleLogin} type="button">
 
-                                <span>Sign In to Add to Cart</span>
+                                <span>
+                                    Sign In to Add to Cart
+                                </span>
+
                                 <span class="cart-arrow">→</span>
 
                             </button>
@@ -172,12 +221,13 @@
 
                     </template>
 
-                    <!-- Logged-In User: Add to Cart -->
+                    <!-- LOGGED-IN USER -->
                     <template if:false={isGuest}>
 
                         <button class="add-to-cart-button" onclick={handleAddToCart} disabled={isAddToCartDisabled}
                             type="button">
 
+                            <!-- ADDING -->
                             <template if:true={isAddingToCart}>
 
                                 <lightning-spinner alternative-text="Adding to cart" size="small">
@@ -187,15 +237,41 @@
 
                             </template>
 
+                            <!-- NOT ADDING -->
                             <template if:false={isAddingToCart}>
 
+                                <!-- OUT OF STOCK -->
                                 <template if:true={isOutOfStock}>
-                                    <span>Currently Unavailable</span>
+
+                                    <span>
+                                        Currently Unavailable
+                                    </span>
+
                                 </template>
 
+                                <!-- IN STOCK -->
                                 <template if:false={isOutOfStock}>
-                                    <span>Add to Cart</span>
-                                    <span class="cart-arrow">→</span>
+
+                                    <!-- QUANTITY AVAILABLE -->
+                                    <template if:true={remainingAddableQuantity}>
+
+                                        <span>Add to Cart</span>
+
+                                        <span class="cart-arrow">
+                                            →
+                                        </span>
+
+                                    </template>
+
+                                    <!-- NO REMAINING QUANTITY -->
+                                    <template if:false={remainingAddableQuantity}>
+
+                                        <span>
+                                            Maximum Quantity Reached
+                                        </span>
+
+                                    </template>
+
                                 </template>
 
                             </template>
@@ -204,37 +280,43 @@
 
                     </template>
 
-                    <!-- Success Message -->
+                    <!-- SUCCESS MESSAGE -->
                     <template if:true={cartMessage}>
+
                         <p class="success-message">
                             {cartMessage}
                         </p>
+
                     </template>
 
-                    <!-- Error Message -->
+                    <!-- ERROR MESSAGE -->
                     <template if:true={cartError}>
+
                         <p class="error-message">
                             {cartError}
                         </p>
+
                     </template>
 
                 </div>
-                <!-- End info-section -->
 
             </div>
-            <!-- End product-layout -->
 
             <!-- ======================================
-                 RELATED FRAGRANCES SECTION
+                 RELATED FRAGRANCES
             ======================================= -->
 
             <section class="related-section">
 
                 <div class="related-heading">
 
-                    <p class="eyebrow">DISCOVER MORE</p>
+                    <p class="eyebrow">
+                        DISCOVER MORE
+                    </p>
 
-                    <h2>More From This Category</h2>
+                    <h2>
+                        More From This Category
+                    </h2>
 
                     <p>
                         Explore more fragrances from our
@@ -243,7 +325,7 @@
 
                 </div>
 
-                <!-- Related Products Loading -->
+                <!-- RELATED LOADING -->
                 <template if:true={relatedLoading}>
 
                     <div class="related-message">
@@ -255,7 +337,7 @@
 
                 </template>
 
-                <!-- Related Products Error -->
+                <!-- RELATED ERROR -->
                 <template if:true={relatedError}>
 
                     <div class="related-message">
@@ -272,19 +354,18 @@
 
                 </template>
 
-                <!-- Related Product Cards -->
+                <!-- RELATED PRODUCTS -->
                 <template if:true={hasRelatedProducts}>
 
                     <div class="related-grid">
 
                         <template for:each={relatedProducts} for:item="item">
 
-                            <!-- FULL CLICKABLE CARD -->
                             <article class="related-card" key={item.Id} data-id={item.Id}
                                 onclick={handleRelatedProductClick} onkeydown={handleRelatedCardKeydown} tabindex="0"
                                 role="link" aria-label={item.Product_Name__c}>
 
-                                <!-- Product Image -->
+                                <!-- RELATED IMAGE -->
                                 <div class="related-image-wrapper">
 
                                     <template if:true={item.imageUrl}>
@@ -297,28 +378,29 @@
                                     <template if:false={item.imageUrl}>
 
                                         <div class="related-image-placeholder">
+
                                             <span>✦</span>
+
                                             <small>SCENTSPHERE</small>
+
                                         </div>
 
                                     </template>
 
-                                    <!-- Out Of Stock Overlay -->
+                                    <!-- OUT OF STOCK -->
                                     <template if:true={item.isOutOfStock}>
 
                                         <div class="related-stock-overlay">
-
                                             <span>
                                                 OUT OF STOCK
                                             </span>
-
                                         </div>
 
                                     </template>
 
                                 </div>
 
-                                <!-- Product Information -->
+                                <!-- RELATED PRODUCT DETAILS -->
                                 <div class="related-product-info">
 
                                     <p class="related-brand">
@@ -339,7 +421,7 @@
 
                                     </p>
 
-                                    <!-- Stock Status -->
+                                    <!-- STOCK STATUS -->
                                     <template if:true={item.isOutOfStock}>
 
                                         <p class="related-unavailable">
@@ -348,14 +430,13 @@
 
                                     </template>
 
-                                    <!-- Price and Details -->
+                                    <!-- PRICE + DETAILS -->
                                     <div class="related-bottom">
 
                                         <strong class="related-price">
                                             {item.formattedPrice}
                                         </strong>
 
-                                        <!-- Avoid nested clickable controls -->
                                         <span class="related-view-button">
                                             View Details →
                                         </span>
@@ -372,7 +453,7 @@
 
                 </template>
 
-                <!-- No Related Products -->
+                <!-- EMPTY RELATED PRODUCTS -->
                 <template if:true={relatedEmpty}>
 
                     <div class="related-message">
@@ -390,7 +471,7 @@
 
                 </template>
 
-                <!-- Pagination -->
+                <!-- PAGINATION -->
                 <template if:true={showRelatedPagination}>
 
                     <div class="related-pagination">

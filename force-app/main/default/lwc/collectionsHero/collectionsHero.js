@@ -1,4 +1,3 @@
-
 import { LightningElement, wire } from 'lwc';
 
 import {
@@ -6,31 +5,20 @@ import {
     NavigationMixin
 } from 'lightning/navigation';
 
+import getPerfumesByCategory
+    from '@salesforce/apex/CollectionsController.getPerfumesByCategory';
+import USER_ID from '@salesforce/user/Id';
+
 import {
-    MessageContext,
-    publish,
-    subscribe,
-    unsubscribe,
-    APPLICATION_SCOPE
-} from 'lightning/messageService';
+    getRecord,
+    getFieldValue
+} from 'lightning/uiRecordApi';
 
-import Toast from 'lightning/toast';
-import isGuest from '@salesforce/user/isGuest';
+import FIRST_NAME_FIELD
+    from '@salesforce/schema/User.FirstName';
 
-import getPerfumesByCategory from
-    '@salesforce/apex/CollectionsController.getPerfumesByCategory';
-
-import getWishlistPerfumeIds from
-    '@salesforce/apex/WishlistController.getWishlistPerfumeIds';
-
-import addToWishlist from
-    '@salesforce/apex/WishlistController.addToWishlist';
-
-import removeFromWishlist from
-    '@salesforce/apex/WishlistController.removeFromWishlist';
-
-import WISHLIST_UPDATE from
-    '@salesforce/messageChannel/WishlistUpdate__c';
+import USERNAME_FIELD
+    from '@salesforce/schema/User.Username';
 
 const PRODUCTS_PER_LOAD = 8;
 
@@ -48,17 +36,11 @@ export default class CollectionsHero extends NavigationMixin(
 
     // Pagination
     displayedCount = PRODUCTS_PER_LOAD;
-
-    // Wishlist
-    isGuestUser = isGuest;
-    wishlistIds = new Set();
-    updatingWishlistIds = new Set();
-    wishlistSubscription = null;
-    wishlistRequestId = 0;
     perfumeRequestId = 0;
 
-    @wire(MessageContext)
-    messageContext;
+    // =====================================
+    // COLLECTION CATEGORIES
+    // =====================================
 
     collectionTypes = [
         {
@@ -120,43 +102,15 @@ export default class CollectionsHero extends NavigationMixin(
     ];
 
     // =====================================
-    // INITIALIZATION
+    // CLEANUP
     // =====================================
-
-    connectedCallback() {
-        if (!this.isGuestUser) {
-            this.loadWishlistIds();
-        }
-    }
 
     disconnectedCallback() {
         this.perfumeRequestId++;
-        this.wishlistRequestId++;
-
-        if (this.wishlistSubscription) {
-            unsubscribe(this.wishlistSubscription);
-            this.wishlistSubscription = null;
-        }
-    }
-
-    // Keep hearts synced with other components
-    @wire(MessageContext)
-    wiredWishlistContext(context) {
-
-        if (!context || this.wishlistSubscription) {
-            return;
-        }
-
-        this.wishlistSubscription = subscribe(
-            context,
-            WISHLIST_UPDATE,
-            (message) => this.handleWishlistMessage(message),
-            { scope: APPLICATION_SCOPE }
-        );
     }
 
     // =====================================
-    // CURRENT PAGE
+    // READ URL CATEGORY
     // =====================================
 
     @wire(CurrentPageReference)
@@ -222,232 +176,6 @@ export default class CollectionsHero extends NavigationMixin(
     }
 
     // =====================================
-    // WISHLIST UI MAPPING
-    // =====================================
-
-    decoratePerfume(perfume) {
-
-        const isWishlisted =
-            this.wishlistIds.has(perfume.Id);
-
-        const isWishlistUpdating =
-            this.updatingWishlistIds.has(perfume.Id);
-
-        return {
-            ...perfume,
-
-            isWishlisted,
-            isWishlistUpdating,
-
-            wishlistIcon: isWishlisted
-                ? 'utility:favorite'
-                : 'utility:heart',
-
-            wishlistButtonClass: isWishlisted
-                ? 'wishlist-heart is-active'
-                : 'wishlist-heart',
-
-            wishlistTitle: isWishlisted
-                ? 'Remove from Wishlist'
-                : 'Add to Wishlist',
-
-            detailsLabel:
-                'View details for ' +
-                (perfume.Product_Name__c || 'perfume')
-        };
-    }
-
-    refreshPerfumeHeartStates() {
-        this.perfumes = this.perfumes.map(
-            perfume => this.decoratePerfume(perfume)
-        );
-    }
-
-    // =====================================
-    // LOAD WISHLIST IDS
-    // =====================================
-
-    async loadWishlistIds() {
-
-        if (this.isGuestUser) {
-            return;
-        }
-
-        const requestId = ++this.wishlistRequestId;
-
-        try {
-            const ids = await getWishlistPerfumeIds();
-
-            if (requestId !== this.wishlistRequestId) {
-                return;
-            }
-
-            const loadedIds = new Set(ids || []);
-
-            // Preserve any locally pending toggle result
-            for (const id of this.updatingWishlistIds) {
-                if (this.wishlistIds.has(id)) {
-                    loadedIds.add(id);
-                } else {
-                    loadedIds.delete(id);
-                }
-            }
-
-            this.wishlistIds = loadedIds;
-            this.refreshPerfumeHeartStates();
-
-        } catch (error) {
-            console.error(
-                'Collections wishlist load error:',
-                error
-            );
-        }
-    }
-
-    handleWishlistMessage(message) {
-
-        if (!message?.perfumeId) {
-            return;
-        }
-
-        const perfumeId = message.perfumeId;
-
-        // Ignore external updates while this card
-        // is already being updated locally.
-        if (this.updatingWishlistIds.has(perfumeId)) {
-            return;
-        }
-
-        const updatedIds = new Set(this.wishlistIds);
-
-        if (message.isWishlisted === true) {
-            updatedIds.add(perfumeId);
-        } else if (message.isWishlisted === false) {
-            updatedIds.delete(perfumeId);
-        } else {
-            this.loadWishlistIds();
-            return;
-        }
-
-        this.wishlistIds = updatedIds;
-        this.refreshPerfumeHeartStates();
-    }
-
-    // =====================================
-    // TOGGLE WISHLIST
-    // =====================================
-
-    async handleWishlistClick(event) {
-
-        // Never trigger the parent card navigation
-        event.preventDefault();
-        event.stopPropagation();
-
-        const perfumeId =
-            event.currentTarget.dataset.id;
-
-        if (!perfumeId) {
-            return;
-        }
-
-        if (this.isGuestUser) {
-            this[NavigationMixin.Navigate]({
-                type: 'comm__loginPage',
-                attributes: {
-                    actionName: 'login'
-                }
-            });
-            return;
-        }
-
-        if (this.updatingWishlistIds.has(perfumeId)) {
-            return;
-        }
-
-        const wasWishlisted =
-            this.wishlistIds.has(perfumeId);
-
-        this.updatingWishlistIds = new Set([
-            ...this.updatingWishlistIds,
-            perfumeId
-        ]);
-
-        this.refreshPerfumeHeartStates();
-
-        try {
-
-            if (wasWishlisted) {
-                await removeFromWishlist({
-                    perfumeId: perfumeId
-                });
-            } else {
-                await addToWishlist({
-                    perfumeId: perfumeId
-                });
-            }
-
-            const updatedIds = new Set(
-                this.wishlistIds
-            );
-
-            if (wasWishlisted) {
-                updatedIds.delete(perfumeId);
-            } else {
-                updatedIds.add(perfumeId);
-            }
-
-            this.wishlistIds = updatedIds;
-
-            // Invalidate older wishlist fetches
-            this.wishlistRequestId++;
-
-            // Keep header and other components updated
-            publish(
-                this.messageContext,
-                WISHLIST_UPDATE,
-                {
-                    perfumeId: perfumeId,
-                    isWishlisted: !wasWishlisted
-                }
-            );
-
-            this.showToast(
-                wasWishlisted
-                    ? 'Removed from Wishlist'
-                    : 'Added to Wishlist',
-                wasWishlisted
-                    ? 'Perfume removed successfully.'
-                    : 'Perfume added successfully.',
-                'success'
-            );
-
-        } catch (error) {
-
-            console.error(
-                'Collections wishlist error:',
-                error
-            );
-
-            this.showToast(
-                'Wishlist Error',
-                this.getErrorMessage(error),
-                'error'
-            );
-
-        } finally {
-
-            const pendingIds = new Set(
-                this.updatingWishlistIds
-            );
-
-            pendingIds.delete(perfumeId);
-
-            this.updatingWishlistIds = pendingIds;
-            this.refreshPerfumeHeartStates();
-        }
-    }
-
-    // =====================================
     // LOAD PERFUMES
     // =====================================
 
@@ -471,19 +199,22 @@ export default class CollectionsHero extends NavigationMixin(
                 return;
             }
 
-            this.perfumes = (result || []).map(
-                perfume => {
+            this.perfumes = (result || []).map(perfume => {
 
-                    const stockQuantity = Number(
-                        perfume.Stock_Quantity__c ?? 0
-                    );
+                const stockQuantity = Number(
+                    perfume.Stock_Quantity__c ?? 0
+                );
 
-                    return this.decoratePerfume({
-                        ...perfume,
-                        isOutOfStock: stockQuantity <= 0
-                    });
-                }
-            );
+                return {
+                    ...perfume,
+
+                    isOutOfStock: stockQuantity <= 0,
+
+                    detailsLabel:
+                        'View details for ' +
+                        (perfume.Product_Name__c || 'perfume')
+                };
+            });
 
         } catch (error) {
 
@@ -509,8 +240,59 @@ export default class CollectionsHero extends NavigationMixin(
         }
     }
 
+
+// =====================================
+// LOGGED-IN USER FIRST NAME
+// =====================================
+
+@wire(getRecord, {
+    recordId: USER_ID,
+    fields: [FIRST_NAME_FIELD, USERNAME_FIELD]
+})
+headerUserRecord;
+
+get accountFirstName() {
+
+    const userData = this.headerUserRecord?.data;
+
+    if (!userData) {
+        return 'My Account';
+    }
+
+    // First priority: Salesforce FirstName
+    const firstName = getFieldValue(
+        userData,
+        FIRST_NAME_FIELD
+    );
+
+    if (firstName && firstName.trim()) {
+        return firstName.trim();
+    }
+
+    // Fallback: First part of Username
+    const username = getFieldValue(
+        userData,
+        USERNAME_FIELD
+    );
+
+    if (username) {
+
+        const shortName = username
+            .split('@')[0]
+            .split(/[._\s-]/)[0];
+
+        if (shortName) {
+            return shortName.charAt(0).toUpperCase()
+                + shortName.slice(1);
+        }
+    }
+
+    return 'My Account';
+}
+
+
     // =====================================
-    // PAGINATION
+    // LOAD MORE
     // =====================================
 
     handleLoadMore() {
@@ -554,7 +336,7 @@ export default class CollectionsHero extends NavigationMixin(
     }
 
     // =====================================
-    // EXPLORE BUTTON
+    // EXPLORE COLLECTIONS
     // =====================================
 
     handleExplore() {
@@ -573,7 +355,15 @@ export default class CollectionsHero extends NavigationMixin(
     }
 
     // =====================================
-    // CARD CLICK
+    // PREVENT WISHLIST CLICK NAVIGATION
+    // =====================================
+
+    stopCardNavigation(event) {
+        event.stopPropagation();
+    }
+
+    // =====================================
+    // PRODUCT CARD CLICK
     // =====================================
 
     handleCardClick(event) {
@@ -643,18 +433,8 @@ export default class CollectionsHero extends NavigationMixin(
     }
 
     // =====================================
-    // TOAST + ERROR HELPERS
+    // ERROR HELPER
     // =====================================
-
-    showToast(title, message, variant) {
-
-        Toast.show({
-            label: title,
-            message: message,
-            variant: variant,
-            mode: 'dismissible'
-        }, this);
-    }
 
     getErrorMessage(error) {
 

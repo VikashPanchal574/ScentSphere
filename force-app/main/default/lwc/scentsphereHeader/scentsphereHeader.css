@@ -1,4 +1,3 @@
-
 /* ==========================================
    SCENTSPHERE HEADER - CLEAN VERSION
    NO ANNOUNCEMENT BAR
@@ -837,5 +836,78 @@
 
     .suggestion-price {
         font-size: 11px;
+    }
+}
+
+/* Single Wishlist Notification */
+
+.header-wishlist-toast {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+
+    z-index: 1100;
+    width: min(390px, calc(100vw - 28px));
+    min-height: 58px;
+    padding: 13px 15px;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    box-sizing: border-box;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.17);
+}
+
+.wishlist-success {
+    background: #278653;
+    color: #ffffff;
+}
+
+.wishlist-warning {
+    background: #efbc53;
+    color: #392611;
+}
+
+.wishlist-notice-icon {
+    flex-shrink: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.wishlist-notice-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.wishlist-notice-content strong {
+    font-size: 13px;
+}
+
+.wishlist-notice-content span {
+    font-size: 12px;
+}
+
+.wishlist-notice-close {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    color: inherit;
+    padding: 6px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+@media (max-width: 600px) {
+    .header-wishlist-toast {
+        top: calc(100% + 8px);
+        width: calc(100vw - 24px);
+        padding: 12px;
     }
 }

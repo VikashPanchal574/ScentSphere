@@ -1,4 +1,3 @@
-
 <template>
     <div class="collections-page">
 
@@ -205,24 +204,18 @@
                                     </div>
                                 </template>
 
-                                <!-- NEW WISHLIST HEART -->
-                                <button
-                                    class={perfume.wishlistButtonClass}
-                                    data-id={perfume.Id}
-                                    onclick={handleWishlistClick}
-                                    type="button"
-                                    disabled={perfume.isWishlistUpdating}
-                                    title={perfume.wishlistTitle}
-                                    aria-label={perfume.wishlistTitle}
-                                    aria-pressed={perfume.isWishlisted}>
+                               
+                            <!-- Wishlist - Same Component as Shop -->
+                            <div
+                                class="wishlist-action"
+                                onclick={stopCardNavigation}>
 
-                                    <lightning-icon
-                                        icon-name={perfume.wishlistIcon}
-                                        size="small"
-                                        alternative-text="Wishlist">
-                                    </lightning-icon>
+                                <c-wishlist-button
+                                    perfume-id={perfume.Id}>
+                                </c-wishlist-button>
 
-                                </button>
+                            </div>
+
 
                                 <!-- OUT OF STOCK -->
                                 <template if:true={perfume.isOutOfStock}>
@@ -264,17 +257,18 @@
 
                                 </div>
 
-                                <!-- PRICE + VIEW DETAILS -->
+
+                                <!-- Price + View Details -->
                                 <div class="product-bottom">
 
-                                    <div class="product-price">
+                                    <span class="product-price">
                                         <lightning-formatted-number
                                             value={perfume.Price__c}
                                             format-style="currency"
                                             currency-code="INR"
-                                            maximum-fraction-digits="2">
+                                            maximum-fraction-digits="0">
                                         </lightning-formatted-number>
-                                    </div>
+                                    </span>
 
                                     <button
                                         class="view-button"
@@ -285,6 +279,7 @@
                                     </button>
 
                                 </div>
+
                             </div>
                         </article>
 

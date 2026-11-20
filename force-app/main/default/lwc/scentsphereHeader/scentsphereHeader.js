@@ -1,4 +1,3 @@
-
 import { LightningElement, wire } from 'lwc';
 
 import {
@@ -36,6 +35,7 @@ import WISHLIST_UPDATE
 import CART_UPDATE
     from '@salesforce/messageChannel/CartUpdate__c';
 
+
 export default class ScentsphereHeader extends NavigationMixin(LightningElement) {
 
     searchTerm = '';
@@ -50,7 +50,20 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     cartCount = 0;
     cartSubscription = null;
 
-    // Search Suggestions
+    // ==========================================
+    // SINGLE WISHLIST NOTIFICATION
+    // ==========================================
+
+    wishlistToastVisible = false;
+    wishlistToastTitle = '';
+    wishlistToastMessage = '';
+    wishlistToastType = 'success';
+    wishlistToastTimer = null;
+
+    // ==========================================
+    // SEARCH SUGGESTIONS
+    // ==========================================
+
     suggestions = [];
     showSuggestions = false;
     isSearchLoading = false;
@@ -65,18 +78,14 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     // LOGGED-IN USERNAME
     // ==========================================
 
-    // Do not fetch a user record for guest visitors
     userId = isGuestUser ? undefined : USER_ID;
 
-    // Fetch current Salesforce user
     @wire(getRecord, {
         recordId: '$userId',
         fields: [USERNAME_FIELD]
     })
     userRecord;
 
-    // Example:
-    // vikash.panchal@gruslabs.com -> Vikash
     get headerUsername() {
 
         const username = getFieldValue(
@@ -92,7 +101,8 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
             .split('@')[0]
             .split('.')[0];
 
-        return firstName.charAt(0).toUpperCase() + firstName.slice(1);
+        return firstName.charAt(0).toUpperCase() +
+            firstName.slice(1);
     }
 
     // ==========================================
@@ -109,6 +119,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     @wire(MessageContext)
     wiredMessageContext(context) {
 
+        // Wishlist subscription
         if (context && !this.subscription) {
 
             this.subscription = subscribe(
@@ -119,15 +130,17 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
             );
         }
 
-        if (context && !this.cartSubscription) {
+        // Cart subscription
 
+        if (context && !this.cartSubscription) {
             this.cartSubscription = subscribe(
                 context,
                 CART_UPDATE,
-                () => this.loadCartCount(),
+                (message) => this.handleCartUpdate(message),
                 { scope: APPLICATION_SCOPE }
             );
         }
+
     }
 
     // ==========================================
@@ -143,7 +156,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     // ==========================================
-    // SYNC FIXED HEADER HEIGHT
+    // FIXED HEADER HEIGHT
     // ==========================================
 
     renderedCallback() {
@@ -166,7 +179,9 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         syncHeight();
 
         if (window.ResizeObserver) {
+
             this.resizeObserver = new ResizeObserver(syncHeight);
+
             this.resizeObserver.observe(shell);
         }
     }
@@ -179,7 +194,9 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
 
         clearTimeout(this.searchTimer);
         clearTimeout(this.searchCloseTimer);
+        clearTimeout(this.wishlistToastTimer);
 
+        this.wishlistToastTimer = null;
         this.searchRequestId += 1;
 
         if (this.resizeObserver) {
@@ -213,7 +230,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
 
             const perfumeIds = await getWishlistPerfumeIds();
 
-            this.wishlistCount = perfumeIds.length;
+            this.wishlistCount = (perfumeIds || []).length;
 
         } catch (error) {
 
@@ -244,12 +261,119 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
         }
     }
 
+    // ==========================================
+    // WISHLIST MESSAGE HANDLER
+    // ==========================================
+
     handleWishlistUpdate(message) {
 
-        if (message) {
-            this.loadWishlistCount();
+        if (!message) {
+            return;
+        }
+
+        // Update Wishlist badge
+        this.loadWishlistCount();
+
+        // Show notification only for Add or Remove
+        if (
+            message.perfumeId &&
+            typeof message.isWishlisted === 'boolean'
+        ) {
+            this.showWishlistNotification(
+                message.isWishlisted
+            );
         }
     }
+
+    // Refresh Cart count and show latest Add to Cart message
+    handleCartUpdate(message) {
+
+        // Existing Cart badge functionality
+        this.loadCartCount();
+
+        // Show toast only after successful Add to Cart
+        if (message?.action === 'added') {
+
+            this.showHeaderNotification(
+                'Added to Cart 🛒',
+                message.perfumeName
+                    ? `${message.perfumeName} has been added to your cart.`
+                    : 'Perfume added to your cart.',
+                'success'
+            );
+        }
+    }
+
+
+    // ==========================================
+    // SHOW LATEST WISHLIST NOTIFICATION
+    // ==========================================
+
+
+// Wishlist green/yellow notification
+showWishlistNotification(isAdded) {
+
+    this.showHeaderNotification(
+        isAdded
+            ? 'Added to Wishlist ❤️'
+            : 'Removed from Wishlist',
+
+        isAdded
+            ? 'Perfume added successfully.'
+            : 'Perfume removed successfully.',
+
+        isAdded ? 'success' : 'warning'
+    );
+}
+
+
+// One notification shared by Wishlist and Cart
+showHeaderNotification(title, message, type) {
+
+    // Cancel previous auto-hide timer
+    clearTimeout(this.wishlistToastTimer);
+
+    // Replace previous message
+    this.wishlistToastTitle = title;
+    this.wishlistToastMessage = message;
+    this.wishlistToastType = type;
+
+    this.wishlistToastVisible = true;
+
+    // Hide after 3 seconds
+    this.wishlistToastTimer = setTimeout(() => {
+        this.wishlistToastVisible = false;
+        this.wishlistToastTimer = null;
+    }, 3000);
+}
+
+
+    // ==========================================
+    // NOTIFICATION COLOR
+    // ==========================================
+
+    get wishlistToastClass() {
+
+        return this.wishlistToastType === 'success'
+            ? 'header-wishlist-toast wishlist-success'
+            : 'header-wishlist-toast wishlist-warning';
+    }
+
+    // ==========================================
+    // CLOSE NOTIFICATION
+    // ==========================================
+
+    handleCloseWishlistToast() {
+
+        clearTimeout(this.wishlistToastTimer);
+
+        this.wishlistToastTimer = null;
+        this.wishlistToastVisible = false;
+    }
+
+    // ==========================================
+    // HEADER COUNTER LABELS
+    // ==========================================
 
     get wishlistCountLabel() {
 
@@ -283,7 +407,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     // ==========================================
-    // CURRENT PAGE HIGHLIGHT
+    // CURRENT PAGE
     // ==========================================
 
     get currentPage() {
@@ -431,8 +555,8 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
 
     get showViewAll() {
 
-        return this.searchTerm.trim().length > 0
-            && !this.isSearchLoading;
+        return this.searchTerm.trim().length > 0 &&
+            !this.isSearchLoading;
     }
 
     handleSearchFocus() {
@@ -622,7 +746,7 @@ export default class ScentsphereHeader extends NavigationMixin(LightningElement)
     }
 
     // ==========================================
-    // ORIGINAL NAVIGATION HANDLERS
+    // NAVIGATION HANDLERS
     // ==========================================
 
     handleHome(event) {
